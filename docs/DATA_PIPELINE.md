@@ -1,4 +1,4 @@
-# How F1 data gets into F1 Simgent (and stays correct)
+# How race data gets into SimGent (and stays correct)
 
 Every file under `data/cache/` comes from one of two free, open community APIs and is checked before it is committed.
 

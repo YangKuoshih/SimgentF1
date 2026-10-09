@@ -29,7 +29,7 @@ from typing import Any, Dict, List, Optional
 
 from app.tools import jolpica_sync as J
 
-logger = logging.getLogger("f1_simgent.openf1")
+logger = logging.getLogger("simgent.openf1")
 
 BASE = "https://api.openf1.org/v1"
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

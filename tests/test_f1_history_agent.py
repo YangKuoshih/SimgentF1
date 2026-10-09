@@ -1,5 +1,5 @@
 """
-F1 Simgent - F1 History, Driver Career & Research Intelligence Test Suite
+SimGent - F1 History, Driver Career & Research Intelligence Test Suite
 Tests fuzzy driver resolution, historical research queries, career timelines,
 technical eras, all-time records, and guarantees zero session hijacking.
 """

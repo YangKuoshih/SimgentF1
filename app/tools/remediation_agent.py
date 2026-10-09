@@ -1,5 +1,5 @@
 """
-F1 Simgent - Autonomous Data Remediation & Self-Healing Agent
+SimGent - Autonomous Data Remediation & Self-Healing Agent
 Acts as the closed-loop healing counterpart to the Offline Evaluation Suite.
 When discrepancies or data corruptions are detected in cached results, timing towers,
 starting grids, replay models, circuits, player registry, or Pit Wall responses,

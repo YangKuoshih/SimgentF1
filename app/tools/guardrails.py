@@ -1,5 +1,5 @@
 """
-F1 Simgent - Security & Agent Guardrails
+SimGent - Security & Agent Guardrails
 Provides input sanitization, prompt injection detection, rate limiting,
 schema enforcement, and output safety for the Pit Wall AI Agent.
 """
@@ -72,7 +72,7 @@ MOTORSPORT_CONTEXT_OVERRIDE = re.compile(
 
 SAFE_OUT_OF_SCOPE_REFUSAL = (
     "🏁 **Pit Wall Radio: Out-of-Scope Query**\n\n"
-    "I am the **F1 Simgent Pit Wall Race Engineer**, specialized exclusively in Formula 1 telemetry, race physics, pit strategies, championship archives (1950–2026), and technical regulations.\n\n"
+    "I am the **SimGent Pit Wall Race Engineer**, specialized exclusively in Formula 1 telemetry, race physics, pit strategies, championship archives (1950–2026), and technical regulations.\n\n"
     "I cannot assist with general weather, non-motorsport topics, general trivia, or creative writing.\n\n"
     "**Here is what you can ask me across the pit wall:**\n"
     "• **Replay & Telemetry**: *\"What tires did Verstappen run in Bahrain 2026?\"*, *\"Who had the highest apex speed at Turn 4?\"*\n"

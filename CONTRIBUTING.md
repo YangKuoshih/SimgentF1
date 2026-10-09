@@ -1,4 +1,4 @@
-# Contributing to F1 Simgent
+# Contributing to SimGent
 
 Start with the setup instructions in [README.md](README.md). Use a feature branch
 and submit a pull request describing the problem, the change, and how you tested it.

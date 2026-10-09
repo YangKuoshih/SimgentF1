@@ -2,7 +2,7 @@
 /**
  * scripts/record_cinematic_demo.js
  * 
- * Records an authentic, feature-packed cinematic video demo of F1 Simgent:
+ * Records an authentic, feature-packed cinematic video demo of SimGent:
  * 1. Opens 2024 Round 3 (Australian GP) replay cockpit.
  * 2. Starts live replay playback (cars racing on track).
  * 3. Collapses Driver Telemetry Card and Circuit Intel HUD so racetrack is 100% unobstructed.
@@ -75,7 +75,7 @@ async function injectFrame(page, { title, assets }) {
   fs.mkdirSync(tempDir, { recursive: true });
 
   const targetUrl = 'http://127.0.0.1:8080/?year=2024&round=3';
-  const outputFile = path.join(process.cwd(), 'f1_simgent_demo.webm');
+  const outputFile = path.join(process.cwd(), 'simgent_demo.webm');
   const viewport = { width: 1600, height: 1000 };
   const assets = loadFrameAssets();
   const title = 'SimGent — Autonomous SI Race Engineer & Telemetry Cockpit';

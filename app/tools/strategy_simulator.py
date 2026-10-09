@@ -1,5 +1,5 @@
 """
-F1 Simgent - What-If Strategy Simulator & Historical Scenario Engine
+SimGent - What-If Strategy Simulator & Historical Scenario Engine
 Simulates full-distance race battles between different drivers, tyre stint strategies,
 pit windows, tyre degradation curves, and Safety Car neutralisations.
 Calculates lap-by-lap pace deltas, crossover overtake laps, finish margins, and Monte Carlo win probabilities.

@@ -1,5 +1,5 @@
 """
-F1 Simgent - Comprehensive Guardrails & Boundary Verification Matrix
+SimGent - Comprehensive Guardrails & Boundary Verification Matrix
 Tests security, safety, domain boundaries, data scope limitations,
 and valid in-scope motorsport queries across all application screens.
 """

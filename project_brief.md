@@ -1,7 +1,7 @@
-# Project Brief: F1 Simgent — Agentic Race Telemetry, Circuit Replay & Technical Regulations Engine
+# Project Brief: SimGent — Agentic Race Telemetry, Circuit Replay & Technical Regulations Engine
 
 ## 1. Executive Summary
-**F1 Simgent** is an agent-first Formula 1 telemetry, race replay, and historical analytics web application. It transforms raw Formula 1 timing, GPS telemetry, and official Race Control event streams into an interactive pit-wall command center. 
+**SimGent** is an agent-first Formula 1 telemetry, race replay, and historical analytics web application. It transforms raw Formula 1 timing, GPS telemetry, and official Race Control event streams into an interactive pit-wall command center. 
 
 Users can:
 1. Track every race across modern and historical seasons with dynamic circuit layouts.
@@ -89,7 +89,7 @@ Users can:
 
 ## 5. Google Cloud (GCP) Architecture & Services
 
-| GCP Component | Role in F1 Simgent | Implementation Details |
+| GCP Component | Role in SimGent | Implementation Details |
 | :--- | :--- | :--- |
 | **Vertex AI Agent Platform / ADK** | Brain & Agentic Runtime | Python agent in `app/agent.py` orchestrating deterministic tools, session state, and Gemini reasoning. |
 | **Vertex AI Memory Bank** | Cross-Session User Memory | Remembers user preferences: favorite teams/drivers, home Grand Prix, preferred units (km/h vs mph), favorite regulation eras. |

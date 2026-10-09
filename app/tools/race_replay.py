@@ -727,7 +727,7 @@ def _reconcile_with_results(year: int, ds: List[Dict[str, Any]], cs: List[Dict[s
     ds2, d_changed = _rebuild(ds, "Driver", d_pts, d_wins)
     cs2, c_changed = _rebuild(cs, "Constructor", c_pts, c_wins) if cs else (cs, False)
     if d_changed or c_changed:
-        logging.getLogger("f1_simgent.standings").warning(
+        logging.getLogger("simgent.standings").warning(
             f"[STANDINGS RECONCILED] {year} standings file disagreed with race results "
             f"(drivers={d_changed}, constructors={c_changed}); using totals rebuilt from results."
         )

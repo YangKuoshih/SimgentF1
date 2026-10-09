@@ -1,4 +1,4 @@
-name: CI - F1 Simgent Automated Test Suite
+name: CI - SimGent Automated Test Suite
 
 on:
   push:

@@ -23,7 +23,7 @@ import urllib.error
 import urllib.request
 from typing import Any, Dict, List, Optional
 
-logger = logging.getLogger("f1_simgent.jolpica")
+logger = logging.getLogger("simgent.jolpica")
 
 BASE = "https://api.jolpi.ca/ergast/f1"
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

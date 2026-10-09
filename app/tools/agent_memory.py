@@ -1,5 +1,5 @@
 """
-F1 Simgent - Pit Wall Agent RAG & Memory Subsystem
+SimGent - Pit Wall Agent RAG & Memory Subsystem
 Persistent knowledge retrieval and autonomous feedback learning system.
 Allows user thumbs up / thumbs down feedback to review, update, and ground
 the agent's memory for improved, verified telemetry answers.

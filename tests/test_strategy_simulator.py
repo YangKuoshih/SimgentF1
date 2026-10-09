@@ -1,5 +1,5 @@
 """
-F1 Simgent - What-If Strategy Simulator & Historical Scenario Test Suite
+SimGent - What-If Strategy Simulator & Historical Scenario Test Suite
 Tests tyre degradation curves, pit window calculations, Safety Car neutralisation,
 crossover lead changes, Monte Carlo win probability, and FastAPI API routes.
 """

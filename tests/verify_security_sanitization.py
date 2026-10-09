@@ -1,5 +1,5 @@
 """
-F1 Simgent - Security & Credential Sanitization Audit
+SimGent - Security & Credential Sanitization Audit
 Verifies that:
 1. Zero secrets, API keys, or service account files are tracked in git.
 2. Checks are limited to supported key patterns, not a complete history audit.

@@ -1,5 +1,5 @@
 # ==============================================================================
-# F1 Simgent - Google Cloud Build Ignore Rules (.gcloudignore)
+# SimGent - Google Cloud Build Ignore Rules (.gcloudignore)
 # Guarantees zero local secrets, virtualenvs, or dev tests are uploaded to GCS,
 # while preserving the essential data/cache/ directory for fast local replay.
 # ==============================================================================
