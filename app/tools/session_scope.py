@@ -77,6 +77,9 @@ def resolve_scope(query: str, context: Optional[Dict[str, Any]],
 
 
 def scope_label(scope: Dict[str, Any], session_name: Optional[str] = None, race_name: Optional[str] = None) -> str:
+    if not race_name and not scope.get("race"):
+        race_name = next((r.get("race_name") for r in race_replay.season_races(scope["year"], net=False)
+                          if r.get("round") == scope["round"]), None)
     race = re.sub(r"\s+-\s+.*$", "", race_name or scope.get("race") or f"Round {scope['round']}")
     race = re.sub(r"^\d{4}\s+", "", race)
     return f"{scope['year']} {race} · {session_name or _LABEL[scope['session']]}"
@@ -107,11 +110,11 @@ def _stage_label(session: str, status: str) -> str:
     return re.sub(r"\bQ([123])\b", r"SQ\1", status) if session == "sprint_qualifying" else status
 
 
-def _driver_line(d: Dict[str, Any], session: str, session_name: str) -> str:
+def _driver_line(d: Dict[str, Any], session: str, session_name: str, knockout: bool = True) -> str:
     pos = d.get("finish")
     status = str(d.get("status") or "")
     if session in ("qualifying", "sprint_qualifying"):
-        stage = d.get("qualifying_stage") or ""
+        stage = (d.get("qualifying_stage") or "") if knockout else ""  # no stages in single-session qualifying
         lap = d.get("best_lap")
         delta = d.get("pole_delta") or ""
         stage_txt = f", out in {_stage_label(session, stage)}" if stage and not stage.endswith("3") else (
@@ -165,6 +168,7 @@ def answer_in_session(query: str, scope: Dict[str, Any], context: Optional[Dict[
     race_name = re.sub(r"\s+-\s+.*$", "", meta.get("race_name", ""))
     label = scope_label(scope, session_name, race_name)
     is_quali = session in ("qualifying", "sprint_qualifying")
+    knockout = any(str(d.get("qualifying_stage", "")).endswith(("2", "3")) for d in drivers)
 
     # A driver question: named in the question, or referred back to ("how did he do?")
     target = _find_driver(q, drivers)
@@ -176,7 +180,7 @@ def answer_in_session(query: str, scope: Dict[str, Any], context: Optional[Dict[
                 break
             target = _find_driver(turn.get("content") or turn.get("text") or "", drivers)
     if target and (_DRIVER_Q.search(q) or len(q.split()) <= 4):
-        return {"role": "assistant", "text": _driver_line(target, session, session_name),
+        return {"role": "assistant", "text": _driver_line(target, session, session_name, knockout),
                 "tool": f"{session}_driver_lookup", "intent": f"{label} — {target['name']}",
                 "a2ui_card": _card(scope, session, f"{target['name']} — {session_name}", [
                     {"label": "Position", "value": f"P{target.get('finish')}" if target.get("finish") else str(target.get("status")), "color": target.get("color", "#FFFFFF")},
@@ -193,7 +197,7 @@ def answer_in_session(query: str, scope: Dict[str, Any], context: Optional[Dict[
     if pos:
         d = next((x for x in drivers if x.get("finish") == pos), None)
         if d:
-            return {"role": "assistant", "text": _driver_line(d, session, session_name),
+            return {"role": "assistant", "text": _driver_line(d, session, session_name, knockout),
                     "tool": f"{session}_position_lookup", "intent": f"{label} — P{pos}", "a2ui_card": None, "label": label}
 
     if not _RESULT_Q.search(q):

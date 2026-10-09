@@ -1335,6 +1335,9 @@ def resolve_historical_driver(query: str) -> Optional[Dict[str, Any]]:
 def lookup_driver_career(driver_id: str) -> Optional[Dict[str, Any]]:
     """Returns the full historical profile and formatted A2UI card for a driver."""
     profile = HISTORICAL_DRIVERS.get(driver_id)
+    if not profile and driver_id:
+        # Current-driver ids are short ("hamilton"); career profiles are keyed in full ("lewis_hamilton").
+        profile = next((p for k, p in HISTORICAL_DRIVERS.items() if k.endswith("_" + driver_id)), None)
     if not profile:
         return None
 

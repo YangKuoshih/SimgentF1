@@ -743,7 +743,9 @@ def _answer_core(
             # conversation context so they cannot desync. Adopting a historical year while
             # keeping the current round produced the wrong race (e.g. 2024 + round 16 = the
             # Italian GP instead of the Australian GP that was actually being discussed).
-            _turns_text = [(t.get("content") or t.get("text") or "") for t in history]
+            # Only the user's questions: assistant answers mention other races and eras in
+            # passing (career profiles, era summaries), which must not move the conversation.
+            _turns_text = [(t.get("content") or t.get("text") or "") for t in history if t.get("role") == "user"]
             for _i in range(len(_turns_text) - 1, -1, -1):
                 _window = _turns_text[_i]
                 if _i > 0:
@@ -815,7 +817,12 @@ def _answer_core(
     # Narrate only when asked for a story, or when THIS question names the race itself.
     # A race inherited from earlier turns ("where did he start?") is context, not a story request.
     names_race_itself = bool(year_match) or race_named
-    if is_narrative_q or (names_race_itself and not is_result_q):
+    # Driver results and strategy belong to the data handlers; "why"/controversy questions
+    # about a named driver ("why was Senna disqualified in 1989?") are still stories.
+    is_story_ask = bool(re.search(r"\b(why|disqualif\w*|controvers\w*|story|what happened|collision|crashgate|scandal)\b", q))
+    is_driver_detail_q = not is_story_ask and (_find_driver(q, drivers) is not None or bool(re.search(
+        r"\b(pit|strateg\w*|stint|tyres?|tires?|retire\w*|dnf|grid|start\w*|qualif\w*|lap \d+|pace|gap)\b", q)))
+    if (is_narrative_q or (names_race_itself and not is_result_q)) and not is_driver_detail_q:
         story_data = f1_history.lookup_historic_race_event(q, year, meta.get("circuit_id"))
     if story_data:
         return {
@@ -1052,6 +1059,16 @@ def _answer_core(
     if hist_driver and is_result_q and race_named and not re.search(r'\b(career|all-time|how many)\b', q):
         hist_driver = None
 
+    race_driver = _find_driver(q, drivers)
+    if hist_driver and race_driver and race_driver.get("id") != hist_driver.get("id") \
+            and race_driver.get("code") != hist_driver.get("code"):
+        hist_driver = None  # "Landi" is Chico Landi in this race, not a fuzzy match for Lando Norris
+    if (hist_driver and race_driver and re.search(r"\bretire", q)
+            and not re.search(r"\b(career|from f1|from formula|stop racing|quit f1|leave f1)\b", q)
+            and not str(race_driver.get("status", "")).startswith(("Finished", "+"))
+            and "Lap" not in str(race_driver.get("status", ""))):
+        hist_driver = None  # "when did Senna retire?" at a race he didn't finish = the race retirement
+
     if hist_driver:
         in_active_session = any(
             (d.get("id") == hist_driver["id"] or d.get("code") == hist_driver["code"])
@@ -1253,6 +1270,9 @@ def _answer_core(
 
             # General accurate telemetry debrief for any retired driver
             reason = d.get("retire_reason") or d.get("status") or "a technical issue"
+            reason = re.sub(r"^[A-Z0-9]{2,4} OUT\s*[—-]\s*", "", reason)  # replay ticker label "MOS OUT — ..." -> cause
+            if reason.strip().lower() in ("retired", "retirement", "dnf"):
+                reason = "an unspecified cause (classified as retired)"
             text = (
                 f"**{d['name']}** retired on **Lap {retire_lap}** of the {meta.get('race_name', 'Grand Prix')} due to {reason.lower()}, "
                 f"after completing {completed_laps} laps from P{d.get('grid', 'PL')} on the grid."
