@@ -1,0 +1,8 @@
+# zizmor configuration (https://docs.zizmor.sh/configuration/)
+rules:
+  adhoc-packages:
+    # Both workflows upgrade the npm CLI itself to an exact version (npm@12.2.0) before
+    # `npm ci`; all project packages install from package-lock.json.
+    ignore:
+      - ci.yml
+      - security.yml
