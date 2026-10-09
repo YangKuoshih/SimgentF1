@@ -2,13 +2,16 @@
 
 ## Reporting a vulnerability
 
-Use GitHub's private vulnerability reporting option on the repository Security tab
-if available. Otherwise contact the maintainer privately using the contact listed
-in `pyproject.toml`. Do not open a public issue containing credentials, conversation
+Report privately through GitHub's private vulnerability reporting:
+**https://github.com/YangKuoshih/SimgentF1/security/advisories/new**
+(Security tab → "Report a vulnerability"). Only the maintainer can see the report.
+Do not open a public issue containing credentials, conversation
 records, personal data, or an exploit against the live service.
 
 Include affected versions, reproduction steps using synthetic data, and impact.
-The current main branch is the maintenance target; no response-time guarantee is offered.
+The current main branch is the maintenance target. This is a volunteer project: reports
+are acknowledged on a best-effort basis, usually within 7 days, and fixes are disclosed
+in a GitHub security advisory and the changelog once released.
 
 ## Operator configuration
 
