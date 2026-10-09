@@ -13,7 +13,8 @@
   <a href="DICTIONARY.md"><img src="https://img.shields.io/badge/Architecture-DICTIONARY.md-FFB703.svg" alt="Architecture Guide" /></a>
   <a href="tests/README.md"><img src="https://img.shields.io/badge/Tests-Python%20%2B%20Playwright%20E2E-00E073.svg" alt="Tests: Python + Playwright E2E" /></a>
   <a href=".github/workflows/ci.yml"><img src="https://img.shields.io/badge/CI-GitHub%20Actions-blue.svg" alt="CI" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-white.svg" alt="License: MIT" /></a>
+  <a href="https://scorecard.dev/viewer/?uri=github.com/YangKuoshih/SimgentF1"><img src="https://api.scorecard.dev/projects/github.com/YangKuoshih/SimgentF1/badge" alt="OpenSSF Scorecard" /></a>
+  <a href="NOTICE.md"><img src="https://img.shields.io/badge/License-MIT%20code%20%C2%B7%20CC%20BY--NC--SA%20data-white.svg" alt="License: MIT code, CC BY-NC-SA data" /></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.14.8-3776AB.svg" alt="Python 3.14.8" /></a>
   <a href="https://fastapi.tiangolo.com"><img src="https://img.shields.io/badge/FastAPI-Hash%20locked-009688.svg" alt="FastAPI" /></a>
   <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-Protocol%20v1.0-8A2BE2.svg" alt="Model Context Protocol" /></a>
