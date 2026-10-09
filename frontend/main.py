@@ -6,6 +6,8 @@ and proxies natural language requests to the AI agent engine.
 """
 
 import datetime
+import ipaddress
+import json
 import re
 import secrets
 import logging
@@ -24,7 +26,7 @@ logger = logging.getLogger("f1_simgent.api")
 from fastapi import FastAPI, Query, HTTPException, Request, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, PROJECT_ROOT)
@@ -60,6 +62,62 @@ from app.tools.f1_telemetry import (
 from app.tools.strategy_simulator import simulate_what_if_battle, get_what_if_presets
 
 app = FastAPI(title="SimGent · Simulator Agent", version="4.2.0")
+
+# ------------------------------------------------------------------ client identity
+# Cloud Run's front end appends the connecting IP as the RIGHTMOST X-Forwarded-For entry;
+# anything to its left is client-supplied and can be forged. Behind Cloudflare the connecting
+# IP is a Cloudflare edge, and Cloudflare sets CF-Connecting-IP to the real visitor.
+# Ranges: https://www.cloudflare.com/ips-v4 and /ips-v6 (October 2026).
+_CLOUDFLARE_NETS = [ipaddress.ip_network(n) for n in (
+    "173.245.48.0/20", "103.21.244.0/22", "103.22.200.0/22", "103.31.4.0/22", "141.101.64.0/18",
+    "108.162.192.0/18", "190.93.240.0/20", "188.114.96.0/20", "197.234.240.0/22", "198.41.128.0/17",
+    "162.158.0.0/15", "104.16.0.0/13", "104.24.0.0/14", "172.64.0.0/13", "131.0.72.0/22",
+    "2400:cb00::/32", "2606:4700::/32", "2803:f800::/32", "2405:b500::/32", "2405:8100::/32",
+    "2a06:98c0::/29", "2c0f:f248::/32")]
+
+
+def _client_ip(request: Request) -> str:
+    """Client IP for rate limiting that a caller cannot choose."""
+    xff = request.headers.getlist("x-forwarded-for") if hasattr(request.headers, "getlist") else [request.headers.get("x-forwarded-for", "")]
+    hops = [h.strip() for h in ",".join(x for x in xff if x).split(",") if h.strip()]
+    peer = hops[-1] if hops else (request.client.host if request.client else "127.0.0.1")
+    try:
+        peer_ip = ipaddress.ip_address(peer)
+    except ValueError:
+        return peer
+    if any(peer_ip in net for net in _CLOUDFLARE_NETS):
+        cf = (request.headers.get("cf-connecting-ip") or "").strip()
+        try:
+            return str(ipaddress.ip_address(cf))
+        except ValueError:
+            pass
+    return str(peer_ip)
+
+
+# ------------------------------------------------------------------ security headers
+# Inline scripts/handlers and Tailwind's browser build need 'unsafe-inline'; the policy still
+# blocks scripts from other sites, sending data to other origins, plugins and framing.
+_CSP = ("default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; "
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; "
+        "img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; object-src 'none'; "
+        "base-uri 'self'; form-action 'self'; frame-ancestors 'none'")
+_SECURITY_HEADERS = {
+    "Content-Security-Policy": _CSP,
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
+    "Cross-Origin-Opener-Policy": "same-origin",
+}
+
+
+@app.middleware("http")
+async def _security_headers(request: Request, call_next):
+    response = await call_next(request)
+    for k, v in _SECURITY_HEADERS.items():
+        response.headers.setdefault(k, v)
+    return response
 
 def require_admin(request: Request):
     """Admin routes fail closed unless an operator configures a bearer token."""
@@ -277,14 +335,16 @@ async def api_replay(
 async def api_telemetry(driver_1: int = Query(1), driver_2: int = Query(4)):
     return get_telemetry_trace(driver_1=driver_1, driver_2=driver_2)
 
+# Bounds keep one request from monopolising the single Cloud Run instance (real races are
+# <= 200 laps; the UI uses a few hundred iterations at most).
 class SimulationRequest(BaseModel):
-    pit_lap: int = 35
-    target_compound: str = "H"
-    disruption: str = "Normal"
-    target_driver: Optional[str] = None
-    rival_driver: Optional[str] = None
-    circuit_name: Optional[str] = None
-    total_laps: Optional[int] = None
+    pit_lap: int = Field(35, ge=0, le=200)
+    target_compound: str = Field("H", max_length=16)
+    disruption: str = Field("Normal", max_length=32)
+    target_driver: Optional[str] = Field(None, max_length=64)
+    rival_driver: Optional[str] = Field(None, max_length=64)
+    circuit_name: Optional[str] = Field(None, max_length=64)
+    total_laps: Optional[int] = Field(None, ge=1, le=200)
 
 @app.post("/api/simulate")
 async def api_simulate(req: SimulationRequest):
@@ -299,12 +359,22 @@ async def api_simulate(req: SimulationRequest):
     )
 
 class WhatIfRequest(BaseModel):
-    circuit_key: str = "bahrain"
-    total_laps: Optional[int] = None
+    circuit_key: str = Field("bahrain", max_length=64)
+    total_laps: Optional[int] = Field(None, ge=1, le=200)
     driver_1: Optional[Dict[str, Any]] = None
     driver_2: Optional[Dict[str, Any]] = None
-    sc_lap: int = 0
-    iterations: int = 200
+    sc_lap: int = Field(0, ge=0, le=200)
+    iterations: int = Field(200, ge=1, le=1000)
+
+    @field_validator("driver_1", "driver_2")
+    @classmethod
+    def _bounded_driver(cls, v):
+        if v is not None:
+            if len(json.dumps(v, default=str)) > 4000:
+                raise ValueError("driver strategy too large")
+            if len(v.get("stints") or []) > 10:
+                raise ValueError("at most 10 stints")
+        return v
 
 @app.get("/api/strategy/what_if/presets")
 async def api_what_if_presets():
@@ -330,9 +400,10 @@ class ChatMessage(BaseModel):
 
 @app.post("/api/chat")
 async def api_chat(msg: ChatMessage, request: Request):
-    forwarded = request.headers.get("x-forwarded-for")
-    client_ip = forwarded.split(",")[0].strip() if forwarded else (request.client.host if request.client else "127.0.0.1")
-    test_hdr = request.headers.get("x-test-client")
+    client_ip = _client_ip(request)
+    # Separate rate buckets per test client exist only in test runs (CI's browser suite);
+    # in production the header would let anyone mint fresh buckets.
+    test_hdr = request.headers.get("x-test-client") if os.environ.get("SIMGENT_TRUST_TEST_CLIENT_HEADER") == "1" else None
     rate_key = f"{client_ip}:{test_hdr}" if test_hdr else client_ip
     if not rate_limiter.is_allowed(rate_key):
         raise HTTPException(
@@ -431,7 +502,9 @@ class FeedbackRequest(BaseModel):
 
 
 @app.post("/api/feedback")
-async def api_feedback(req: FeedbackRequest):
+async def api_feedback(req: FeedbackRequest, request: Request):
+    if not rate_limiter.is_allowed(_client_ip(request)):
+        raise HTTPException(status_code=429, detail="Too many feedback submissions. Please wait a moment.")
     clean_query = sanitize_input(req.query, max_chars=500)
     clean_comment = sanitize_input(req.comment or "", max_chars=2000) if req.comment else None
     res = memory_manager.record_feedback(

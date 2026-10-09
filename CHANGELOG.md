@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Security
+- The live service runs as a dedicated identity with no Google Cloud roles (it only reads public APIs), instead of the default compute account with project Editor.
+- Rate limiting keys on an IP the caller can't forge: the rightmost X-Forwarded-For hop added by Google's front end, or Cloudflare's CF-Connecting-IP when the request comes from a Cloudflare edge. The test-only `X-Test-Client` header is honored only when `SIMGENT_TRUST_TEST_CLIENT_HEADER=1` (CI).
+- Security headers on every response: Content-Security-Policy (no scripts from other sites except Tailwind's CDN, no requests to other origins, no framing or plugins), nosniff, X-Frame-Options, Referrer-Policy, Permissions-Policy, HSTS.
+- Strategy simulator inputs are bounded (iterations ≤ 1000, laps ≤ 200, small driver payloads) and feedback submissions are rate-limited.
+
 ## v1.3.0 — 2026-10-09
 
 Moved to this repository with a fresh history (October 2026).

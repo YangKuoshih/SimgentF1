@@ -68,6 +68,7 @@ jobs:
       - name: Run Browser Suites with Managed Test Server
         env:
           CHAT_RENDER_DELAY_MS: '150'
+          SIMGENT_TRUST_TEST_CLIENT_HEADER: '1'  # test-only rate buckets; never set in production
         run: npm run test:browser
 
       - name: Build and Smoke Test Non-root Container
