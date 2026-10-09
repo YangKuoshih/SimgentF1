@@ -2,11 +2,26 @@
 
 ## Unreleased
 
+## v1.4.0 — 2026-10-09
+
 ### Security
 - The live service runs as a dedicated identity with no Google Cloud roles (it only reads public APIs), instead of the default compute account with project Editor.
 - Rate limiting keys on an IP the caller can't forge: the rightmost X-Forwarded-For hop added by Google's front end, or Cloudflare's CF-Connecting-IP when the request comes from a Cloudflare edge. The test-only `X-Test-Client` header is honored only when `SIMGENT_TRUST_TEST_CLIENT_HEADER=1` (CI).
-- Security headers on every response: Content-Security-Policy (no scripts from other sites except Tailwind's CDN, no requests to other origins, no framing or plugins), nosniff, X-Frame-Options, Referrer-Policy, Permissions-Policy, HSTS.
+- Security headers on every response: Content-Security-Policy (no scripts from other sites except Tailwind's CDN, no requests to other origins except Cloudflare Web Analytics, no framing or plugins), nosniff, X-Frame-Options, Referrer-Policy, Permissions-Policy, HSTS.
 - Strategy simulator inputs are bounded (iterations ≤ 1000, laps ≤ 200, small driver payloads) and feedback submissions are rate-limited.
+- The Pit Wall Agent's race-label parsing is linear on hostile input (CodeQL `py/polynomial-redos`), and `/api/chat` rejects a `context` over 4 KB or more than 50 history turns with 422.
+- GitHub Actions: `actions/checkout` no longer leaves the token on the runner (`persist-credentials: false`) except in the data sync job, which pushes; Dependabot waits 7 days after a release before proposing it.
+- `SECURITY.md` links GitHub private vulnerability reporting directly and describes how reports are handled.
+- The package metadata no longer lists a personal email address.
+
+### Added
+- OpenSSF Scorecard workflow (weekly and on `main`), with results in code scanning and a README badge.
+- zizmor workflow that audits the GitHub Actions workflows on every pull request; accepted exceptions are documented in `.github/zizmor.yml`.
+
+### Changed
+- Data license stated clearly: the MIT License covers the code only. Cached Jolpica-F1 and OpenF1 data is CC BY-NC-SA 4.0 (attribution, non-commercial, share-alike); see `NOTICE.md` and `data/cache/LICENSE.md`. The README no longer calls the data non-copyrightable, and the license badge shows both.
+- The project is called SimGent throughout: the agent's self-introduction, system prompts, docs, CI name and logs no longer say "F1 Simgent".
+- Wording: "team-inspired colors" instead of "official team liveries", and answer cards no longer say "Official" (e.g. "Podium & Race Classification", "Fastest Lap"). The trademark notice drops an incorrect statute citation.
 
 ## v1.3.0 — 2026-10-09
 

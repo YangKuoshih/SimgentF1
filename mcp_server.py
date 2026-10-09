@@ -351,7 +351,7 @@ def main():
                         "protocolVersion": "2024-11-05",
                         "serverInfo": {
                             "name": "f1-simgent-mcp",
-                            "version": "1.3.0"
+                            "version": "1.4.0"
                         },
                         "capabilities": {
                             "tools": {},
