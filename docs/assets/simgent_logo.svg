@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E1E2D"/>
+      <stop offset="50%" stop-color="#15151E"/>
+      <stop offset="100%" stop-color="#101017"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#E10600" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#E10600" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Squircle rounded background -->
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#bg-grad)"/>
+  <rect x="2" y="2" width="60" height="60" rx="14" fill="url(#glow)"/>
+  <rect x="2" y="2" width="60" height="60" rx="14" stroke="#E10600" stroke-width="2" stroke-opacity="0.5"/>
+
+  <!-- S-Chicane Aerodynamic Racing Curve (SimGent Red #E10600) -->
+  <path d="M48 14C34 12 24 22 32 32C40 42 30 52 16 50" stroke="#E10600" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- SI Telemetry Pulse Vector (Electric Mint #00F5D4) -->
+  <path d="M14 32H22L28 22L36 42L42 32H50" stroke="#00F5D4" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Apex Neural Beacon / Core (White) -->
+  <circle cx="32" cy="32" r="3.5" fill="#FFFFFF"/>
+</svg>

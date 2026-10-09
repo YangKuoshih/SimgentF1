@@ -1,0 +1,117 @@
+{
+  "2023_4": {
+    "session": "Sprint Shootout",
+    "session_key": 9278,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=9278"
+  },
+  "2023_9": {
+    "session": "Sprint Shootout",
+    "session_key": 9282,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=9282"
+  },
+  "2023_12": {
+    "session": "Sprint Shootout",
+    "session_key": 9286,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=9286"
+  },
+  "2023_17": {
+    "session": "Sprint Shootout",
+    "session_key": 9298,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=9298"
+  },
+  "2023_18": {
+    "session": "Sprint Shootout",
+    "session_key": 9294,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=9294"
+  },
+  "2023_20": {
+    "session": "Sprint Shootout",
+    "session_key": 9308,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=9308"
+  },
+  "2024_5": {
+    "session": "Sprint Qualifying",
+    "session_key": 9668,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=9668"
+  },
+  "2024_6": {
+    "session": "Sprint Qualifying",
+    "session_key": 9502,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=9502"
+  },
+  "2024_11": {
+    "session": "Sprint Qualifying",
+    "session_key": 9545,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=9545"
+  },
+  "2024_19": {
+    "session": "Sprint Qualifying",
+    "session_key": 9612,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=9612"
+  },
+  "2024_21": {
+    "session": "Sprint Qualifying",
+    "session_key": 9631,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=9631"
+  },
+  "2024_23": {
+    "session": "Sprint Qualifying",
+    "session_key": 9650,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=9650"
+  },
+  "2025_2": {
+    "session": "Sprint Qualifying",
+    "session_key": 9989,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=9989"
+  },
+  "2025_6": {
+    "session": "Sprint Qualifying",
+    "session_key": 10024,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=10024"
+  },
+  "2025_13": {
+    "session": "Sprint Qualifying",
+    "session_key": 9930,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=9930"
+  },
+  "2025_19": {
+    "session": "Sprint Qualifying",
+    "session_key": 9879,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=9879"
+  },
+  "2025_21": {
+    "session": "Sprint Qualifying",
+    "session_key": 9860,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=9860"
+  },
+  "2025_23": {
+    "session": "Sprint Qualifying",
+    "session_key": 9841,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=9841"
+  },
+  "2026_2": {
+    "session": "Sprint Qualifying",
+    "session_key": 11236,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=11236"
+  },
+  "2026_4": {
+    "session": "Sprint Qualifying",
+    "session_key": 11271,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=11271"
+  },
+  "2026_5": {
+    "session": "Sprint Qualifying",
+    "session_key": 11282,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=11282"
+  },
+  "2026_9": {
+    "session": "Sprint Qualifying",
+    "session_key": 11317,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=11317"
+  },
+  "2026_12": {
+    "session": "Sprint Qualifying",
+    "session_key": 11344,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=11344"
+  }
+}

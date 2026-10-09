@@ -1,0 +1,107 @@
+name: CI - F1 Simgent Automated Test Suite
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run Unit, Integration & E2E Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Set up Python 3.14.8
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.14.8'
+          cache: 'pip'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --require-hashes -r requirements.txt
+          python -m pip check
+          python scripts/check_dependency_metadata.py
+
+      - name: Run Python Automated Test Suite
+        run: |
+          python -m unittest discover tests
+
+      - name: Run Season Accuracy & Robustness Suite
+        run: |
+          python tests/test_season_robustness.py
+
+      - name: Run 7-Pillar Offline Data & Frontend Evaluation Suite
+        run: |
+          python -m app.tools.offline_eval --year 2026 --round 16 --circuit bahrain --remediate
+
+      - name: Data Integrity Gate (standings vs results, grids, lap timing, provenance manifest)
+        run: |
+          python tests/check_data_integrity.py
+          python -m app.tools.data_manifest --check
+
+      - name: Agent Accuracy Evals (all eras, multi-turn)
+        run: |
+          python tests/eval_cross_era.py
+          python tests/eval_multi_turn.py
+
+      - name: Set up Node.js 26.11.1
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '26.11.1'
+          cache: 'npm'
+
+      - name: Install Node Dependencies & Playwright Chromium
+        run: |
+          npm install --global npm@12.2.0
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Run Browser Suites with Managed Test Server
+        env:
+          CHAT_RENDER_DELAY_MS: '150'
+        run: npm run test:browser
+
+      - name: Build and Smoke Test Non-root Container
+        run: |
+          docker build -t simgent-ci .
+          test "$(docker image inspect simgent-ci --format '{{.Config.User}}')" = '10001:10001'
+          docker run -d --name simgent-ci -p 127.0.0.1:8081:8080 simgent-ci
+          trap 'docker logs simgent-ci; docker rm -f simgent-ci' EXIT
+          ready=false
+          for attempt in {1..30}; do
+            if curl --fail --silent http://127.0.0.1:8081/api/health; then
+              ready=true
+              break
+            fi
+            sleep 1
+          done
+          test "$ready" = true
+          docker exec simgent-ci python -c "from app.tools.agent_memory import AgentMemory; AgentMemory(); import os; assert os.getuid() == 10001; assert os.access('/app/data/cache', os.W_OK)"
+
+  python-compatibility:
+    name: Python compatibility (${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.12', '3.13']
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: Install and Check Locked Dependencies
+        run: |
+          python -m pip install --require-hashes -r requirements.txt
+          python -m pip check
+      - name: Run Offline Security and Core Compatibility Tests
+        run: python -m unittest tests.test_guardrails_matrix tests.test_memory_privacy tests.test_security_boundaries tests.test_strategy_simulator

@@ -1,0 +1,31 @@
+"""Current driver registry (code -> Jolpica id, car number, name, nationality, team)."""
+
+DRIVER_REGISTRY = {
+    "VER": {"id": "max_verstappen", "num": "3", "given": "Max", "family": "Verstappen", "nat": "Dutch", "team_id": "red_bull", "team": "Red Bull"},
+    "ANT": {"id": "antonelli", "num": "12", "given": "Andrea Kimi", "family": "Antonelli", "nat": "Italian", "team_id": "mercedes", "team": "Mercedes"},
+    "RUS": {"id": "russell", "num": "63", "given": "George", "family": "Russell", "nat": "British", "team_id": "mercedes", "team": "Mercedes"},
+    "HAM": {"id": "hamilton", "num": "44", "given": "Lewis", "family": "Hamilton", "nat": "British", "team_id": "ferrari", "team": "Ferrari"},
+    "LEC": {"id": "leclerc", "num": "16", "given": "Charles", "family": "Leclerc", "nat": "Monegasque", "team_id": "ferrari", "team": "Ferrari"},
+    "NOR": {"id": "norris", "num": "1", "given": "Lando", "family": "Norris", "nat": "British", "team_id": "mclaren", "team": "McLaren"},
+    "PIA": {"id": "piastri", "num": "81", "given": "Oscar", "family": "Piastri", "nat": "Australian", "team_id": "mclaren", "team": "McLaren"},
+    "HAD": {"id": "hadjar", "num": "6", "given": "Isack", "family": "Hadjar", "nat": "French", "team_id": "red_bull", "team": "Red Bull"},
+    "LAW": {"id": "lawson", "num": "30", "given": "Liam", "family": "Lawson", "nat": "New Zealander", "team_id": "rb", "team": "RB F1 Team"},
+    "LIN": {"id": "lindblad", "num": "41", "given": "Arvid", "family": "Lindblad", "nat": "British", "team_id": "rb", "team": "RB F1 Team"},
+    "ALO": {"id": "alonso", "num": "14", "given": "Fernando", "family": "Alonso", "nat": "Spanish", "team_id": "aston_martin", "team": "Aston Martin"},
+    "STR": {"id": "stroll", "num": "18", "given": "Lance", "family": "Stroll", "nat": "Canadian", "team_id": "aston_martin", "team": "Aston Martin"},
+    "HUL": {"id": "hulkenberg", "num": "27", "given": "Nico", "family": "Hülkenberg", "nat": "German", "team_id": "audi", "team": "Audi"},
+    "BOR": {"id": "bortoleto", "num": "5", "given": "Gabriel", "family": "Bortoleto", "nat": "Brazilian", "team_id": "audi", "team": "Audi"},
+    "BEA": {"id": "bearman", "num": "87", "given": "Oliver", "family": "Bearman", "nat": "British", "team_id": "haas", "team": "Haas F1 Team"},
+    "OCO": {"id": "ocon", "num": "31", "given": "Esteban", "family": "Ocon", "nat": "French", "team_id": "haas", "team": "Haas F1 Team"},
+    "GAS": {"id": "gasly", "num": "10", "given": "Pierre", "family": "Gasly", "nat": "French", "team_id": "alpine", "team": "Alpine"},
+    "COL": {"id": "colapinto", "num": "43", "given": "Franco", "family": "Colapinto", "nat": "Argentine", "team_id": "alpine", "team": "Alpine"},
+    "SAI": {"id": "sainz", "num": "55", "given": "Carlos", "family": "Sainz", "nat": "Spanish", "team_id": "williams", "team": "Williams"},
+    "ALB": {"id": "albon", "num": "23", "given": "Alexander", "family": "Albon", "nat": "Thai", "team_id": "williams", "team": "Williams"},
+    "PER": {"id": "perez", "num": "11", "given": "Sergio", "family": "Pérez", "nat": "Mexican", "team_id": "cadillac", "team": "Cadillac F1 Team"},
+    "BOT": {"id": "bottas", "num": "77", "given": "Valtteri", "family": "Bottas", "nat": "Finnish", "team_id": "cadillac", "team": "Cadillac F1 Team"},
+    "TSU": {"id": "tsunoda", "num": "22", "given": "Yuki", "family": "Tsunoda", "nat": "Japanese", "team_id": "rb", "team": "RB F1 Team"},
+    "RIC": {"id": "ricciardo", "num": "3", "given": "Daniel", "family": "Ricciardo", "nat": "Australian", "team_id": "rb", "team": "RB F1 Team"},
+    "MAG": {"id": "magnussen", "num": "20", "given": "Kevin", "family": "Magnussen", "nat": "Danish", "team_id": "haas", "team": "Haas F1 Team"},
+    "ZHO": {"id": "zhou", "num": "24", "given": "Guanyu", "family": "Zhou", "nat": "Chinese", "team_id": "sauber", "team": "Kick Sauber"},
+    "SAR": {"id": "sargeant", "num": "2", "given": "Logan", "family": "Sargeant", "nat": "American", "team_id": "williams", "team": "Williams"}
+}

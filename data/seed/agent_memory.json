@@ -1,0 +1,183 @@
+[
+  {
+    "id": "mem_2026_bahrain_ver_tyres",
+    "topic": "2026_bahrain_verstappen_tyre_strategy",
+    "driver": "max_verstappen",
+    "patterns": [
+      "what tires were used by red bull for max verstappens win during the 2026 bahrain gp",
+      "what tires were used by red bull for max verstappen",
+      "what tyres did verstappen use in bahrain 2026",
+      "did he run on mediums or softs",
+      "did verstappen run on mediums or softs",
+      "what compound did verstappen use",
+      "verstappen tyre strategy bahrain 2026",
+      "verstappen pit stops bahrain 2026"
+    ],
+    "keywords": [
+      "verstappen",
+      "bahrain",
+      "mediums",
+      "softs",
+      "tires",
+      "tyres",
+      "strategy",
+      "medium",
+      "soft"
+    ],
+    "answer": "**Max Verstappen ran Intermediates, then three sets of Softs** in his 3-stop win for Red Bull Racing at the 2026 Bahrain Grand Prix (held at Sepang, Malaysia). He did not use Mediums.\n\n• **Stint 1 (Laps 1–9)**: **Intermediate (Green)** — started on intermediates after a ~40-minute rain delay.\n• **Stint 2 (Laps 10–33)**: **Soft (Red)** — pitted on Lap 9 under the Safety Car as the track dried.\n• **Stint 3 (Laps 34–43)**: **Soft (Red)** — pitted on Lap 33.\n• **Stint 4 (Laps 44–55)**: **Soft (Red)** — pitted on Lap 43 under the neutralisation for Albon's stop, then held off Antonelli to win.",
+    "source": "verified_f1_ground_truth (Jolpica pit stops; grandprix.com and Pirelli strategy review)",
+    "confidence": 1.0,
+    "a2ui_card": {
+      "type": "strategy_card",
+      "title": "Tyre & Pit Strategy — Max Verstappen (Bahrain 2026)",
+      "metrics": [
+        {
+          "label": "Stint 1 (L1-9)",
+          "value": "Intermediate (Wet Start)",
+          "color": "#10B981"
+        },
+        {
+          "label": "Stint 2 (L10-33)",
+          "value": "Soft Compound",
+          "color": "#EF4444"
+        },
+        {
+          "label": "Stints 3-4 (L34-55)",
+          "value": "Soft, Soft",
+          "color": "#EF4444"
+        },
+        {
+          "label": "Total Pit Stops",
+          "value": "3 Stops (Laps 9, 33, 43)",
+          "color": "#00F5D4"
+        }
+      ],
+      "action": "SIMULATE UNDERCUT",
+      "target": {
+        "action_type": "open_strategy",
+        "year": 2026,
+        "round": 16,
+        "session": "race",
+        "lap": 9,
+        "driver": "VER",
+        "race_name": "Bahrain Grand Prix"
+      }
+    }
+  },
+  {
+    "id": "mem_2026_championship_leaders",
+    "topic": "2026_championship_leaders",
+    "patterns": [
+      "who is currently the leader of the 2026 season",
+      "who is currently leading in the 2026 season",
+      "who is leading the 2026 season",
+      "who is leading 2026",
+      "who leads 2026",
+      "2026 championship leader",
+      "leader of 2026",
+      "who is in first place 2026",
+      "who is p1 in 2026",
+      "wdc leader 2026",
+      "wcc leader 2026",
+      "current leader of 2026",
+      "who is leading the championship in 2026"
+    ],
+    "keywords": [
+      "leader",
+      "leading",
+      "2026",
+      "season",
+      "championship"
+    ],
+    "answer": "**Andrea Kimi Antonelli** currently leads the 2026 Drivers' World Championship with **320 points** for Mercedes across 8 Grand Prix victories. Teammate George Russell holds P2 with 236 points (+84 pts), while Mercedes commands the Constructors' title with **556 points**.",
+    "source": "verified_f1_ground_truth",
+    "confidence": 1.0,
+    "a2ui_card": {
+      "type": "championship_card",
+      "title": "2026 FIA World Championship Leaders",
+      "metrics": [
+        {
+          "label": "WDC Leader",
+          "value": "Andrea Kimi Antonelli",
+          "color": "#00F5D4"
+        },
+        {
+          "label": "WDC Points",
+          "value": "320.0 pts (8 Wins)",
+          "color": "#FFFFFF"
+        },
+        {
+          "label": "WCC Leader",
+          "value": "Mercedes",
+          "color": "#27F4D2"
+        },
+        {
+          "label": "WCC Points",
+          "value": "556.0 pts (11 Wins)",
+          "color": "#FFB703"
+        }
+      ],
+      "action": "OPEN 2026 STANDINGS",
+      "target": {
+        "action_type": "open_standings",
+        "year": 2026
+      }
+    }
+  },
+  {
+    "id": "mem_2026_bahrain_gp_winner",
+    "topic": "2026_bahrain_gp_winner",
+    "patterns": [
+      "who won the 2026 bahrain grand prix",
+      "who won bahrain 2026",
+      "bahrain 2026 winner",
+      "verstappen bahrain 2026",
+      "how did ver win this race",
+      "explain ver victory"
+    ],
+    "keywords": [
+      "bahrain",
+      "2026",
+      "winner",
+      "won"
+    ],
+    "answer": "**Max Verstappen** took victory for Red Bull Racing at the 2026 Bahrain Grand Prix from pole position, finishing **2.3 seconds** ahead of Andrea Kimi Antonelli in mixed, monsoon-delayed conditions. Lewis Hamilton completed the podium in P3 for Ferrari.",
+    "source": "verified_f1_ground_truth",
+    "confidence": 1.0,
+    "a2ui_card": {
+      "type": "race_winner_card",
+      "title": "2026 Bahrain GP Official Classification",
+      "metrics": [
+        {
+          "label": "Race Winner",
+          "value": "Max Verstappen",
+          "color": "#3671C6"
+        },
+        {
+          "label": "Winning Time",
+          "value": "1:47:14.808 (55 Laps)",
+          "color": "#FFFFFF"
+        },
+        {
+          "label": "Podium P2",
+          "value": "Kimi Antonelli (+2.307s)",
+          "color": "#00F5D4"
+        },
+        {
+          "label": "Podium P3",
+          "value": "Lewis Hamilton (+4.919s)",
+          "color": "#E80020"
+        }
+      ],
+      "action": "VIEW BAHRAIN CLASSIFICATION",
+      "target": {
+        "action_type": "jump_to_replay",
+        "year": 2026,
+        "round": 16,
+        "session": "race",
+        "lap": 55,
+        "driver": "max_verstappen"
+      }
+    }
+  }
+]

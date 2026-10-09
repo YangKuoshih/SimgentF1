@@ -1,0 +1,49 @@
+name: Signed release archives
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to archive and attest
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  release:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Archive exact tag and record source provenance
+        id: archive
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+        run: python scripts/release_archive.py
+      - name: Sign source archive provenance
+        id: attest
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4
+        with:
+          subject-path: ${{ steps.archive.outputs.archive }}
+          predicate-type: https://github.com/YangKuoshih/SimgentF1/source-archive/v1
+          predicate-path: release-artifacts/provenance.json
+      - name: Publish archive, checksum and signature bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.archive.outputs.tag }}
+          ARCHIVE: ${{ steps.archive.outputs.archive }}
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+          SOURCE_COMMIT: ${{ steps.archive.outputs.commit }}
+        run: |
+          cp "$BUNDLE" "$ARCHIVE.intoto.jsonl"
+          printf 'Source archive for %s at cleaned commit %s. The attestation identifies the archive source; it does not certify application security.\n' "$TAG" "$SOURCE_COMMIT" > release-artifacts/notes.md
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --verify-tag --title "$TAG" --notes-file release-artifacts/notes.md
+          fi
+          gh release upload "$TAG" "$ARCHIVE" "$ARCHIVE.sha256" "$ARCHIVE.intoto.jsonl" --clobber

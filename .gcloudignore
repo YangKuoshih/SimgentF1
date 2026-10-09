@@ -1,0 +1,78 @@
+# ==============================================================================
+# F1 Simgent - Google Cloud Build Ignore Rules (.gcloudignore)
+# Guarantees zero local secrets, virtualenvs, or dev tests are uploaded to GCS,
+# while preserving the essential data/cache/ directory for fast local replay.
+# ==============================================================================
+
+.gcloudignore
+.git/
+.gitignore
+.github/
+
+# Virtual Environments & Secrets
+.venv/
+venv/
+env/
+.env*
+*.env
+application_default_credentials.json
+*-sa-key*.json
+*service_account*.json
+*credentials*.json
+credentials.json
+client_secret*.json
+*secret*.json
+*gcp*.json
+*.pem
+*.key
+*.token
+
+# Python Bytecode
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+
+# Node, Playwright & Tests
+node_modules/
+tests/
+test-results/
+playwright-report/
+.playwright/
+package.json
+package-lock.json
+run_tests.sh
+
+# Media & Temporary Data
+.video_tmp/
+/tmp/
+Context/
+Claude outputs/
+*.private.md
+CONTENT_STRATEGY*.md
+marketing_private/
+build-with-gemini/
+*.webm
+*.mp4
+*.log
+
+# Explicitly ensure telemetry cache is included
+!data/cache/**
+
+# Private runtime state, local agent configuration, and generated builds
+.aws/
+.codex/
+.agents/
+data/runtime/
+data/agent_feedback.json
+data/agent_memory.json
+dist/
+build/
+*.egg-info/
+
+# Browser verification artifacts (documentation images live in docs/assets)
+tests/screenshots/
+
+# Synthetic fuzz output
+fuzz-artifacts/
+release-artifacts/

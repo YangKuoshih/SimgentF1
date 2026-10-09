@@ -1,0 +1,83 @@
+# ==============================================================================
+# F1 Simgent - Docker Container Ignore Rules
+# Excludes local secrets, git history, and development dependencies from images
+# ==============================================================================
+
+# Environments & Local Secrets
+.venv/
+venv/
+env/
+.env*
+*.env
+application_default_credentials.json
+*-sa-key*.json
+*service_account*.json
+*credentials*.json
+credentials.json
+client_secret*.json
+*secret*.json
+*gcp*.json
+*.pem
+*.key
+*.token
+
+# Git & CI/CD
+.git/
+.gitignore
+.github/
+
+# Bytecode & Caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Node & Browser Test Dependencies
+node_modules/
+tests/
+test-results/
+playwright-report/
+.playwright/
+package.json
+package-lock.json
+run_tests.sh
+
+# OS & Editor Artifacts
+.DS_Store
+.DS_Store?
+._*
+.vscode/
+.idea/
+.gemini/
+
+# Media & Temp Files
+.video_tmp/
+/tmp/
+Context/
+Claude outputs/
+*.private.md
+CONTENT_STRATEGY*.md
+marketing_private/
+*.webm
+*.mp4
+*.log
+scripts/
+
+# Private runtime state, local agent configuration, and generated builds
+.aws/
+.codex/
+.agents/
+data/runtime/
+data/agent_feedback.json
+data/agent_memory.json
+dist/
+build/
+*.egg-info/
+
+# Browser verification artifacts (documentation images live in docs/assets)
+tests/screenshots/
+
+# Synthetic fuzz output
+fuzz-artifacts/
+release-artifacts/

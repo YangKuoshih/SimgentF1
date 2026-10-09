@@ -1,0 +1,40 @@
+{
+  "name": "f1-simgent",
+  "version": "1.2.0",
+  "description": "F1 Simgent - Autonomous Formula 1 Race Engineering Agent & 60 FPS Replay Cockpit",
+  "scripts": {
+    "test": "node scripts/python.mjs scripts/run_tests.py",
+    "test:unit": "node scripts/python.mjs -m unittest discover tests",
+    "test:security": "node scripts/python.mjs tests/verify_security_sanitization.py",
+    "test:eras": "node scripts/python.mjs tests/test_sessions_and_eras.py",
+    "test:mcp": "node scripts/python.mjs tests/test_mcp_server.py",
+    "test:e2e": "node tests/e2e_playwright_suite.js",
+    "test:e2e:headed": "node tests/e2e_playwright_suite.js --headed",
+    "test:mobile": "node tests/test_mobile_replay_speed.js",
+    "start": "node scripts/python.mjs frontend/main.py",
+    "test:browser": "node scripts/python.mjs scripts/run_tests.py --browser-only",
+    "test:guardrails": "node scripts/python.mjs tests/test_guardrails_matrix.py"
+  },
+  "keywords": [
+    "formula-1",
+    "f1",
+    "telemetry",
+    "ai-agent",
+    "replay",
+    "fastapi",
+    "playwright",
+    "mcp",
+    "race-engineering"
+  ],
+  "author": "Tony Yang",
+  "license": "MIT",
+  "devDependencies": {
+    "playwright": "1.63.0"
+  },
+  "private": true,
+  "engines": {
+    "node": "^22.22.2 || ^24.15.0 || ^26.0.0",
+    "npm": "^12.2.0"
+  },
+  "packageManager": "npm@12.2.0"
+}

@@ -1,0 +1,107 @@
+name: Auto-Sync F1 Data (fetch, verify, then propose)
+
+# Data only reaches main after it has been fetched from the sources (Jolpica, plus OpenF1
+# for Sprint Qualifying), re-checked against Jolpica, passed the offline integrity gate
+# and passed the agent evals. Any failing step stops the job before proposing a review branch.
+
+on:
+  schedule:
+    # Every 6 hours: picks up results, sprint/sprint-qualifying, grids and late corrections
+    # for races in the last 21 days (jolpica_sync.RECENT_DAYS).
+    - cron: '17 */6 * * *'
+    # Wednesdays: full re-check of every cached season against Jolpica (older data can
+    # still be corrected upstream).
+    - cron: '43 3 * * 3'
+  workflow_dispatch:
+    inputs:
+      year:
+        description: 'Season year to sync'
+        required: true
+        default: '2026'
+      full_revalidate:
+        description: 'Also re-check every cached season against Jolpica'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: data-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    permissions:
+      contents: write
+    name: Sync, verify and propose F1 data
+    runs-on: ubuntu-latest
+    env:
+      YEAR: ${{ github.event.inputs.year || '2026' }}
+      FULL: ${{ github.event.schedule == '43 3 * * 3' || github.event.inputs.full_revalidate == 'true' }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Set up Python 3.14.8
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.14.8'
+          cache: 'pip'
+
+      - name: Install Python Dependencies
+        run: |
+          pip install --require-hashes -r requirements.txt
+
+      - name: 1. Fetch (Jolpica results, qualifying, sprints, grids, laps, pit stops; OpenF1 Sprint Qualifying)
+        run: python -m app.tools.jolpica_sync "$YEAR" --laps
+
+      - name: 1b. Fetch Sprint Qualifying / Shootout from OpenF1 (re-fetches the last 21 days)
+        run: |
+          if [ "$FULL" = "true" ]; then
+            python -m app.tools.openf1_sync $(seq 2023 "$YEAR") --refresh
+          else
+            python -m app.tools.openf1_sync "$YEAR"
+          fi
+
+      - name: 2. Re-check cached files against Jolpica (replaces anything that drifted)
+        run: |
+          if [ "$FULL" = "true" ]; then
+            YEARS=$(ls data/cache/jolpica | grep -oE '^[0-9]{4}' | sort -u | tr '\n' ' ')
+          else
+            YEARS="$YEAR"
+          fi
+          set +e
+          python -m app.tools.revalidate $YEARS --budget 400
+          rc=$?
+          set -e
+          # 2 = request budget used up (Jolpica allows ~500/hour); the rest is checked next run
+          if [ $rc -ne 0 ] && [ $rc -ne 2 ]; then exit $rc; fi
+
+      - name: 3. Offline integrity gate (standings = results, real grids, real lap timing, manifest)
+        run: python tests/check_data_integrity.py
+
+      - name: 4. Agent evals on the new data
+        run: |
+          python tests/eval_cross_era.py
+          python tests/eval_multi_turn.py
+          python tests/test_guardrails_matrix.py
+          python tests/test_mcp_server.py
+
+      - name: 5. Propose verified data for review
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/cache/
+          if git diff --staged --quiet; then
+            echo "No data changes."
+          else
+            git checkout -b "automation/verified-data-${GITHUB_RUN_ID}"
+            git commit -m "chore(data): verified F1 data sync for $YEAR"
+            git push origin HEAD
+            echo "Open a pull request from automation/verified-data-${GITHUB_RUN_ID}; main requires review and CI." >> "$GITHUB_STEP_SUMMARY"
+          fi

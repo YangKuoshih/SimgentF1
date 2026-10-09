@@ -1,0 +1,27 @@
+name: Data issue
+description: A result, grid, lap time or sprint qualifying classification looks wrong.
+labels: [data]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Cached data comes only from the open Jolpica and OpenF1 APIs (see docs/DATA_PIPELINE.md).
+        If the source itself is wrong, please also report it upstream.
+  - type: input
+    id: session
+    attributes:
+      label: Session
+      placeholder: 2025 Round 6, Sprint Qualifying
+    validations:
+      required: true
+  - type: textarea
+    id: wrong
+    attributes:
+      label: What is wrong, and what should it be?
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Public source for the correct value
+      description: A link to a public, freely accessible source.

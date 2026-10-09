@@ -1,0 +1,2835 @@
+{
+ "description": "Provenance of every cached data file. Written by the fetchers; do not edit by hand.",
+ "files": {
+  "jolpica/1950_1_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1950/1/pitstops.json",
+   "sha256": "c0e2d301a82131ccb8064d03e60db441893020a93f87fdccd33fbf5315c35f99",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1950_1_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1950/1/results.json",
+   "sha256": "2cfc997d16f9ad3e1d8c331359b0712a249161a78e3e2e85516c6eee027df3ca",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1950_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1950.json",
+   "sha256": "b0ac180aa1c3791c440a6bb0ba5f6833e7d23dbec2474749692ca7aa3823f673",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1950_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1950/results/1.json",
+   "sha256": "471839602687aac1ccb0634b6da09102cc8f349701b57431088de5a3836c3e45",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1951_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1951.json",
+   "sha256": "563f039333b2e408f9eb8cfb21fefba8f9c6827100da61bdf10ec56eed0d53df",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1951_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1951/results/1.json",
+   "sha256": "4f335c14a89ddba13389e96248b443bcff150dafb12558572b5c53b6dce5740e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1952_8_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1952/8/pitstops.json",
+   "sha256": "aef7f513d90360b744d90d6fb2ace38c257e6d2710eb0f95e4d8073bd6b34703",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1952_8_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1952/8/results.json",
+   "sha256": "855bb7d0e95409dc3f0bcff5b37b2d90a1ee548818d6f30d725ecad50b81b6da",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1952_constructorStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1952/constructorstandings.json",
+   "sha256": "7e44e3283c00923d58285f7347208efc3fbed4fcb3ef587bb5099d244717d88f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1952_driverStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1952/driverstandings.json",
+   "sha256": "2c62d9fd0c080261fe4213b2d37dd250f67393831e8eb7281456fe8cfb525d7d",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1952_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1952.json",
+   "sha256": "72c8ecb53de9b01534945e159f13fcb02d15b49ad3be334bb222f168c4467e8a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1952_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1952/results/1.json",
+   "sha256": "8c3a65e7e8658054789e686d08b06256e498ec01c79b2b7736c41b2b64d95287",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1953_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1953.json",
+   "sha256": "a23448c27bedba1baae6b24493fb1035d5c28d9339ff7482edae050b2c94662a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1953_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1953/results/1.json",
+   "sha256": "1a1a9e7cfc7b5f98caf498b8a32abc6f2135c4634cb512cb2bd1c1e09b544f30",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1954_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1954.json",
+   "sha256": "63cc59b5a012e5607c25acfafd433b4651661411eff00ca187a8e5daa912fa40",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1954_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1954/results/1.json",
+   "sha256": "88d9ddef9596f0f0709565b910750efdad9af2e8c033ae16490e89ef65ed28f5",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1955_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1955.json",
+   "sha256": "2f40a414240ac9ec0ef454868cea50e94c157f657c63eacb98d62683acfb2aa8",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1955_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1955/results/1.json",
+   "sha256": "5661ffe6c54835a738a2366e087699d47a7d81ff211b4cb48804605fc738854a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1956_1_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1956/1/pitstops.json",
+   "sha256": "e6a15c8e5946cc9cbfe4c37840840051d278146fd2a54bf547ecab7d77f7d5e2",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1956_1_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1956/1/results.json",
+   "sha256": "d4600722a0af3c14c0d54b1de7903ed6cc7bdb88c30112f6eaadd0b7e1535d89",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1956_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1956.json",
+   "sha256": "b0413d4aa254727cc2943b53301244693c112253261b060a063f814dd5331852",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1956_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1956/results/1.json",
+   "sha256": "b33062211e4a86ce869f170b393fe134d38d742d5c0d9bd25ee456fe7538bced",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1957_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1957.json",
+   "sha256": "f860ab491f728548bad05670fee6fa2db6be16e5baf4b6084e6c1ecedd185609",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1957_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1957/results/1.json",
+   "sha256": "ba5696c6fec2db6dd9b86c8c5f4216f8677d60fa82909691386d2c4906f8751e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1958_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1958.json",
+   "sha256": "e507d731e177b58c7fd7a6b4d327013fed5c15dbcb4f062b99db0578ab52b5f3",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1958_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1958/results/1.json",
+   "sha256": "18d226528dcd44c306d48958665f4b1d38d87760b696218ac0c051702bf4183e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1959_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1959.json",
+   "sha256": "b64b729e97d59a156f69c6d501e45d6eafbdd0ac26fe20a8e050abc8178a3ada",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1959_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1959/results/1.json",
+   "sha256": "67d0ccb068acf362f161e0238013c510600aa13071f572ee16609e5e5d819286",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1960_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1960.json",
+   "sha256": "3e818b69f0ec4846c9157559e64c38960f8fa52c7952dcfc35ee819057883e29",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1960_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1960/results/1.json",
+   "sha256": "bd755b2b371ad405c34e4f8a70ba23bd0eec0e124d3012187b7eddc48b522e22",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1961_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1961.json",
+   "sha256": "5128611f7b735e3b00be271e6a011c6ac955086026ad478d7e9dc94fe4d5926a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1961_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1961/results/1.json",
+   "sha256": "1abd3029f52e26ebd182256fa01277cf3b38147a64a28700cb5fa32c36fc5e8c",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1962_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1962.json",
+   "sha256": "b9432b895dbe0f922810b4bcb85d74f588cc6505ee52c6dac7d42759290b02f8",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1962_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1962/results/1.json",
+   "sha256": "9d49b0c03a1ec289f3d0d7cc773ddf84a1e1ad7ff5f5ee42adf5176b38d557a8",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1963_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1963.json",
+   "sha256": "1cb418685e9ec32e3e677ebff5409dd3ea760eed9310c7dbaf265c2000e117e1",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1963_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1963/results/1.json",
+   "sha256": "56a826c52b3412034cc9a91b9c2901e157b1188e7e3b612b4f750df449d39c2a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1964_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1964.json",
+   "sha256": "3f3b2021666feba5a0c1b4ea38f2a649a227401207ea29eeeb47e525113fddde",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1964_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1964/results/1.json",
+   "sha256": "b263178f626564a37ff1232257c802511b94c172c79f6baf093f2060d41a4227",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1965_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1965.json",
+   "sha256": "010b6b520522c3763aeb605244ba73bdfee628da7ea848f231beacaaa0424f2b",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1965_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1965/results/1.json",
+   "sha256": "50c98fdd5e964b0aaaf122f4e1dbff5d53eef78be1f69fd023a3ba44388ef734",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1966_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1966.json",
+   "sha256": "0a2d8c88dae3223109ecef4a0097d2235ffde1023adb9da1c80cb0b33bd9b0f1",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1966_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1966/results/1.json",
+   "sha256": "d7dee753b011991abaad097f9d98f23dbbbd179e3e3a56dc90e85073673b5a8e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1967_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1967.json",
+   "sha256": "828f826036b56c2299d8b83e4e5b3d6d76f16001d10367dd2df42ec56e5ad3d6",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1967_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1967/results/1.json",
+   "sha256": "725ec4c30dc29128368389f40beec5c7f1e197e61ebffee4960b370b3736cf24",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1968_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1968.json",
+   "sha256": "89ee9ec1a321bb7d104f44df9a2cac8df5dc9f45e1885f0b600dd345116ce777",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1968_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1968/results/1.json",
+   "sha256": "893d5500aa291f9d906538ae016c8a62bab7e9e36cd53e212985e9bb52716612",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1969_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1969.json",
+   "sha256": "df51b9659f2dfaae13538515efadb6d50195c2c42afe5d2e29a61fbcd38df58c",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1969_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1969/results/1.json",
+   "sha256": "e217720b42d4ead6a7fd69a37656c3e65f138cb0392006845e6ad2a3fdeaa0de",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1970_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1970.json",
+   "sha256": "34f8fa24f556f5c72df11e66b4ad3d7101b8ac35a6ed7c28e7fe99f0561d4ad6",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1970_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1970/results/1.json",
+   "sha256": "5a05bcb6baa9c2156ceda28c7110e06ccfaa3a4bcdccb19bac9addb791f2a25b",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1971_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1971.json",
+   "sha256": "01b5d8bd58f3589d3ef19ae3e64b79674662cdf1022e56e3fb0a3707cecc2c47",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1971_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1971/results/1.json",
+   "sha256": "623aafc8122d2c0d094645ec083f44893fea98d34fc47618f06bb0790ea1b1ae",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1972_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1972.json",
+   "sha256": "7af1c898b4721936c3074c60643848f995a993a6cf4b38bdf9981300ea519953",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1972_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1972/results/1.json",
+   "sha256": "05e59e4d4ecb6f914eae4961c1922d04cadd721ef4d6ac72d498219d55a734bb",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1973_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1973.json",
+   "sha256": "297c6db51dab87788ba9f40feac1cb2239a2d847e0ad2d186868903ee37fb820",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1973_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1973/results/1.json",
+   "sha256": "5be918b3c6414af1844207b3d0ebd6c75ff4202de90184a52f8a3b6e593d1c66",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1974_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1974.json",
+   "sha256": "8b86f49af96a65c9702ac882f0039e3e6ff3eede5c047a4d7203831388ac6a19",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1974_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1974/results/1.json",
+   "sha256": "12fa69e2f4dfe667d7b0b7f35236af0b1e7073bd7e14405c144a6a6dda0cd660",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1975_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1975.json",
+   "sha256": "aaa2d8d5cb4919fe879fe8edf3bcbec1af39bb0429d1ac069af532eac9181b17",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1975_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1975/results/1.json",
+   "sha256": "8950d9dc2fab04f77f9c008da26d823d469eb488528f09b0eb35e8c056b44590",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1976_16_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1976/16/pitstops.json",
+   "sha256": "4ef552af7da5b0b9f2548e35e22c8e51a48c6c0916ff7ee549b4f671bf2139e2",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1976_16_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1976/16/results.json",
+   "sha256": "1f7ac5cc96859d4dd52228f99471e37f64d0531af0d8046ed625f6a4e85107e0",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1976_1_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1976/1/pitstops.json",
+   "sha256": "79102f1ecd68aa1c686bc3e2e7b160dc6bf84f1ef07933e2d619af5474e3e6d5",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1976_1_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1976/1/results.json",
+   "sha256": "84febb8ef406b0c785f8ebbb76296228d9104f340f84b3f3168049dba97dc437",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1976_constructorStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1976/constructorstandings.json",
+   "sha256": "dd7475d7c84c5c1cab48c5a71ae85a03cbd69dfdc007a69588937fe15290e82f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1976_driverStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1976/driverstandings.json",
+   "sha256": "70706010a62ea692919810449fdbfb8af8c856aceaa91f1a91d085bc823a3164",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1976_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1976.json",
+   "sha256": "b66b8a3d5666b1c513a934adf8dc50775c911c1eb2957e4cc24bd08bef3013c6",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1976_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1976/results/1.json",
+   "sha256": "ec217023bcbef1369d3aa1afab2c2109856458a84ed83405f14abe31f5ce29f1",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1977_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1977.json",
+   "sha256": "5e8b875eaa1bbd3f5112200a0fd77e44f5d81a6067b77a1e0d209e7a5df5a2a2",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1977_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1977/results/1.json",
+   "sha256": "99cde00106d2e0e0e92c0bf32ee4487bf37638a818384b7deb804158bd1ae861",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1978_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1978.json",
+   "sha256": "2ebf8e3386369ff28306185e7c1fe320552ba478325dd4468821e0d441b984d9",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1978_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1978/results/1.json",
+   "sha256": "15f44b3a6048ed6f9991a8cc0f9c7a7014dbcbe7a3c72c8279e1435a4993b035",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1979_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1979.json",
+   "sha256": "01975489bbcc51b66af531a03b54afa10e71a0ddc0ff1c52e4e9d3e2ac93216f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1979_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1979/results/1.json",
+   "sha256": "b33e124265e779f6fc23246058942db0592f47387b28f696e128d8f3b75e550f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1980_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1980.json",
+   "sha256": "39f82384c65d0cc81b67b92c125d89505a8159c7fd9bef52465352ebf40d4b8c",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1980_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1980/results/1.json",
+   "sha256": "ba344d5f5381586710715d20bc4aefae07fed14092a23b05ca18809f97f72dc2",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1981_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1981.json",
+   "sha256": "9ed6f17d6d3eed9dedba643b54208f12008833f5ad510974b6da9b880603db3e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1981_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1981/results/1.json",
+   "sha256": "a650bc570e3a8c5a8a4ea8e6d2423a877600b6f94750babb6b42d60cce45d82b",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1982_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1982.json",
+   "sha256": "bf6311c57b66cd9d047f2a809c97c783c7eb3538966c67c2c9e9954101fae59e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1982_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1982/results/1.json",
+   "sha256": "5a6d0feaf22f4d92d04d86c466daede8c4a578f95b192ce2bda11a66a934d853",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1983_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1983.json",
+   "sha256": "788f4c5263b88470e191e281f787b08978b223b82ca22fcff4340dec019be5f4",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1983_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1983/results/1.json",
+   "sha256": "b32102115b8cdbfb921e8b2ea895f66d73e9e5f897dd2c0ee635489b26637247",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1984_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1984.json",
+   "sha256": "acb8189b3d9579a45bd507066d6eb54dabc48fa77518e2bd3f5b1f70b3c149b8",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1984_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1984/results/1.json",
+   "sha256": "453c31cc22c1cb1703ea7f155e30417663904c006173e5fe1a987f26cbbf0686",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1985_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1985.json",
+   "sha256": "011abd8832988fd42fa1a6beb3daa8c33cc66ed83a5f8114725dcfb90575d53c",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1985_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1985/results/1.json",
+   "sha256": "2bfa50492a66bf0201da46d767e42ca415ff458d9b0b86bea5650f598dadf873",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1986_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1986.json",
+   "sha256": "fce93591325306202932d0203e0d3163453d203d35711bce98ac0d59e20453aa",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1986_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1986/results/1.json",
+   "sha256": "97f310ca971d13908b7ecfd8c048b1f5b356526b32665b3940fcb624097797a7",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1987_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1987.json",
+   "sha256": "1607490512528c60f6165f35e638e1e64cba9d122062460faefc766cad9e7c3d",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1987_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1987/results/1.json",
+   "sha256": "028507bd088521c3d76dca3a7515b79b5dca7ff3705138379a329e9a9614ed65",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1988_12_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1988/12/pitstops.json",
+   "sha256": "ee40fb6b354e55a82032d9361c4de7011e9036c08e6c58428f16c71ab255456a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1988_12_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1988/12/results.json",
+   "sha256": "779fb648ffb4870d9d57e9b5be4ce665040d6caa3f2c20423dc87d9b903155f7",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1988_constructorStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1988/constructorstandings.json",
+   "sha256": "f0158e32990af659bc538dea7a3ab62e2a954c90ac78e971f0a0041f9e6b9e46",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1988_driverStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1988/driverstandings.json",
+   "sha256": "9bc016d1ee05666fb30530904ec6594b7ce58d1db988c44f1309b83ed13bf594",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1988_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1988.json",
+   "sha256": "01f2b3612e9dae527e5ddb8db103c6b62127910921c612c028dc045500ced98f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1988_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1988/results/1.json",
+   "sha256": "ea6439be187f9e418ab21a5879cb5ed1b8b7f8177a5f16b1f33086f566561706",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1989_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1989.json",
+   "sha256": "0f62fe8c2dd85fc6fdc8e42d91e162d6363d0690ee67869ec983494a994b8641",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1989_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1989/results/1.json",
+   "sha256": "5bfef36350f9fcae78d455c8bf9819a32b2fb3b54d0d871aecc057684a992649",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1990_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1990.json",
+   "sha256": "125be67533d2ed0a1e9eaa913340205dffebe02b2ad935420a5e78a24c93da64",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1990_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1990/results/1.json",
+   "sha256": "415d464002f587bfb688ce40a0de9510b3b2ccbb85d70a7b691f216a144427c9",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1991_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1991.json",
+   "sha256": "8e55221c16c3916a996662dab7eec57cca6ffd47aed1c979edc149eaf402417f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1991_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1991/results/1.json",
+   "sha256": "dd7422281f20ff47d38d64eb99544d08fa0545b52041deeb7bfbefe373cd725f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1992_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1992.json",
+   "sha256": "bffe14ce2d9a5f00d73be46bc7cbb50323d6022a7659969c50b5675a069d0a21",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1992_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1992/results/1.json",
+   "sha256": "64a711f259b6088dc708830c3a6971e52703a77cd233e8925e0cb25495b5c4c9",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1993_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1993.json",
+   "sha256": "2c4303444d156099878222c4e2f01065ae039710adf96734b35cf23b0e83b8b5",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1993_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1993/results/1.json",
+   "sha256": "9dc81399b9836c7bec13d7d08024055abe400cb50abb18cd65863471e7ce2029",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1994_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1994.json",
+   "sha256": "0e11050d7acfd50c4d86a710a8757bee3a14dae2f1b3c7b4caf03a8688fde5d3",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1994_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1994/results/1.json",
+   "sha256": "57a9bbfa7df184252cdaa0cb642010cca6e2adcd76e03177242f5cad3479539d",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1995_1_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1995/1/pitstops.json?limit=100",
+   "sha256": "5ace6b9a016db88824999ee061610fa201c34e8ce2342cb4a4cc81325b251846",
+   "fetched_at": "2026-10-08T19:09:21Z"
+  },
+  "jolpica/1995_1_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1995/1/results.json?limit=100",
+   "sha256": "e1e520f2618795180737d45339eff821a16aa8e2fe33742792909b9b6c337e9b",
+   "fetched_at": "2026-10-08T19:09:22Z"
+  },
+  "jolpica/1995_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1995.json",
+   "sha256": "4712aca5e6dffdf02c25e395c5d7a598fdcbda27ab1bba5ca646e32892c8a725",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1995_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1995/results/1.json",
+   "sha256": "4809b0a791471cb6c6b2df665900cce973a7e1bf2dfda6a506815650c6792663",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1996_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1996.json",
+   "sha256": "403d1820c58bdcbdeaf3aac87f2452ce73456a65991e15a10f97cd5959b50ebc",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1996_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1996/results/1.json",
+   "sha256": "05ffd700c248dac5e3b90695355a2f0df21031cc8070d0f47d3f4fadf5f779a4",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1997_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1997.json",
+   "sha256": "9e2733dd4a66603829ca7c2ebd5171154e48ddf0447c7185628fbc5460c8b079",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1997_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1997/results/1.json",
+   "sha256": "be24836995ff1c6d240d2ec08b905a0641e5051f9fda151fc9690cf087822c3b",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1998_13_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1998/13/laps.json (all pages merged)",
+   "sha256": "f1bf54846aea9fe112b95b1410a3411883f4ead9ca8dbd785fda60fb4ecd7184",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1998_13_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1998/13/pitstops.json",
+   "sha256": "40aefafedd7a3a18d9928c56b39f9a9ae8b4e3098ad9a6e3da82869e85bd6190",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1998_13_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1998/13/results.json",
+   "sha256": "9d8bf34001864a2b8760cd2b90fa5a55d4ace32a932851b49f6a32a1d7480337",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1998_16_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1998/16/laps.json (all pages merged)",
+   "sha256": "09d6a081732519efe95887171da2d20d0e0b73013c8cf408f4fcbcd5fad74321",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1998_16_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1998/16/pitstops.json",
+   "sha256": "22b252077f3e3410cc275d880e318e1f0f153c882166c002b7acff3c5e2566f4",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1998_16_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1998/16/results.json",
+   "sha256": "cc1a5d6ca1547db4c4b9663759c16b769e0016be6a9a6bb40f4fbace84225b55",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1998_constructorStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1998/constructorstandings.json",
+   "sha256": "80d9ddbeb86d133cbfcf54f3fe04b08593282768477de40237e306594dbd406b",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1998_driverStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1998/driverstandings.json",
+   "sha256": "0b78259aa8ee56a6daab7b6b4d1a07bf3bac87971f9759ee9bd992f6654fc964",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1998_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1998.json",
+   "sha256": "36e89b707a0493c44a02413157490d48ea32adedb427660647ced864c399632e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1998_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1998/results/1.json",
+   "sha256": "604d33e46d30ff661d235c03073f5d36cff2a24d6ef16084c5fc5296a6bd75cd",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1999_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1999.json",
+   "sha256": "a074dd3ee5f53af72e57533886fbab8437ef376a4891a9c9761fc109f9de5ad0",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/1999_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/1999/results/1.json",
+   "sha256": "5da79af1867a6e3b944d57f4a8081177cec8c7ce76e63e5f8fbb1e20fab82325",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2000_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2000.json",
+   "sha256": "17d5ef9fef86eb8f1442b91ceca6f52fa2179a610a349142cc7575674ba67d73",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2000_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2000/results/1.json",
+   "sha256": "0467a4c6db6ee6722c8f6dac34cbc4e5925e26f2d46e7c875253c778744483c6",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2001_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2001.json",
+   "sha256": "4220bbe0b6542686b774cff76748ea6650466b5f1341c307be5e4114d3c1af17",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2001_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2001/results/1.json",
+   "sha256": "43f1a50917e4d20c25c1265f91d58e2d96defb0748ec7401cd80d467e2e2625a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2002_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2002.json",
+   "sha256": "9fc515725de02dbdd27c492801be4b0f1a065b74a727c03b8f045719ecd11d95",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2002_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2002/results/1.json",
+   "sha256": "44a86d6c60e9dd44b07c8b6601b1c563aa0d8b5a6928fd9e0cd53dbf6917350e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2003_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2003.json",
+   "sha256": "7956c385613ed0013c00f33582e0e6feb6f2c3de3fdc1aa3493ec1488abe773a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2003_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2003/results/1.json",
+   "sha256": "b4fbafc413ee292ded00f19b707cb97f38b9767189b8cb86be981a3ff41c6323",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2004_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2004.json",
+   "sha256": "b4eca15fff846c859c1cc0b259a154764007930dfd7fa8c488617521216e34d8",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2004_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2004/results/1.json",
+   "sha256": "20a04ac2c7e1d8f78e3a3e2b37a0ccacca295f377fbf7b37f86020449b0a79c0",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2005_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2005.json",
+   "sha256": "3cb1ecbc27697a6061c345e33fd962181b426a3ec8271ab8105cb5e7a3a2c11f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2005_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2005/results/1.json",
+   "sha256": "f7b6a7495dcb67fbe57fb36d89cc54935a84a5916c2bde892ba6c129de835983",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2006_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2006.json",
+   "sha256": "609f26156dc38a9527553e0be8922b608457d3ee8103f884098068760ffa4cd8",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2006_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2006/results/1.json",
+   "sha256": "e897a5a34a436c6d84f1ebcb72103da2c018ffdcac1215a73eea98b849f76262",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2007_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2007.json",
+   "sha256": "012ff4325049ff87d7ce88dbc4fd12a755c81c74fceb448f15e709550cbded91",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2007_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2007/results/1.json",
+   "sha256": "75776e233a9ad21299a2887ea24173c41e66b03b5fe220d4f00b46a8ccf20c6a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2008_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2008.json",
+   "sha256": "4ee4e404b84114a52c2cf420bc0e90b47ea963ca49c3a302749aaca42c780065",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2008_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2008/results/1.json",
+   "sha256": "2c8580cd2ff9338dae05dab10e5aa0a279f3caaa74930a1598a0c2f17fb6ee05",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2009_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2009.json",
+   "sha256": "a20aabe0c7c127e96429178f55520d289e357f298c6c793dbf058c268ec04bb9",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2009_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2009/results/1.json",
+   "sha256": "3228bbe2098ec27643f8a52002823de50fa65a41401690681b8e4fac2a801895",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2010_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2010.json",
+   "sha256": "c73f3aa9c78832451dfe5a3d99c298a11c772f8b17ac578ebaaf88f18e167a2d",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2010_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2010/results/1.json",
+   "sha256": "e882df11c1bc313a5a962edb086c52d1e6296fec0284fe043e103d6a9d29ac0e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2011_1_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2011/1/laps.json (all pages merged)",
+   "sha256": "cd27634927857e02ea0225b8a83226a0f6a6678728532c58b9862145bdb0dd02",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2011_1_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2011/1/pitstops.json",
+   "sha256": "5d3a9e62ce1abfe5146e09817960d79476fe35b6101470512de4fe8eab8f17c0",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2011_1_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2011/1/results.json",
+   "sha256": "22788ddb1105bbc89cc7df64b0db3382c97b82377fbcb987b0de717b2cf51053",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2011_constructorStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2011/constructorstandings.json",
+   "sha256": "2c08062ca803b1720f928243689cc9750bcb97768d3cdeece0f6a528c5e5ecc4",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2011_driverStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2011/driverstandings.json",
+   "sha256": "35db47f039bf33c89e31f0c13851626f7c30898dadfd35fcef725636ac586ba7",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2011_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2011.json",
+   "sha256": "86ff6331f3f32e04ceb45b5c3d3c54639ce2d13cfdea77278cfe70a7954d3add",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2011_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2011/results/1.json",
+   "sha256": "f6d0d35bd495673dfb56a4dda6d6d10e414c32f46ac9dad482bfefae4e7df21d",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2012_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2012.json",
+   "sha256": "4665564fa170af4b7a4d2a995646dfff1ec524c89ea162e714cbb6df747a91d6",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2012_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2012/results/1.json",
+   "sha256": "4a0f1ca898ffafa266d2a935b9ee7aaf9026cd91677db34c5028b22779a9120b",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2013_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2013.json",
+   "sha256": "bba9a6ad130430cddedfdd65d9993b2f2f1ff20a6f333746d40a400a309c3c02",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2013_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2013/results/1.json",
+   "sha256": "1c7779ee82e2b19d8ddb7101d9b29946425a0b2b944806b678ae06543c32e807",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2014_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2014.json",
+   "sha256": "ecab8628df895665283a8660675b903264bdecb35f2a342eff096b811597a745",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2014_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2014/results/1.json",
+   "sha256": "efb5d01bb966ae37961c85e15d68c9a21116654cc088964198e3913306afb6d3",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2015_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2015.json",
+   "sha256": "8e9f21b488fd12764f9fa96dc370f51f2ee8ebfca6116771920e8b3a3fa9a78e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2015_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2015/results/1.json",
+   "sha256": "4b64d5d20a931d8e055137cdc241e88c4c839d15e24db240390dd321f62087cd",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2016_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2016.json",
+   "sha256": "710cb91b0c2bf9c3a50a8e1d5357145a8be59b0514eac0c57fccde6e926d182b",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2016_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2016/results/1.json",
+   "sha256": "56ecf3d953f48c896fe6ae00ea1640b95c6a36a64ec43ec0946d3f024b5b77cf",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2017_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2017.json",
+   "sha256": "476dedf42d0dd21c607f41770c13f9041971277da9727749e286b7dcf8a06866",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2017_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2017/results/1.json",
+   "sha256": "f17bba4977ebf52dda8540a9021f92685d5dd2bd9a3110bd2621fdc3b037ab29",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2018_1_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2018/1/laps.json (all pages merged)",
+   "sha256": "09a3da5dc019bc0c6f3c9998d1d6b3b412522bfd6bd4d6f1b0d9aa5b23c7615b",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2018_1_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2018/1/pitstops.json",
+   "sha256": "a1ec432c7a2eade7f1f3e3ce689076fed68a3a007010f76e171aebe3ba5b0fcf",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2018_1_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2018/1/qualifying.json",
+   "sha256": "70466902b8c70cc7b7406378a30e59499747c327a76070556c86cd0843185f40",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2018_1_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2018/1/results.json",
+   "sha256": "741fb28315f16d3a973553e2f5cd1fb9724fb4f6cf5a5cfbb079a9543da91069",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2018_constructorStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2018/constructorstandings.json",
+   "sha256": "45fd5cef0429241874b5a596c665e3acc22b8d4e11eaaabb478edc0b5e07fcd1",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2018_driverStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2018/driverstandings.json",
+   "sha256": "9e9bcf11c392eeaad5a6598019e6004c5e45bfc81bcd2b92417f1420b72460bb",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2018_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2018.json",
+   "sha256": "1c30ad870415f8eb0c766505e9ca237f24f87bda4713282849439b12ef8a6ad3",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2018_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2018/results/1.json",
+   "sha256": "eb3605b96ab6ef5f12450bc9a64667d72e5b0c5e060cc58b8d86385a4ddbb5a4",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2019_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2019.json",
+   "sha256": "44d6c51b19747f346747883f055256e578954f1d13ac880076df7aba7358bcf6",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2019_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2019/results/1.json",
+   "sha256": "93530517617df3e014a0340d54dd6a18ad7f45f34894160d134710deec06d1b0",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2020_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2020.json",
+   "sha256": "73386dba995ec465d15c8893c70a7dbe5f259812b0119cc90fb557fb2e5bdbd8",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2020_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2020/results/1.json",
+   "sha256": "d9c841f903ea3d4a5f88afd9c302644fcb3b39e87e8f6583c2d37de3f9cb6f66",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2021_10_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2021/10/laps.json (all pages merged)",
+   "sha256": "b30f4e49347456e0b8464ce33cb67612195d5c8ed7d10502b8b40c7fd6f1493a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2021_10_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2021/10/pitstops.json",
+   "sha256": "e4bc1656a6114d6d7d2db584320bc8cd1ff08360843cae9a92dd7f3410ed70eb",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2021_10_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2021/10/results.json",
+   "sha256": "b928e9646afdf3abdf0765d27d284816fd452931e3a6294452a35a187d23b871",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2021_10_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2021/10/sprint.json",
+   "sha256": "7bfa3ac726903fed9d93c6180d167c81342af672a535b07f8c04c736eeb34960",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2021_14_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2021/14/sprint.json",
+   "sha256": "6542f2ca91aa9f71e87754053ba69f93bd1549970f068507795082253e9b01c4",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2021_19_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2021/19/sprint.json",
+   "sha256": "2e6887f4290d5a66e7458ee1e6b0198403f1a38a19e20d242ba78c34ab872b36",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2021_22_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2021/22/laps.json (all pages merged)",
+   "sha256": "6ba70423985c7cb322442f43ba2971d4864de7e825a3b8a2f45e0a77d74a64f9",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2021_22_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2021/22/pitstops.json",
+   "sha256": "9070818c7a1a9cde2bff7d07cabb0dbe6f34b2d30d446a055ff9a2c21604889c",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2021_22_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2021/22/results.json",
+   "sha256": "519726c27cde3cc41a0234c6125cd1ef75f5a3d264115c4399bdd80241bd3fd5",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2021_constructorStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2021/constructorstandings.json",
+   "sha256": "b1ca481d748b04d024021c963207c19b5d56040249c5091885bbc2599862f252",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2021_driverStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2021/driverstandings.json",
+   "sha256": "962721a4f26d9ce147e2bb7b522052d0d99bb79a894650b4b4e546a6c412a296",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2021_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2021.json",
+   "sha256": "eac008033becb892ab1ac256d7a5cdca007b18959063dbb581241f0fa602e76c",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2021_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2021/results/1.json",
+   "sha256": "ffbcd52b705e65adf3ee0bfad8f834cb7f2827a2d1346d590d8fd68e211c8361",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2022_11_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2022/11/sprint.json",
+   "sha256": "0b7fddd3113cb8822695ce724175b5601e677655978e3a9bb9b35e1d0393ba7f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2022_21_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2022/21/sprint.json",
+   "sha256": "38fa98410d130d8836b2b2c0da29ee2ff9fc40d1b70629319357725dfcebd969",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2022_4_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2022/4/sprint.json",
+   "sha256": "a7a203a793f4a6df56d542dd8b898f02a3746d28976cd4f87675134a880a6d77",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2022_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2022.json",
+   "sha256": "909081c72e9c76de095e0dda3884625d4bd7a9e704560e86f660036dea425b42",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2022_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2022/results/1.json",
+   "sha256": "5beb7d1334761a809efe67b62a46d86984ce6154bae90599eda13f5b32840276",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_10_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/10/pitstops.json",
+   "sha256": "19e77dd3ac5090b438223004d5c55b0ce2a6a1593a9c5e24fd5a7a96a6417ed8",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_10_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/10/qualifying.json",
+   "sha256": "832b56e09d45508011e9171767e521c251ab9c9395c0d629a70e157fa198d1ce",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_10_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/10/results.json",
+   "sha256": "cc8e7328dd03dc106106eacf70409ae87bd47d4d69022aea57c6da80d0d1b59c",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_11_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/11/pitstops.json",
+   "sha256": "6a51c1d375e743dc678257d783bd93afe492b8d380f4c8603525d9b6a9b51443",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_11_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/11/qualifying.json",
+   "sha256": "c470a0b498143daa7f163fe96698961e603088135428851fed705afd96036eed",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_11_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/11/results.json",
+   "sha256": "004c1d5add5d3ad84422dd3dfb0b706b35d60b598684aa240520f8b8a02318e6",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_12_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/12/pitstops.json",
+   "sha256": "80782bfc76b3a4eacee68415aa309f95128d1dc36fb2ad87f4098aff335ab00f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_12_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/12/qualifying.json",
+   "sha256": "5847b0d2ad1021403a585ece733363b3315a892342f9bca5b254d8d0044db58d",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_12_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/12/results.json",
+   "sha256": "dd62dabac369ee0de22ebbbe478837267dac9537dcd974a2cdee3b093cd70f54",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_12_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/12/sprint.json",
+   "sha256": "7725565f5129024e6791ad74f8258edc8f933b6e100668519af233f059a3dee3",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_13_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/13/pitstops.json",
+   "sha256": "bb579883528df8bf4ffe60d6f2c21a24e6f28498f1f576ee37cf9bb776fc0280",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_13_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/13/qualifying.json",
+   "sha256": "8c50ca3cf11c1d49a94715e6545eba8792d93f384e3f472368270c9eb43fecbc",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_13_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/13/results.json",
+   "sha256": "6e6b3c933eed765307984970bc396a4d3eb22700eed503b75e895406f9b54670",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_14_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/14/pitstops.json",
+   "sha256": "bf2c3e35a48a2ab6078e32b7ecd46faaed14820e8c1ab75d6fcc133321695ff9",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_14_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/14/qualifying.json",
+   "sha256": "8613830b0814cbacea315d546195aa52b62267d1624eb5cb913ae7754d8291f5",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_14_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/14/results.json",
+   "sha256": "8559c8e05b74869b3db956f4c001d1d6d3bd82852233a99dfbca453bbbc7a726",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_15_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/15/pitstops.json",
+   "sha256": "2767e9d99ee3cab6c528a9cbee6662c7f3f208a030f8b7bc8c2cefaa831b79fe",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_15_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/15/qualifying.json",
+   "sha256": "b2b778001fb13b45a9831bdba726180f64e2d8f011bbffbe37ff12a92149fb9a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_15_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/15/results.json",
+   "sha256": "6e6ee40885c775b4c03e93fb2b9952cdedc86d344c7f4195a52b91246bbfa3d0",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_16_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/16/pitstops.json",
+   "sha256": "4e4b4c801b4220af2935034f1f5db747cf1bb15b00963f944ad530d934a3a6ee",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_16_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/16/qualifying.json",
+   "sha256": "629369c797aa516110202f5d08e02a2c59d69879f84c12cd231af27b70dd177e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_16_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/16/results.json",
+   "sha256": "1bfaccb539b524a59e7dd8c83e8f2a3a93c6d572230925ca704c973c72b1c046",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_17_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/17/pitstops.json",
+   "sha256": "070fdfb5d353a892e50dfb99f682b4df4a99a218b6c1d422af88b5ca357e4496",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_17_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/17/qualifying.json",
+   "sha256": "e5e354ae7c8a32da08b757757af0a24dfad33178511fd433d333901fdf82a3fb",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_17_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/17/results.json",
+   "sha256": "fb9556240d36fd9f1dfa9608510e747e89f8d34418900ee3e84fb975bdfc5e9d",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_17_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/17/sprint.json",
+   "sha256": "7d836d67df559200855808ad8e316880746213d326155ba73bf52cef6e44c9bb",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_18_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/18/pitstops.json",
+   "sha256": "909439a1071e3cf33db569e2bfbf466c51f408d0f57ed425faf8f4586068592e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_18_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/18/qualifying.json",
+   "sha256": "3df49a5956596d7a741fadd59568b95c1b6cf094d9f4fff2a2acb40f995444a5",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_18_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/18/results.json",
+   "sha256": "cdb88c528a1b0dfc308c7b2e49547ecd8160c21ee52e16fe5f26ec856d6365e0",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_18_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/18/sprint.json",
+   "sha256": "30bdfd08a0c0acfa3fd71a326469a8abe4e3947c797218597b59446b8a2ed986",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_19_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/19/pitstops.json",
+   "sha256": "20b2d9b4ae16a1cf0538b4def8620216f2bc64552640dc5626eba132c2346ae2",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_19_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/19/qualifying.json",
+   "sha256": "cdfabd2e1979e0830c19fe64956e2de5ec1ded510ba5b0ffe5f4bfa473c66ab6",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_19_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/19/results.json",
+   "sha256": "ef2c33a05bec0f9b44605d2e772d47acf9c840b75a079709e24704ff69299304",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_1_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/1/pitstops.json",
+   "sha256": "401a7d8a0cefc0e17e17632add1429a5358caf8a03aff0966f6518de1364b6c2",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_1_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/1/qualifying.json",
+   "sha256": "eb6a17a3888f4836dd150a7487edc90fa61a24df6d98fb6449102617085617e2",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_1_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/1/results.json",
+   "sha256": "d19ece8f2422ba284d2ad21769d9cb090320add86c1f3c735482864642b74913",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_20_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/20/pitstops.json",
+   "sha256": "b541b294adc99a3436ed92d54ca7af7af1eecffc7ead066a3be7cce436ab8b6c",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_20_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/20/qualifying.json",
+   "sha256": "2be0d122616c621e3354b41ae17b72e49be12109c335b2aa7f33f2729467be30",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_20_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/20/results.json",
+   "sha256": "b12b558b09611412b22d518beb6000ef30bccd97e9a353b55ddd795109e17d9f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_20_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/20/sprint.json",
+   "sha256": "b541bdc685fab826db0a0c095936a66a04e4b50c4de3d6c3cf40b89caaf27e97",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_21_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/21/pitstops.json",
+   "sha256": "b1813637e3a787f61b0189df71090bd97819b75a7dd04056bfa3bbb2bc70555a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_21_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/21/qualifying.json",
+   "sha256": "0ff4799bba2c69f31a44ba7de9487d2bd7d8b3cf2b9d1623e13fb712aa8fbd14",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_21_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/21/results.json",
+   "sha256": "fe3a85f2ea617bbdfbc1f3a1b4db289f13d1edbab7aea854d075e135aacf0787",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_22_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/22/pitstops.json",
+   "sha256": "80c48b9870cedea8285b369fd1f05f824385802df1972a3d8840a7613e215658",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_22_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/22/qualifying.json",
+   "sha256": "3e994c1c182558f49cc12d6d5e786b24e8d630f4a084e5a5e4e27d502bfa674f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_22_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/22/results.json",
+   "sha256": "72090146c063d27517f4d1ae2c56657bc33eb159bd45298e4b56ce1fe6ce03ee",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_2_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/2/pitstops.json",
+   "sha256": "c73914c689c8c1bfb523db3c6d75a74b81117d664a70ba0c54073bcb7dbb8ce9",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_2_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/2/qualifying.json",
+   "sha256": "3d7b1d8d103bf5797724ed73f4f4862e2f2bcf00ddeb1468a7ea8a736a27428a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_2_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/2/results.json",
+   "sha256": "5da73ccb029f882d839b2de9234d3b993b454f48abb299a678d2a6db03db39c6",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_3_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/3/pitstops.json",
+   "sha256": "cca74a823733c21746ed43d612c688e8aaea556403eada4916d131071688b91a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_3_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/3/qualifying.json",
+   "sha256": "ecba350cc26cec3c56e8bcdfbaebb666c0ee42a9b95b35e4a1da139f2c32331b",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_3_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/3/results.json",
+   "sha256": "0a1d28b6aa878f42b1ec2241c71597787aa852e54afb83987c0e4c05d6a8b791",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_4_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/4/pitstops.json",
+   "sha256": "0c543540f7eb8dd55dd842455f0d83c870843cfde6fbfa407f328416dea3a014",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_4_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/4/qualifying.json",
+   "sha256": "5ef52c0260135ab91120b9dc0c41920f04f9d320bc0e78dc850c2332c039c865",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_4_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/4/results.json",
+   "sha256": "5c90a6e01f7e0b4a8772478946bd558c1f9cfdf5ddad655fc443957162ca628e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_4_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/4/sprint.json",
+   "sha256": "a004d0e96a19a744ba3490dfcd0033ae6ceb979cf51ffe99ecf08a48ed32f91c",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_5_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/5/pitstops.json",
+   "sha256": "b89a4a6f3b118164fcd5e42494e0063a89267d1f762f3f7caef2550512791fc4",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_5_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/5/qualifying.json",
+   "sha256": "505003289471bc8353a1fd9a780f3372ffd9d3ff250604b2f613ac63d45e9e2f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_5_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/5/results.json",
+   "sha256": "e7e9e1ba6f081bc52a20f7a7ced09138318eed1f4d09201d24494f0c92bd6ce9",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_6_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/6/pitstops.json",
+   "sha256": "9bdd37a0e945410d8adab3e830e8d7fea2ebb859d090fd92763bb7bdb1936975",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_6_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/6/qualifying.json",
+   "sha256": "464502d614aca85cfefdd1cc6d51b06ff0cf49978a76a8ed6dadc461738583b8",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_6_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/6/results.json",
+   "sha256": "13926520a0b183bfdaec77480045b7fbaf238bbf157ab664211173c7e17f8c3c",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_7_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/7/pitstops.json",
+   "sha256": "33eaf02bca9c10fd84c64e7c8e4f421ad65a710ea9be42e0869c7e421dbbeac1",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_7_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/7/qualifying.json",
+   "sha256": "94a8a52d78f1af87b8efba28a892c1b909d7da468d6529378849737a17bdc8a6",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_7_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/7/results.json",
+   "sha256": "4febd6ca9455790817b562638e680554071ea25c57b2e4560089d545c7e538e5",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_8_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/8/pitstops.json",
+   "sha256": "bafa1b75777c60669d08a5942373da8278b2a9f648714832a4717e724fab9128",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_8_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/8/qualifying.json",
+   "sha256": "f9a8f24b2e3c14d1dbc8d7ca6d03a7f0250262762541e0d201369e81df907580",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_8_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/8/results.json",
+   "sha256": "a0966cce2b91b8f5528041b9d6a0c206b2a3b540a66acddd85130f02db533f9c",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_9_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/9/pitstops.json",
+   "sha256": "c68ab9721f2ee4e2a0684786fced80a53cab69273e318e7801c73f61ec082eeb",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_9_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/9/qualifying.json",
+   "sha256": "eacab45b098f4805ab45cf74a52e2a4a1f84d8e5053083d479523cc8d68c990b",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_9_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/9/results.json",
+   "sha256": "dd365593d65d56a12b2a577ecdfe5b807b7d25437e27a3f30294e3711556c8d2",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_9_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/9/sprint.json",
+   "sha256": "26fa0890063c298ebaed251bdac163eec24fa0c4d8d5e14504a5a418c215eaa3",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023.json",
+   "sha256": "a3fda8f2899acfeecf4c66f42b0020d4eec1f41642e51e95883c5a2d1077ad40",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2023_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2023/results/1.json",
+   "sha256": "ce270b4414aa5ca47aa7a96dc352df51059ab7e19a28df980b0b3c8fd973eb51",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_10_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/10/laps.json (all pages merged)",
+   "sha256": "9c2d9de50b51afcd9d73074007c6ba7c297c394a8209fcf782304fc95e240498",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_10_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/10/pitstops.json",
+   "sha256": "813c9a2acc2af0311fe8417437e5cc7ab4811f5046e96e7a7296390af17d98c8",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_10_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/10/qualifying.json",
+   "sha256": "7af56ec4d513016f685a094032d462e1aa24ac553e18de8cc29d79614549bd46",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_10_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/10/results.json",
+   "sha256": "31f8703d361d1eb2d31c3d4825ee556b8615924d4bb7f01135ef55de2b468d4e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_11_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/11/pitstops.json",
+   "sha256": "5dbbedc0d52cd14e8868a9ff56664f778fd53e0b029b1c8d38cfa477776f6ea4",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_11_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/11/qualifying.json",
+   "sha256": "05c060c09c14bfc783f3abeff6dab3f6de3e62fda31df491efbe05e00e359d4d",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_11_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/11/results.json",
+   "sha256": "8b127fe83b84aeeaa419be51c3b39fd03d6ffbe1d945af4a315a31206b0e04de",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_11_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/11/sprint.json",
+   "sha256": "c419274e6eec6f38b2a3b71d088a629c3af5f75e6bd77daf39f0af73cf87236e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_12_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/12/laps.json (all pages merged)",
+   "sha256": "15a9261ff4f38716c1342085bf7f3beb6fcbb93a2d81e4a8e7559faa6a2ff290",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_12_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/12/pitstops.json",
+   "sha256": "5c433197f37a1a216e3c519b83270582762458b2243b65d0c8c6458991705eab",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_12_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/12/qualifying.json",
+   "sha256": "b56c3d3e78fbfb1ae9c89fa14bca013677cad1de2e49702b08baa3cf37b1ed26",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_12_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/12/results.json",
+   "sha256": "8fbaf0a4bdd0ee9c4131b3907543498fe2ab3ace37f0c98e47563c2e22dd5fc1",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_13_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/13/pitstops.json",
+   "sha256": "a6fa567b159658ab7e0e192311fa8531c0287ad76d03d2d929ee690683b694ab",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_13_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/13/qualifying.json",
+   "sha256": "8a65104ef65c3d154ed5c6edf4beb448267880c7fe19d8851c8a6518fcc9c9f2",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_13_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/13/results.json",
+   "sha256": "b980a414e6ad4ae83ce142d90705f4b6852191ce1c004842c2f7d9a33c82f284",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_14_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/14/pitstops.json",
+   "sha256": "59660c8900ad76fcd6511a44c4febf2c9d368c618aec1c48befdd293e59053cd",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_14_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/14/qualifying.json",
+   "sha256": "18958d3f24dc46d3e488326e4bcf39d307dd45ac5d146e92343ed94a3e9fdab4",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_14_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/14/results.json",
+   "sha256": "168c9de64b50b096834e0fb378e9eb4126f404b1e1cc06b4cc1d9cd18831b778",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_15_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/15/pitstops.json",
+   "sha256": "2fb8a7ac87563e0807c5c130b6aab6723bf2a750211f7a5f795ee20cbe6bc87d",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_15_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/15/qualifying.json",
+   "sha256": "93f8012acc4382bc74bce9a5878393d0bb712149b3a53fc229744c8bc775f92f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_15_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/15/results.json",
+   "sha256": "c32890fd32947d443cc95a3eb87e0a100c6973c5b4aa85e5f3adc550e78d05cd",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_16_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/16/pitstops.json",
+   "sha256": "49d82dd387b3eadadc1c406aab4cc71113d0ea5c636d8fa7ca68e16e334dc80b",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_16_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/16/qualifying.json",
+   "sha256": "7da82df87893014efc8aa4a6161ee9550651a8f9c9c3e6e6a9f6cf44b4f4397b",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_16_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/16/results.json",
+   "sha256": "6751890ff5a9d04a7102b5a7d674c99c8d693005f8d7b0614730a6cb9436c36d",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_17_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/17/pitstops.json",
+   "sha256": "a92db384696c3ac5b914078df8e8e1d199738eaed53083f8668ac8e98a8b2b0a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_17_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/17/qualifying.json",
+   "sha256": "c98ee348d8f4ff002c9fde47936fd2858f068240a0a2d7a1915201869e7a93ea",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_17_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/17/results.json",
+   "sha256": "dbe112114c7282a8d13d05287daaf0768ada892aca84f296ba28e0b8ad846812",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_18_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/18/pitstops.json",
+   "sha256": "dea8859c5b68cea4272d6e81c97e518f2b4df252ea4ced1d067836b4cd181c41",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_18_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/18/qualifying.json",
+   "sha256": "e9e1e75a7e8bde95ac4d0ab37369e14600c2a090d23718e42013c828723554ec",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_18_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/18/results.json",
+   "sha256": "06aed2af3929bebee27b43b3b4115a5a78db1a1fb3f7e2e76228a57c7de0edd1",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_19_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/19/pitstops.json",
+   "sha256": "e4ee05ed33b604b68214b1b33db1418e202340c9626664702d5058bcffe0ea10",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_19_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/19/qualifying.json",
+   "sha256": "dc6e0fc4f2704f233aaf1e265d5f864e471feab61e5362a6017a707262ee6f9c",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_19_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/19/results.json",
+   "sha256": "5cf18ed8a4bf2753507cf2e62096936b33915b9e43ad84d688fbaa9ac72a574c",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_19_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/19/sprint.json",
+   "sha256": "0db5ac86b6f8ecb702ca936cd8a81e7283b5ec8436e4d722003360686b64022d",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_1_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/1/laps.json (all pages merged)",
+   "sha256": "9ebc3f71f132a6785321d3237ce12523ae90da995fb5d8eeb9a4d4559a98c889",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_1_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/1/pitstops.json",
+   "sha256": "65fbcbc1e00f21c103a0e94db48a7615b3e80d8900b21913edddd6f106fa7658",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_1_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/1/qualifying.json",
+   "sha256": "4dccf94e5e5c723a8e89f603f1361f6a9a2cddf25dcb747c27d2307357547d4b",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_1_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/1/results.json",
+   "sha256": "62874536edbc0605648871d46aa63224b4b6fe238442c688b78008e4abb89d94",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_20_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/20/pitstops.json",
+   "sha256": "b5006f3be104756505ce1826688951bd6358819b6394cdf6a6991ad05652c59e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_20_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/20/qualifying.json",
+   "sha256": "b28a191703f6011192b701f77e59fb342905d9940897ba34603e45f7328e224e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_20_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/20/results.json",
+   "sha256": "e8745832e70a11e0fa2811bedfd32d7ab2ebe36806f6ed40e54dd35ba3c0e441",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_21_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/21/pitstops.json",
+   "sha256": "28a9e6410cf8a9d41176706085bd8e74da3b633aa13d4de1bf585508df0fbab6",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_21_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/21/qualifying.json",
+   "sha256": "995bb77a525f784685b3c463637a522b4d1dfa83e76f4287ebc6354f3242c8a7",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_21_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/21/results.json",
+   "sha256": "d8bea19afb2b136a597832a2b3be9319f3f7836291b377d7da2891848eecac2d",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_21_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/21/sprint.json",
+   "sha256": "e09e1ba61c612bbc862bf65c4eb6b24a2b6b81c0138a57983f974044ce0ac86e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_22_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/22/pitstops.json",
+   "sha256": "fa48591f3b481f136010a75d27080d93b46f474736d15bb0b1095174419deb25",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_22_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/22/qualifying.json",
+   "sha256": "63a606a04b0dd9c9c6d0af2cc95acc19d7b68b47f598c95b9398dc508ff01a5a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_22_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/22/results.json",
+   "sha256": "9651eac791f1ad06b404cc1f980774af54ba2c819ea6b45336667e440a243dc7",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_23_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/23/pitstops.json",
+   "sha256": "05d1169d83b08dc053ad6c7e05a5d2f4184b4483805ebfa75371c7536d70728c",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_23_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/23/qualifying.json",
+   "sha256": "fc1ac8f3aeda64c57e025af88be7ee7096ea1abe4207ff0a0a8da53fad3b4d00",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_23_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/23/results.json",
+   "sha256": "7bdd037bf1c1b841e8e56bb597cb9883c199f22c3ac7b16f8456ed0c92a80631",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_23_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/23/sprint.json",
+   "sha256": "7ba2c71e84a3684d0be13095b5be7dbeee092890ed00fedd7a453e36e1f8a74a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_24_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/24/laps.json (all pages merged)",
+   "sha256": "fbad16155ec69c1e36d063a87fe5d960063267f97ee5d1fedee3b7ef061539d4",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_24_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/24/pitstops.json",
+   "sha256": "025434d8b19389e5b4f1a50e872c022f0d2f6404ccc9c48db1f784d6ffe007af",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_24_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/24/qualifying.json",
+   "sha256": "b378270803efff89c4c6cd07a7b212ae9db2d8be4e6a5f11007ba5690a46a43a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_24_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/24/results.json",
+   "sha256": "adcc3a00ead512653d8656984399c814a126cf267e2e09bd428be4e596f4936e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_2_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/2/laps.json (all pages merged)",
+   "sha256": "84903a1e9dd13b4501b42c77f49576fb931ac005a5ce55f5064f033979bf88a5",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_2_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/2/pitstops.json",
+   "sha256": "acfaca0ffbda83528ff43c560f6e96a45ffe3fb50c72cc5184caf15bdd771084",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_2_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/2/qualifying.json",
+   "sha256": "08ecb79c5c47341ffc9e5271264dcfbecbf8d3b2751aad40b1d60b21788b137c",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_2_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/2/results.json",
+   "sha256": "c88cdefe5ad1a4873bffbf0a41aa570bdc251deb35cfbb71af8649f43be85a23",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_3_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/3/laps.json (all pages merged)",
+   "sha256": "32cb4ba95ee80024011beff89004800570b5c8b375c1de4262bc0d380d94cb78",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_3_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/3/pitstops.json",
+   "sha256": "13732910b03afee05ca2d292d594356e2995c4f148eba4d661bccfdf4d3ddea6",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_3_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/3/qualifying.json",
+   "sha256": "216a69ae3443526b68db34343d12920b08bc474c5658a51350bba9ef6841ba64",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_3_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/3/results.json",
+   "sha256": "8f3b2bf5ba315b6e60ccaa0e1403e48c077ef7d5be71e0ada0d50a183ac146d7",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_4_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/4/pitstops.json",
+   "sha256": "86dd5a7a57c8b1f21973012a07c08798e1d64553379d1b95bbf34d67cf32ebf1",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_4_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/4/qualifying.json",
+   "sha256": "8ce870ed0d544e4a059bd8a2ea76f2db48594c3b6136ef89d706b779c2771b59",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_4_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/4/results.json",
+   "sha256": "3ccb67f72f14da40ba18ad921de1dd468baec0f21d6f5e528723ecfaf35b195a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_5_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/5/pitstops.json",
+   "sha256": "f13eba4448f8a08bd73d7d5f3fb9c0a4c3dbcf2d1ff9f36b5070ab66785e0edc",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_5_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/5/qualifying.json",
+   "sha256": "a9a29d709a2e83bfff092659f09e835be21d2c3f181ce9cdb0facfb175f21d77",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_5_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/5/results.json",
+   "sha256": "22d09618fca3400f227dbbb190734cdc9e8e474228305f93fa423fc84acd44f9",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_5_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/5/sprint.json",
+   "sha256": "d21ac1ee64fba33301417ce2637e1e4fa08e3578afe180ad62e97cdca2e2b1b9",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_6_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/6/laps.json (all pages merged)",
+   "sha256": "2007489f20de4c9795311f68cac833b1aef251286436607fd06eb1ea68164d96",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_6_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/6/pitstops.json",
+   "sha256": "deb524616b1aa2df0051b74a151b5b295d3101f78f136a57b542dfb246238d52",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_6_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/6/qualifying.json",
+   "sha256": "da160d5e77c282d22283a0530bae39370e0a937098bb2101eb9cafb76261e138",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_6_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/6/results.json",
+   "sha256": "65043b76c9d8892dd7eadd29fe04e6feaf5f15116d267aec5acc0e0fe96c50f2",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_6_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/6/sprint.json",
+   "sha256": "ae675093859dfbe23b67322a41e2d2b3d945e612a7c3323ce15256adadaefeb0",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_7_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/7/pitstops.json",
+   "sha256": "fa80cb9690fa30c86d0c1c3b45f903ceb518a8de7250ff8f00ced91edc208e80",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_7_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/7/qualifying.json",
+   "sha256": "532410bfc1a2b5fb13e02f0137d024bb9d6ba501e2760869a80ac982a96400a4",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_7_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/7/results.json",
+   "sha256": "64a8a6c26cfa9ab18e6e0f421f7769019f1f75dabdc748953042d5f3e7cdff3a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_8_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/8/laps.json (all pages merged)",
+   "sha256": "ec45c3f67bd897fcb1bc1696d181ba12f762a5956731dcb502c1ba4c54f0d9f2",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_8_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/8/pitstops.json",
+   "sha256": "021432166651e5b5706d14024c17a3c963ee60b7c68e9c8c4daa68edf617767a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_8_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/8/qualifying.json",
+   "sha256": "857d698eac93fe8b72006b706192e96fd303520dd4b0b2d4afea9bf904d1850d",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_8_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/8/results.json",
+   "sha256": "808fd8d5f7ac7bf33ce96151c679bd1ca67aa74c05a306590d1f8587ee028c04",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_9_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/9/pitstops.json",
+   "sha256": "c2064cc797e7ec23c62470b87bcb6dc9de383d95a74a89a74960298852c346c7",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_9_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/9/qualifying.json",
+   "sha256": "3003ac87bb0f35358c93814c342887fe83e7bed37df945dcdb7dfdbbf422dde2",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_9_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/9/results.json",
+   "sha256": "5568a67ee719c4e5d22c8dae02274c2159c4b670c72c741fb8f62e2405fef69b",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_constructorStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/constructorstandings.json",
+   "sha256": "a0f34ecaeb4dd3312972cec5bcdcf1d239ac9b4431093fff743fbbb6bd84c539",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_driverStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/driverstandings.json",
+   "sha256": "3e6eacb0eda7302684af19d8716d40d046af255d77e7a5bb1094077f5c290f2e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024.json",
+   "sha256": "b2a302fb5beb26bd09e5ab5d7c39288f3b7c437a6cca563983e1e78ee9700baa",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2024_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2024/results/1.json",
+   "sha256": "da2b0d809084617d8bd60b3aecb5c1f923dcebd735a9d4a960e96b1dc5c78e56",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2025_13_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2025/13/sprint.json",
+   "sha256": "5bc06dec7d649231f8495103d42948565be4fdac044c03980c02ae950dcf913e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2025_19_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2025/19/sprint.json",
+   "sha256": "0ddef2f2269613abb5a292dec32cf779b2f0013787a1b97350e05db88fe5a38d",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2025_1_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2025/1/laps.json (all pages merged)",
+   "sha256": "bd09fae440008a414f34910d0f7db575d07ef4f9d94d04f0b854a91a4cf4c6fa",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2025_1_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2025/1/pitstops.json",
+   "sha256": "fed2f7fc47b2f7db05aec7e1c4f9a03a7aba75dff8b32d5c7289592dec7b8e1a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2025_1_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2025/1/results.json",
+   "sha256": "786597992382dda4bef7bcfb09f10e65b30c8ec85526da9bf0dd6a7b5161c02e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2025_21_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2025/21/sprint.json",
+   "sha256": "68f4eb53f496b8188cf125ebbe4db39b200dca87c9e215179472ff82c386c008",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2025_23_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2025/23/sprint.json",
+   "sha256": "40db0bcfea723482a931c07050a38d48ef2413d7677838320dc07baec81106a5",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2025_24_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2025/24/laps.json (all pages merged)",
+   "sha256": "4fca1051623813c371ae6607a191b7fa9d457b65f67457db4d6b96c35dcb639b",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2025_24_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2025/24/pitstops.json",
+   "sha256": "7de0a47e83146046b74b7bb307196d0809111960af8ed10084177df81ab467a3",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2025_24_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2025/24/results.json",
+   "sha256": "8db117e3e53413f970b9cd1ef1c36112aade6ba2134c5ddfc5a0fe243c5893e3",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2025_2_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2025/2/sprint.json",
+   "sha256": "82aa74377cb7b028a46ce1de1674b6fe7ab0689a39565445562cbd5628caebdf",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2025_6_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2025/6/sprint.json",
+   "sha256": "72399f7676a883b8051507ea0e20a9cf3ea7bd9ff24297942225d1f376816685",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2025_constructorStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2025/constructorstandings.json",
+   "sha256": "bb39169f51126d1cb27f1a02f2708d2b15c10a26740d7cc672c4c1b02d19f705",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2025_driverStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2025/driverstandings.json",
+   "sha256": "468b3277a988eff152be9c5d895b4f62b5b533d835578e508d331ca565782bc7",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2025_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2025.json",
+   "sha256": "6fcd40276e05ed960ff6796e0ca4fe892759be2045b1c3c9c0770280a23d8160",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2025_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2025/results/1.json",
+   "sha256": "52c121d1dddfbea16b11ec6e4f0439003eef7f8c982b477a9ea583f7da863ed9",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_10_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/10/laps.json (all pages merged)",
+   "sha256": "4269f37aec9e2c2c8d63ff5d1359b43ae5f3aa7636ae20495c539b93ecd02ae8",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_10_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/10/pitstops.json",
+   "sha256": "abc1b9adf36451a51ee806ccd2eb88c07e35a6586bc2a5a153a2f840bb34f628",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_10_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/10/qualifying.json",
+   "sha256": "ff15abdaa7079785265ab07284a02d7bd40474e4c57455de44a1af5d958e50cc",
+   "fetched_at": "2026-10-08T18:28:50Z",
+   "note": "corrected from Jolpica 2026-10-08 (audit)"
+  },
+  "jolpica/2026_10_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/10/results.json",
+   "sha256": "2236c23bc21cbacbe1ec7fcd2409d912e8e1187717d70fad0d36c3134f834186",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_11_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/11/laps.json (all pages merged)",
+   "sha256": "bbf7f596d1ca041a7198e8203e5cc9bf52189aa70bfbc3e4f18bc0c16e1b47a9",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_11_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/11/pitstops.json",
+   "sha256": "d4bc361aeeecab7ec40a9e0a2faf66f501bf334a7797ccfdb8c171efe8d7c593",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_11_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/11/qualifying.json",
+   "sha256": "5d5f39395b5379d4c59f680bf924c559f34a0921f323963b67d8d0950ddcc49a",
+   "fetched_at": "2026-10-08T18:28:50Z",
+   "note": "corrected from Jolpica 2026-10-08 (audit)"
+  },
+  "jolpica/2026_11_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/11/results.json",
+   "sha256": "380e2881469abc769b267ef2e39266deac7f80fb0b6a55974feba7271de17800",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_12_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/12/laps.json (all pages merged)",
+   "sha256": "79db43d42e06df285d2a162875116c1bd9ba0b0c66dde8952b10c63432e531d4",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_12_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/12/pitstops.json",
+   "sha256": "03c0d0600618fc005d9827ad5af748a7c9405f3957dedf35128a6a94aa35ebf5",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_12_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/12/qualifying.json",
+   "sha256": "a18dcaa21737b61c701982452dc3c085952153c82dfe3dd30d0567ea74e85ec0",
+   "fetched_at": "2026-10-08T18:28:50Z",
+   "note": "corrected from Jolpica 2026-10-08 (audit)"
+  },
+  "jolpica/2026_12_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/12/results.json",
+   "sha256": "2aa3ab5808bb8b8b0e08a794785199c5711d290440db115446d9db0488723257",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_12_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/12/sprint.json",
+   "sha256": "22cc9e915f6d2a840ec24596d942094aa1f955542c9375caa67d1b1a827389dd",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_13_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/13/laps.json (all pages merged)",
+   "sha256": "caa45c95784fcd8db34a0f20efa0dbc0467d51f138e30806d68deffa97fba0dd",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_13_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/13/pitstops.json",
+   "sha256": "faf040a5764804946f72f6e706974f76c749e21c13350295c3744e7cbe671018",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_13_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/13/qualifying.json",
+   "sha256": "7e22d10b5eaa115f5fc7156f514346bf8dfb85bd1ecb7fcd1aa2d3334522f3e2",
+   "fetched_at": "2026-10-08T18:28:50Z",
+   "note": "corrected from Jolpica 2026-10-08 (audit)"
+  },
+  "jolpica/2026_13_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/13/results.json",
+   "sha256": "4653499a4c9611bcb23787dd78b2fe56e59eea669ae35e7fa98790c2df3725d9",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_14_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/14/laps.json (all pages merged)",
+   "sha256": "26de1480621a9090877dac9637abf51c49b91ed65b09e4e2ea48286409b0d3e1",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_14_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/14/pitstops.json",
+   "sha256": "49b00981d5515b859122dcc00f67b13d1ec485d84acc0e115c80e9432a14cdef",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_14_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/14/qualifying.json",
+   "sha256": "08db16d8f1d25d7d6081cd6564e7b8f756973e2fe29b5232e679ae7fbe3aaa21",
+   "fetched_at": "2026-10-08T18:28:50Z",
+   "note": "corrected from Jolpica 2026-10-08 (audit)"
+  },
+  "jolpica/2026_14_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/14/results.json",
+   "sha256": "8962bff555166154da0e2cd51ea4980b60f8786784cefe934b62e0833e81a1ee",
+   "fetched_at": "2026-10-08T18:28:50Z",
+   "note": "corrected from Jolpica 2026-10-08 (audit)"
+  },
+  "jolpica/2026_15_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/15/laps.json (all pages merged)",
+   "sha256": "30d3f7bb5f4a78f541f966ff6186cb2bcfdfdd4421607c93294eebd43eff8c5e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_15_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/15/pitstops.json",
+   "sha256": "afe0c8f7914ee96ae42d02ee6742aedd837bf62f15621aacb45727aeed44910d",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_15_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/15/qualifying.json",
+   "sha256": "119a0f3d88d643bc7ee39d0c83918de872b5a2be3b723d6424f5b95adfc92459",
+   "fetched_at": "2026-10-08T18:28:50Z",
+   "note": "corrected from Jolpica 2026-10-08 (audit)"
+  },
+  "jolpica/2026_15_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/15/results.json",
+   "sha256": "cd668193de4702be4136c822294f40c7e73ab02883ab30fa770266fe32b3dd6e",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_16_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/16/laps.json (all pages merged)",
+   "sha256": "b1bbf09a7b5a39375357f3bbb42e9f2426c6ae7dc5937725cf3bbd9c5d791b81",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_16_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/16/pitstops.json",
+   "sha256": "41e6e4441c80fc0f3b13125a660198c0f427b185bd7a607af9a1f4b2e77672a6",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_16_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/16/qualifying.json",
+   "sha256": "2a4abe40a2ad031efd8c73370b46fea9868bd43b7b8761568d1bc44b5bd94bd7",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_16_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/16/results.json",
+   "sha256": "9123a75c97aaab270ec393cd267c11775fb075ed58bc10c987d116c03c182839",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_1_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/1/laps.json (all pages merged)",
+   "sha256": "e867f6a4e72e7de43c6884448232f01d1bb9a8fa2195119489e8cc17cc3f82d4",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_1_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/1/pitstops.json",
+   "sha256": "4eac72a00676a5f222fea528d2945f0f2e31d6c6eee63617b23bc656944cc0ea",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_1_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/1/qualifying.json",
+   "sha256": "6a7181bc7ae059737f627c1393424175872e7fd5a9115aa6344303beb43118c3",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_1_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/1/results.json",
+   "sha256": "324bcc6e88a672f7f054de3c4ffba9777dd3d5f2acf3ded26bf4546603a9b81f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_2_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/2/laps.json (all pages merged)",
+   "sha256": "e7feced57027f44e4f21a10daf4292e1b94e5d4688649d3a94c46f6dee2616fe",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_2_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/2/pitstops.json",
+   "sha256": "d3a0d23fe6932b6439be5c1a2402193ce59d3cf0cc00ff1dd624982013631839",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_2_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/2/qualifying.json",
+   "sha256": "30691e37ef4d132f26a53c0c8362a73ccdff718db3ccfce431bd370eb4fd44ab",
+   "fetched_at": "2026-10-08T18:28:50Z",
+   "note": "corrected from Jolpica 2026-10-08 (audit)"
+  },
+  "jolpica/2026_2_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/2/results.json",
+   "sha256": "379b6340efda99ebacf4ae861704e1d61398bfdfe324e78a6d6aa8ffb8173031",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_2_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/2/sprint.json",
+   "sha256": "dff64cea902ce0dfea9bca71b822d966f2dd4809b9c3983223733a100b48afcd",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_3_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/3/laps.json (all pages merged)",
+   "sha256": "65496cd6a5c8f236cf6f44dc3ae3e930b6ae56536a2f1b3b9a6d58113890ce12",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_3_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/3/pitstops.json",
+   "sha256": "4e1c0f44d93c33a6c80a9f7fd7256645e43c70eccef01856a1050611da20ea9f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_3_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/3/qualifying.json",
+   "sha256": "7621aee722a2122aa3cf565671ee93ee73ffe5cdc01e066d34780c595d593ebf",
+   "fetched_at": "2026-10-08T18:28:50Z",
+   "note": "corrected from Jolpica 2026-10-08 (audit)"
+  },
+  "jolpica/2026_3_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/3/results.json",
+   "sha256": "ef8c1aa8cebd5f24d703943adedebce4bc111b369f609f1802239b83c94d14ff",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_4_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/4/laps.json (all pages merged)",
+   "sha256": "d15a667fa33d188bbf2269c2bad87073a8a67d6c6f73d9c5ad0f44241fb8cf2f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_4_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/4/pitstops.json",
+   "sha256": "76d07e9f7a602a6b9af073fc6f9cfaab7b0f4f708c5aca0a8c1729e5e353a27a",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_4_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/4/qualifying.json",
+   "sha256": "efb6907cfdb5566324d333f217d50fdb0431c0a9abede9f91dd14c34bfa0e84d",
+   "fetched_at": "2026-10-08T18:28:50Z",
+   "note": "corrected from Jolpica 2026-10-08 (audit)"
+  },
+  "jolpica/2026_4_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/4/results.json",
+   "sha256": "beef781b852a6c1a365cb3fe94eccd8fb7dd719c44f04a8aa49db0a7d85dd0b8",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_4_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/4/sprint.json",
+   "sha256": "c58566587159dc75c9068f1ea63efed543aa95f91c513a2ecc5c1f55b460ac7b",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_5_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/5/laps.json (all pages merged)",
+   "sha256": "98f95861aecafeba9707be3aa6846a3224b8b1cfa8b318b9774b33d6d4feb93d",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_5_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/5/pitstops.json",
+   "sha256": "63aca97ed4986e73485568b44980a368b3b570526a3ec47ff9226508e850497f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_5_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/5/qualifying.json",
+   "sha256": "8b2f0ff59f46f3ac68a3f6968162be0eb4092030df99cf3aa3fb00678651c3ab",
+   "fetched_at": "2026-10-08T18:28:50Z",
+   "note": "corrected from Jolpica 2026-10-08 (audit)"
+  },
+  "jolpica/2026_5_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/5/results.json",
+   "sha256": "62f041929730e1732f8ac08d22c1d168d66edf59e5ec4d10ae2abe4c5e311227",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_5_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/5/sprint.json",
+   "sha256": "55d807c3002dd9c62a22386d4625fc0eff674479532b74608c9342d5007daac0",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_6_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/6/laps.json (all pages merged)",
+   "sha256": "ad28876ca025773dad1499bff14b89a8cfefc63b948ea933e1056abb599ad473",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_6_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/6/pitstops.json",
+   "sha256": "5696a3f2378c4e9fa04445898f719419ecede1cb7fd2cb8b2d9c25e432b9b5e4",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_6_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/6/qualifying.json",
+   "sha256": "c50fe931fdbadf5f5227606fca7ca9e30a6ff228990187b50645628f94b3aa64",
+   "fetched_at": "2026-10-08T18:28:50Z",
+   "note": "corrected from Jolpica 2026-10-08 (audit)"
+  },
+  "jolpica/2026_6_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/6/results.json",
+   "sha256": "f5b6aea4d4c7168d7206d8b4fce2802e0032575fe5e8dba2e44137da584a7793",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_7_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/7/laps.json (all pages merged)",
+   "sha256": "67d7a7e3c4f2b2108d37b5e2585376c9e11b39cd9ae5dd734a37183095c7c0cd",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_7_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/7/pitstops.json",
+   "sha256": "bc32e0430d47196273401173aa8f0ced32e581c8cbced20e302b3e4771d33c03",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_7_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/7/qualifying.json",
+   "sha256": "61112270e229ea36446d4f76bb601d9db4672b44e18d6e5b76c9ee5898f2c95e",
+   "fetched_at": "2026-10-08T18:28:50Z",
+   "note": "corrected from Jolpica 2026-10-08 (audit)"
+  },
+  "jolpica/2026_7_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/7/results.json",
+   "sha256": "34a05aec1a8946253502662a7de95a88a1c9b49988a3cfaec261d99c2270d30f",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_8_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/8/laps.json (all pages merged)",
+   "sha256": "d9c04db123ef7c7f9594b3e198c7cce329b4d85c4972bd68a74477c5126765d6",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_8_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/8/pitstops.json",
+   "sha256": "1ce0c3c920ec223f7016815a1647164e78cab66f8b59e925c37b758ff6cd0fa2",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_8_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/8/qualifying.json",
+   "sha256": "36c0c61542791ab5d5770e2fda1ff246ee844da43069532b72ee3c88008973b6",
+   "fetched_at": "2026-10-08T18:28:50Z",
+   "note": "corrected from Jolpica 2026-10-08 (audit)"
+  },
+  "jolpica/2026_8_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/8/results.json",
+   "sha256": "69c74628133428b0bd67ac95b667800d0541f447860bd31dd638d6a29bf0eadd",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_9_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/9/laps.json (all pages merged)",
+   "sha256": "31d353b9883860d8e78a7d1a8828bc4457bff366fa690b112b2a0227465ad9df",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_9_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/9/pitstops.json",
+   "sha256": "a9195bd9c289231e18def70c27e8980e409a3d920db940fd1e5ca0bd539574da",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_9_qualifying.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/9/qualifying.json",
+   "sha256": "5903715d70d0bf0a8bbe7e7964679ef37895977b3007a6dce0ec67bba0d3d5f4",
+   "fetched_at": "2026-10-08T18:28:50Z",
+   "note": "corrected from Jolpica 2026-10-08 (audit)"
+  },
+  "jolpica/2026_9_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/9/results.json",
+   "sha256": "0a97eae2cecd387fefe311e024385a05ba0040425c44794ce190ece40240ce40",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_9_sprint.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/9/sprint.json",
+   "sha256": "9401b4fd17305fb326970c6d12e2cc49c4e396a24d9397b3966b960cae25a7d4",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_constructorStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/constructorstandings.json",
+   "sha256": "e576c21a8e2defec06e01f6e594ecb90e0347dbb5c82216436782ab9f3e98f03",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_driverStandings.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/driverstandings.json",
+   "sha256": "a36de025d9863a322bb9cd37fd7cc5dc4fbbf875b178d0432576c48af3a97a9b",
+   "fetched_at": "2026-10-08T18:28:50Z",
+   "note": "corrected from Jolpica 2026-10-08 (audit)"
+  },
+  "jolpica/2026_schedule.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026.json",
+   "sha256": "3402c485e5801e089ae98ba3fc0d0312f68d32927e0bad9f9cd726cf375844f0",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "jolpica/2026_winners.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/results/1.json",
+   "sha256": "4edbe12e1f0eb8f92a036180e798d2e0bb94fd10f5100bac452e0ca0d2444cb0",
+   "fetched_at": "2026-10-08T18:37:48Z",
+   "note": "verified against Jolpica 2026-10-08"
+  },
+  "openf1/2023_12_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=9286",
+   "sha256": "c0903413adf7b085d3042c6a21cdb7252a93a6329a49e8ec45efe979cb4496f8",
+   "fetched_at": "2026-10-09T00:51:44Z"
+  },
+  "openf1/2023_17_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=9298",
+   "sha256": "0dd82a93dfdae7f3824888b40fd9e82f4017a48cb6819e1414f3d52e3a062797",
+   "fetched_at": "2026-10-09T00:51:48Z"
+  },
+  "openf1/2023_18_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=9294",
+   "sha256": "889b602dbbe03dad11133c28172d28af264924b6f03a31f248569595a24c80a6",
+   "fetched_at": "2026-10-09T00:51:52Z"
+  },
+  "openf1/2023_20_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=9308",
+   "sha256": "8fbe9b9e2d0f938df91b5b2fee48fb4a5ada13a4a4e006c0c0891e0bede4e22c",
+   "fetched_at": "2026-10-09T00:51:56Z"
+  },
+  "openf1/2023_4_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=9278",
+   "sha256": "68a8107dab89e5ede936e3e70c134d06308c54b5dcddfb4f0524d507c12cdc08",
+   "fetched_at": "2026-10-09T00:51:35Z"
+  },
+  "openf1/2023_9_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=9282",
+   "sha256": "8a92a8a454374060644545ea482f9ae62471b9a5511a7b0ae1dd16943212cdad",
+   "fetched_at": "2026-10-09T00:51:39Z"
+  },
+  "openf1/2024_11_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=9545",
+   "sha256": "9f3ab26dfe75d34cdb42b83005589a3c6de46801200101086183ecbde14e4b56",
+   "fetched_at": "2026-10-09T00:52:11Z"
+  },
+  "openf1/2024_19_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=9612",
+   "sha256": "c6d58a11e3c6b5d98a180cec5a47ad54addd425fa84d4ecccb89decb06010c13",
+   "fetched_at": "2026-10-09T00:52:15Z"
+  },
+  "openf1/2024_21_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=9631",
+   "sha256": "ab211de9fa2d8d8d4ad57d0c2156d01cf21361637b9dddef833bbfa0483d091b",
+   "fetched_at": "2026-10-09T00:52:19Z"
+  },
+  "openf1/2024_23_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=9650",
+   "sha256": "2db438843b6b18a98148de0a5d55ad59bc72c233125008546c5388f82707088d",
+   "fetched_at": "2026-10-09T00:52:24Z"
+  },
+  "openf1/2024_5_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=9668",
+   "sha256": "0ca8b35f095e8a9cdfb6755fe945add55e418458a3362f89b418f161e7ef6199",
+   "fetched_at": "2026-10-09T00:52:03Z"
+  },
+  "openf1/2024_6_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=9502",
+   "sha256": "26933bf67177631c4a09e63e67eb9940c3e596e6313c21e9209a2967cbe389c8",
+   "fetched_at": "2026-10-09T00:52:07Z"
+  },
+  "openf1/2025_13_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=9930",
+   "sha256": "482e49abc18c2583f3cacea7e0e1370d331e8987354d0df26172dc4b0bef0f9e",
+   "fetched_at": "2026-10-09T00:52:38Z"
+  },
+  "openf1/2025_19_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=9879",
+   "sha256": "290f3cbf63f0d86629d054039c1077567154b15d02e7835fa6fe4bc2626925f9",
+   "fetched_at": "2026-10-09T00:52:43Z"
+  },
+  "openf1/2025_21_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=9860",
+   "sha256": "ac51b25a48e9fbaad60cdd625e7761f5c5737e82370612e7ff3d5d1749bf0027",
+   "fetched_at": "2026-10-09T00:52:47Z"
+  },
+  "openf1/2025_23_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=9841",
+   "sha256": "b3eedc9327dd6a449ccab55445d76bc0028875156b5961a14c6b014f47661fc1",
+   "fetched_at": "2026-10-09T00:52:52Z"
+  },
+  "openf1/2025_2_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=9989",
+   "sha256": "32a3773aba3419fd142467755e647da0f4baa82aeb3178bfabbe0ff7c3811672",
+   "fetched_at": "2026-10-09T00:52:30Z"
+  },
+  "openf1/2025_6_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=10024",
+   "sha256": "c740bac15136c312eceb324951cbf22b7efb196830b8ef42db48b3d466ab0e31",
+   "fetched_at": "2026-10-09T00:52:34Z"
+  },
+  "openf1/2026_12_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=11344",
+   "sha256": "bfd37b9ddac168d15956ac4efb3cf8504629e8bf802f1c36cf1a64fcaacac982",
+   "fetched_at": "2026-10-09T00:53:15Z"
+  },
+  "openf1/2026_2_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=11236",
+   "sha256": "94ffa785c4025b70cbc6258065ead44dcf480d4641456228ced32513c3feb6e9",
+   "fetched_at": "2026-10-09T00:52:57Z"
+  },
+  "openf1/2026_4_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=11271",
+   "sha256": "7f929d3d9c0a38f4bd1037ec5fc5ede7e567f679518280b7763f08236073cc71",
+   "fetched_at": "2026-10-09T00:53:01Z"
+  },
+  "openf1/2026_5_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=11282",
+   "sha256": "57cb0710d9f4c93dcd432c66994f6599cc4e5ae75d177a5a6f9747b60a0c38ff",
+   "fetched_at": "2026-10-09T00:53:06Z"
+  },
+  "openf1/2026_9_sprint_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=11317",
+   "sha256": "a8087a482a315c159b9bf95750bdc67f3729d29ab170fc4aa1990270509f5d9d",
+   "fetched_at": "2026-10-09T00:53:10Z"
+  },
+  "openf1/sprint_qualifying_meta.json": {
+   "source": "https://api.openf1.org/v1/sessions",
+   "sha256": "1b59b70b5f760d3a3fe701e37ca9bea6b5e37d5c846043f93f8547963f5e2591",
+   "fetched_at": "2026-10-09T00:53:15Z"
+  }
+ }
+}
