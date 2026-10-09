@@ -1206,7 +1206,7 @@ def _build_race_replay(year: int, rnd: int, net: bool = True, circuit_override: 
                 retire_msg = f'{d["code"]} OUT — {cause_label}'
                 # When no curated event, retirement lap is laps completed + 1
                 retire_race_lap = max(1, d["laps"] + 1 if d["laps"] > 0 else 1)
-                retire_con = f"Official classification: {st}. Completed {max(0, retire_race_lap - 1)} laps."
+                retire_con = f"Race classification: {st}. Completed {max(0, retire_race_lap - 1)} laps."
 
             # Determine completed full laps vs retirement lap
             # If the driver's recorded laps >= retire_race_lap, they retired DURING retire_race_lap,

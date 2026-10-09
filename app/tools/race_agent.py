@@ -1218,7 +1218,7 @@ def _answer_core(
             "role": "assistant",
             "text": text,
             "tool": "driver_starting_grid_lookup",
-            "intent": f"{d['name']} Official Starting Grid Position & Race Classification",
+            "intent": f"{d['name']} Starting Grid Position & Race Classification",
             "a2ui_card": {
                 "type": "starting_grid_card",
                 "title": f"Starting Grid — {d['name']} (#{d['number']})",
@@ -1543,7 +1543,7 @@ def _answer_core(
                 "role": "assistant",
                 "text": text,
                 "tool": "race_classification_lookup",
-                "intent": "Official FIA Podium & Race Results Classification",
+                "intent": "Podium & Race Classification",
                 "a2ui_card": {
                     "type": "race_summary_card",
                     "title": f"Official Podium & Race Results — {meta.get('race_name', 'Grand Prix')}",

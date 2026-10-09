@@ -15,7 +15,7 @@ CACHE_DIR = os.path.join(DATA_DIR, "cache")
 os.makedirs(CACHE_DIR, exist_ok=True)
 
 # -------------------------------------------------------------
-# Official Team Liveries & Hex Codes
+# Team-inspired colors (hex codes)
 # -------------------------------------------------------------
 TEAM_LIVERIES = {
     "Red Bull Racing": {"primary": "#3671C6", "secondary": "#FFD700", "accent": "#E10600", "text": "#FFFFFF"},
