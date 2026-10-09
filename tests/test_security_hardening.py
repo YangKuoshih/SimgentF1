@@ -98,5 +98,24 @@ class RequestBoundTests(unittest.TestCase):
         self.assertEqual(M.WhatIfRequest().iterations, 200)
 
 
+class ChatBoundTests(unittest.TestCase):
+    def test_oversized_context_and_history_are_rejected(self):
+        with self.assertRaises(ValidationError):
+            M.ChatMessage(query="Who won?", context={"race": "x" * 5000})
+        with self.assertRaises(ValidationError):
+            M.ChatMessage(query="Who won?", history=[{"role": "user", "content": "hi"}] * 51)
+        M.ChatMessage(query="Who won?", context={"year": 2026, "round": 4, "race": "Miami Grand Prix"})
+
+    def test_race_label_is_linear_on_hostile_input(self):
+        import time
+        from app.tools.session_scope import scope_label
+        scope = {"year": 2026, "round": 4, "session": "race", "race": " " * 3900 + "x"}
+        t = time.perf_counter()
+        scope_label(scope)
+        self.assertLess(time.perf_counter() - t, 0.5)
+        self.assertEqual(scope_label(dict(scope, race="Miami Grand Prix - Sprint Weekend")),
+                         "2026 Miami Grand Prix · Race")
+
+
 if __name__ == "__main__":
     unittest.main()

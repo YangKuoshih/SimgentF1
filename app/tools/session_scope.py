@@ -81,7 +81,11 @@ def scope_label(scope: Dict[str, Any], session_name: Optional[str] = None, race_
     if not race_name and not scope.get("race"):
         race_name = next((r.get("race_name") for r in race_replay.season_races(scope["year"], net=False)
                           if r.get("round") == scope["round"]), None)
-    race = re.sub(r"\s+-\s+.*$", "", race_name or scope.get("race") or f"Round {scope['round']}")
+    race = race_name or scope.get("race") or f"Round {scope['round']}"
+    # Drop a " - subtitle" suffix. One-character \s on each side keeps the search linear
+    # (the old \s+-\s+ backtracked quadratically on long runs of spaces from the client).
+    cut = re.search(r"\s-\s", race)
+    race = (race[:cut.start()] if cut else race).rstrip()
     race = re.sub(r"^\d{4}\s+", "", race)
     return f"{scope['year']} {race} · {session_name or _LABEL[scope['session']]}"
 
