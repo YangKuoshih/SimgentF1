@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "f1-simgent"
-version = "1.3.0"
+version = "1.4.0"
 description = "Autonomous Formula 1 Race Engineering Agent, Strategy Battle Simulator, and 60 FPS Replay Cockpit"
 readme = "README.md"
 requires-python = ">=3.11"
