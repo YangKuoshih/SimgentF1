@@ -47,10 +47,11 @@ jobs:
           python tests/check_data_integrity.py
           python -m app.tools.data_manifest --check
 
-      - name: Agent Accuracy Evals (all eras, multi-turn)
+      - name: Agent Accuracy Evals (all eras, multi-turn, on-screen session scope)
         run: |
           python tests/eval_cross_era.py
           python tests/eval_multi_turn.py
+          python tests/eval_session_scope.py
 
       - name: Set up Node.js 26.11.1
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0

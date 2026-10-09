@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Added
+- The Pit Wall Agent answers for the session on screen. A question that doesn't name a race or session ("Who won?", "How did Hamilton do?", "Who was P3?") is answered from the Race, Sprint, Qualifying or Sprint Qualifying being viewed; anything the question names (another race, "the sprint", "the grand prix") overrides it. Qualifying "winner" questions name the pole-sitter and note that qualifying has no winner (`app/tools/session_scope.py`).
+- Race-data answers end with the race and session they are based on (e.g. *2026 Miami Grand Prix · Sprint Qualifying*), and say so when a question had to be answered from the Grand Prix instead.
+- `tests/eval_session_scope.py`: every cached sprint weekend, each session, checked against the source files (runs in CI and the data sync).
+
 ### Changed
 - Sprint Qualifying / Sprint Shootout sessions (2023 on) now come from the free OpenF1 API (`app/tools/openf1_sync.py`, cached under `data/cache/openf1/`, CC BY-NC-SA 4.0). All 23 cached sessions match the previous data on every position, time and lap count. The scheduled sync fetches new sessions every 6 hours and the app fetches an uncached session on demand.
 

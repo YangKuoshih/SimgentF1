@@ -639,7 +639,45 @@ def scope_history_to_view(history: Optional[List[Dict[str, Any]]],
 _DRIVER_BACKREF = re.compile(r"\b(he|his|him|she|her|they|their|them|that|it|its|same driver)\b")
 
 
+# Answers built from one session's data, and which session that is.
+_RACE_DATA_TOOLS = {
+    "race_classification_lookup": "race", "driver_performance_lookup": "race",
+    "driver_classification_lookup": "race", "driver_finish_position_lookup": "race",
+    "driver_starting_grid_lookup": "race", "starting_grid_lookup": "race",
+    "driver_podium_verification": "race", "pit_strategy_profile": "race",
+    "pit_strategy_explanation": "race", "safety_car_analysis": "race", "race_control_lookup": "race",
+    "incident_investigation": "race", "dnf_summary_lookup": "race", "fastest_lap_lookup": "race",
+    "sprint_classification_lookup": "sprint", "sprint_grid_lookup": "sprint",
+    "sprint_qualifying_lookup": "sprint_qualifying", "qualifying_pole_lookup": "qualifying",
+}
+
+
 def answer_race_engineer_query(
+    query: str,
+    context: Optional[Dict[str, Any]] = None,
+    history: Optional[List[Dict[str, Any]]] = None
+) -> Dict[str, Any]:
+    """Main entry point. The race and session on screen are the default scope for questions
+    that don't name their own (ADK session-state pattern); every race-data answer says which
+    race and session it is based on."""
+    from app.tools import session_scope as SS
+    history = scope_history_to_view(history, context)
+    scope = SS.resolve_scope(query, context, history)
+    if scope and scope["from_screen"] and scope["session"] != "race":
+        resp = SS.answer_in_session(query, scope, context, history)
+        if resp:
+            return SS.with_scope(resp, scope, resp.pop("label"))
+    resp = _answer_core(query, context, history)
+    used = _RACE_DATA_TOOLS.get(resp.get("tool", ""))
+    if scope and scope["from_screen"] and used:
+        answered = dict(scope, session=used)
+        note = (f"No {SS._LABEL[scope['session']]} data for this question — answered from "
+                if used != scope["session"] else "")
+        resp = SS.with_scope(resp, answered, SS.scope_label(answered), note)
+    return resp
+
+
+def _answer_core(
     query: str,
     context: Optional[Dict[str, Any]] = None,
     history: Optional[List[Dict[str, Any]]] = None

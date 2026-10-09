@@ -185,6 +185,7 @@ flowchart TD
 | **Scale-to-Zero** | Paying nothing for idle servers | Serverless container orchestration that de-provisions CPU instances when traffic is zero, spinning up on HTTP request. | [`Dockerfile`](Dockerfile) |
 | **Telemetry Transponder** | Virtual car sensor | Discrete timing sensor checkpoint logged at start/finish, sector lines, and pit entry/exit. | [`app/tools/race_replay.py`](app/tools/race_replay.py) |
 | **Undercut** | Pit strategy tactic | Pitting a lap earlier on fresh tires to overcome a car ahead when they make their subsequent pit stop. | [`app/tools/f1_telemetry.py`](app/tools/f1_telemetry.py) |
+| **Session Scope** | "What's on screen" is the default | The race and session being viewed answer any question that doesn't name its own; explicit mentions override (ADK session-state pattern). | [`app/tools/session_scope.py`](app/tools/session_scope.py) |
 | **Provenance Manifest** | Receipt for every data file | SHA-256 and source URL of every cached file; the integrity gate fails on anything edited outside the fetchers. | [`app/tools/data_manifest.py`](app/tools/data_manifest.py) |
 
 ---
