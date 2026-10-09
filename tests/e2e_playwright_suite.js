@@ -1,5 +1,5 @@
 /**
- * F1 Simgent - Comprehensive End-to-End Playwright Chromium Test Suite
+ * SimGent - Comprehensive End-to-End Playwright Chromium Test Suite
  * 
  * Verifies:
  * 1. 2D Circuit Engine, Hermite Spline Physics & Timing Tower
@@ -35,7 +35,7 @@ function assert(condition, message) {
 
 async function runTestSuite() {
   console.log(`\n===============================================================`);
-  console.log(`🏁 F1 SIMGENT — CHROMIUM END-TO-END AUTOMATED TEST SUITE`);
+  console.log(`🏁 SIMGENT — CHROMIUM END-TO-END AUTOMATED TEST SUITE`);
   console.log(`Target: ${BASE_URL} | Headless: ${HEADLESS}`);
   console.log(`===============================================================\n`);
 

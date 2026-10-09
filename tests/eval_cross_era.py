@@ -1,4 +1,4 @@
-"""Cross-era eval for the F1 Simgent agent.
+"""Cross-era eval for the SimGent agent.
 
 Builds questions whose expected answers come straight from the cached Jolpica
 data, runs them through answer_race_engineer_query with the network stubbed

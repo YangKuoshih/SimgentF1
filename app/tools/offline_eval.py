@@ -1,5 +1,5 @@
 """
-F1 Simgent - Comprehensive Offline Data & Frontend Evaluation Suite
+SimGent - Comprehensive Offline Data & Frontend Evaluation Suite
 Validates that all telemetry, replay models, circuits, driver registry, and Pit Wall agent
 responses presented to the user and frontend meet 100% data integrity standards.
 Includes closed-loop autonomous remediation via RemediationAgent.
@@ -37,7 +37,7 @@ logging.basicConfig(
 
 class OfflineDataEval:
     """
-    Seven-pillar offline evaluation suite for F1 Simgent data and frontend models.
+    Seven-pillar offline evaluation suite for SimGent data and frontend models.
     """
 
     def __init__(self, offline: bool = True, remediate_on_failure: bool = True):
@@ -435,7 +435,7 @@ class OfflineDataEval:
 
 
 def run_cli():
-    parser = argparse.ArgumentParser(description="F1 Simgent Offline Data Evaluation Harness")
+    parser = argparse.ArgumentParser(description="SimGent Offline Data Evaluation Harness")
     parser.add_argument("--year", type=int, default=2026, help="Season year (default: 2026)")
     parser.add_argument("--round", type=int, default=16, help="Round number (default: 16)")
     parser.add_argument("--circuit", type=str, default="bahrain", help="Circuit ID (default: bahrain)")

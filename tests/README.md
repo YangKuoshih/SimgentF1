@@ -1,6 +1,6 @@
-# 🏁 F1 Simgent — Automated Test Suite & Verification Matrix
+# 🏁 SimGent — Automated Test Suite & Verification Matrix
 
-Welcome to the **F1 Simgent** automated test suite. This testing infrastructure provides comprehensive, two-tier verification:
+Welcome to the **SimGent** automated test suite. This testing infrastructure provides comprehensive, two-tier verification:
 
 1. **Python Unit & Boundary Matrix (`tests/test_guardrails_matrix.py`)**: Verification of security guardrails, safety interceptors, domain boundaries, data scope notices, and telemetry engine math.
 2. **Headless Chromium E2E Suite (`tests/e2e_playwright_suite.js`)**: Real browser automation simulating physics canvas rendering, timing towers, multi-turn chat, client-side memory rehydration (`localStorage`), A2UI two-way action card navigation, and live attack resilience.

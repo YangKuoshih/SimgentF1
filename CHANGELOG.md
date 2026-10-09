@@ -21,7 +21,7 @@ Moved to this repository with a fresh history (October 2026).
 - Sprint Qualifying / Sprint Shootout sessions (2023 on) now come from the free OpenF1 API (`app/tools/openf1_sync.py`, cached under `data/cache/openf1/`, CC BY-NC-SA 4.0). All 23 cached sessions match the previous data on every position, time and lap count. The scheduled sync fetches new sessions every 6 hours and the app fetches an uncached session on demand.
 
 ### Removed
-- All data and tooling sourced from the official F1 results website, including its cache, the scrapers that fetched it and the admin `/api/verify` endpoint. Cached data now comes only from Jolpica and OpenF1.
+- All data scraped from a third-party results website whose terms don't allow reuse, along with its cache, the scrapers and the admin `/api/verify` endpoint. Cached data now comes only from Jolpica and OpenF1.
 
 ### Fixed
 - After a restart the app opens the newest finished race: the season winners list refreshes while races are recent, and the current year replaces hard-coded 2026 in the season list and latest-race lookup.

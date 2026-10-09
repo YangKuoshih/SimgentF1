@@ -1,5 +1,5 @@
 # ==============================================================================
-# F1 Simgent - Docker Container Ignore Rules
+# SimGent - Docker Container Ignore Rules
 # Excludes local secrets, git history, and development dependencies from images
 # ==============================================================================
 

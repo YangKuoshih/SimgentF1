@@ -1,5 +1,5 @@
 """
-F1 Simgent - Telemetry, Multi-Circuit & Historical Analytics Data Engine
+SimGent - Telemetry, Multi-Circuit & Historical Analytics Data Engine
 Provides access to OpenF1 API, circuit geometries, Race Control events (SC/VSC/Flags/Crashes),
 WDC/WCC Championship standings, and F1 Technical Regulations Era comparisons.
 """

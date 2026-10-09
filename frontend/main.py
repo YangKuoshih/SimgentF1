@@ -21,7 +21,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] [%(name)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S"
 )
-logger = logging.getLogger("f1_simgent.api")
+logger = logging.getLogger("simgent.api")
 
 from fastapi import FastAPI, Query, HTTPException, Request, Depends
 from fastapi.staticfiles import StaticFiles
@@ -584,7 +584,7 @@ async def serve_index():
     index_path = os.path.join(STATIC_DIR, "index.html")
     if os.path.exists(index_path):
         return FileResponse(index_path)
-    return {"message": "F1 Simgent API Ready."}
+    return {"message": "SimGent API Ready."}
 
 if __name__ == "__main__":
     import uvicorn

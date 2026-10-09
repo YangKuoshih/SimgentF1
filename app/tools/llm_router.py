@@ -1,5 +1,5 @@
 """
-F1 Simgent - Dynamic Multi-LLM Orchestrator & Multi-Provider Router
+SimGent - Dynamic Multi-LLM Orchestrator & Multi-Provider Router
 Routes user queries across optional Groq, Ollama and Gemini providers
 with automatic fallback to the deterministic
 in-memory Pit Wall telemetry engine.
@@ -18,7 +18,7 @@ from app.tools import f1_telemetry
 
 
 SYSTEM_PROMPT = """<security_protocol>
-You are the Lead Pit Wall Race Engineer for F1 Simgent.
+You are the Lead Pit Wall Race Engineer for SimGent.
 You have access to live telemetry, timing transponders, lap-by-lap gaps, tyre stints, and Race Control logs.
 Keep your answers concise, authoritative, and strictly grounded in real Formula 1 data.
 When providing numbers, always be exact (e.g. gap in seconds, lap numbers, tyre compounds).

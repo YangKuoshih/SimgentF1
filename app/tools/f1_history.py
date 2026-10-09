@@ -1,5 +1,5 @@
 """
-F1 Simgent - Comprehensive Formula 1 History & Career Knowledge Base (1950–2026)
+SimGent - Comprehensive Formula 1 History & Career Knowledge Base (1950–2026)
 Provides authoritative data, fuzzy driver matching, career timelines, technical eras,
 championship rosters, all-time records, and legendary rivalries for motorsport research and analysis.
 """

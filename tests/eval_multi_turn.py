@@ -1,4 +1,4 @@
-"""Multi-turn conversation eval for the F1 Simgent agent.
+"""Multi-turn conversation eval for the SimGent agent.
 
 Each conversation is replayed the way the web app sends it: every follow-up carries the
 earlier user AND assistant turns as `history`. Expected answers are read from the cached
