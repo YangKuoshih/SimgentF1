@@ -5,8 +5,9 @@ Race Control events, driver retirements, pit strategies, championship standings,
 and FIA technical regulations. Returns authoritative text plus rich A2UI cards.
 """
 
+import datetime
 import re
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List, Optional, Tuple
 from app.tools import race_replay, f1_telemetry, f1_history
 from app.tools import jolpica_sync as J
 from app.tools.agent_memory import memory_manager
@@ -610,6 +611,34 @@ def _get_driver_tyre_stints(d: Dict[str, Any], events: List[Dict[str, Any]], tot
     }
 
 
+def race_from_history(history: Optional[List[Dict[str, Any]]], default_year: int) -> Optional[Tuple[int, int]]:
+    """The race a conversation is about, from the user's own questions.
+
+    Walk back over plain follow-ups ("who finished second?", "where did he start?") to the
+    most recent question that names a race and use it. If the first naming question is about
+    a whole season instead ("what about 2016?", "who won the 2024 championship?"), the
+    conversation has left any single race: return None. A circuit named without a year takes
+    the year from the nearest earlier question that has one, never from a later one (that
+    produced a phantom "2024 Monaco GP" from "what about Monaco?" + "2024 championship").
+    """
+    users = [(t.get("content") or t.get("text") or "").lower() for t in (history or []) if t.get("role") == "user"]
+    for i in range(len(users) - 1, -1, -1):
+        text = users[i]
+        ym = re.search(r"\b(19\d\d|20\d\d)\b", text)
+        year = int(ym.group(1)) if ym else None
+        if year is None:
+            year = next((int(m.group(1)) for t in reversed(users[:i])
+                         for m in [re.search(r"\b(19\d\d|20\d\d)\b", t)] if m), default_year)
+        if not 1950 <= year <= default_year + 1:
+            continue
+        rnd = _match_race_round(text, race_replay.season_races(year))
+        if rnd is not None:
+            return year, rnd
+        if ym:
+            return None  # season-level question: no single race in focus
+    return None
+
+
 def scope_history_to_view(history: Optional[List[Dict[str, Any]]],
                           context: Optional[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Drop turns from before the viewer switched to the race now on screen.
@@ -743,24 +772,12 @@ def _answer_core(
             # conversation context so they cannot desync. Adopting a historical year while
             # keeping the current round produced the wrong race (e.g. 2024 + round 16 = the
             # Italian GP instead of the Australian GP that was actually being discussed).
-            # Only the user's questions: assistant answers mention other races and eras in
-            # passing (career profiles, era summaries), which must not move the conversation.
-            _turns_text = [(t.get("content") or t.get("text") or "") for t in history if t.get("role") == "user"]
-            for _i in range(len(_turns_text) - 1, -1, -1):
-                _window = _turns_text[_i]
-                if _i > 0:
-                    _window = _turns_text[_i - 1] + " " + _window  # year & circuit may sit in adjacent turns
-                _window = _window.lower()  # _match_race_round compares against lowercased race tokens
-                _ym = re.search(r'\b(19\d\d|20\d\d)\b', _window)
-                if _ym and 1950 <= int(_ym.group(1)) <= 2026:
-                    _h_year = int(_ym.group(1))
-                    _h_races = race_replay.season_races(_h_year)
-                    _h_rnd = _match_race_round(_window, _h_races)
-                    if _h_rnd is not None:
-                        year = _h_year
-                        races = _h_races
-                        round_no = _h_rnd
-                        break
+            # Only the user's questions count: assistant answers mention other races and
+            # eras in passing (career profiles, era summaries).
+            _h = race_from_history(history, datetime.date.today().year)
+            if _h:
+                year, round_no = _h
+                races = race_replay.season_races(year)
 
     # Check if an explicit round was requested in text (e.g. "round 16", "r16")
     round_match = re.search(r'\b(?:round|r)\s*(\d+)\b', q)
@@ -1753,15 +1770,26 @@ def _answer_core(
             }
         started = f"P{d['grid']}" if d.get('grid') else "Pit Lane"
         is_finish = (d["status"].startswith(("Finished", "Lapped")) or d["status"].startswith("+"))
-        finished = f"P{d['finish']}" if is_finish else f"DNF (Lap {d.get('retire_lap', d['laps']+1)})"
-        delta = (d['grid'] - d['finish']) if (d.get('grid') and d.get('finish') and is_finish) else 0
+        classified = str(d.get("classified_text", "")).isdigit()
+        out_lap = d.get('retire_lap', d['laps'] + 1)
+        finished = f"P{d['finish']}" if (is_finish or classified) else f"DNF (Lap {out_lap})"  # card value
+        delta = (d['grid'] - d['finish']) if (d.get('grid') and d.get('finish') and (is_finish or classified)) else 0
         delta_str = f"gaining {delta} places" if delta > 0 else f"dropping {abs(delta)} places" if delta < 0 else "holding track position"
         pits_note = f" across {len(d['pits'])} pit stop{'s' if len(d['pits']) != 1 else ''}" if d.get('pits') else ""
 
-        text = (
-            f"**{d['name']}** finished **{finished}** for {d['team']} after starting {started} ({delta_str}), "
-            f"completing {d['laps']}/{meta.get('total_laps', 51)} laps{pits_note}."
-        )
+        if str(d.get("status", "")).lower().startswith("disqualif"):
+            text = (f"**{d['name']}** was **disqualified** from the race for {d['team']} after starting {started} "
+                    f"and completing {d['laps']}/{meta.get('total_laps', 51)} laps{pits_note}.")
+            finished = "DSQ"
+        elif is_finish:
+            text = (f"**{d['name']}** finished **P{d['finish']}** for {d['team']} after starting {started} ({delta_str}), "
+                    f"completing {d['laps']}/{meta.get('total_laps', 51)} laps{pits_note}.")
+        elif classified:  # stopped before the end but covered enough distance to be classified
+            text = (f"**{d['name']}** was classified **P{d['finish']}** for {d['team']} despite stopping on lap {out_lap} "
+                    f"({d['status']}), after starting {started} ({delta_str}) and completing {d['laps']}/{meta.get('total_laps', 51)} laps{pits_note}.")
+        else:
+            text = (f"**{d['name']}** retired from the race on lap {out_lap} ({d['status']}) for {d['team']} after starting {started}, "
+                    f"completing {d['laps']}/{meta.get('total_laps', 51)} laps{pits_note}.")
         return {
             "role": "assistant",
             "text": text,

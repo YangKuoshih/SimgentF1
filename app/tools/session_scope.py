@@ -61,9 +61,10 @@ def resolve_scope(query: str, context: Optional[Dict[str, Any]],
     except (KeyError, TypeError, ValueError):
         return None
     q = query.lower()
-    from_screen = not _names_a_race(q, year) and not any(
-        _names_a_race(t.get("content") or t.get("text") or "", year)
-        for t in (history or []) if (t.get("role") == "user"))
+    from app.tools.race_agent import race_from_history
+    # The screen applies unless this question, or the conversation's current race, names another
+    conv_race = race_from_history(history, year)
+    from_screen = not _names_a_race(q, year) and conv_race in (None, (year, rnd))
     named = explicit_session(q)
     screen_session = _UI_SESSION.get(str(ctx.get("session") or "race").lower(), "race")
     # Generic qualifying words ("pole", "where did he qualify?") on the Sprint Qualifying

@@ -73,5 +73,49 @@ class HistoryRaceComesFromTheUsersQuestions(unittest.TestCase):
         self.assertNotIn("Canadian", r["text"])
 
 
+class ClassifiedNonFinishers(unittest.TestCase):
+    def test_classified_despite_retiring(self):
+        r = ask("How did Perez do?", view(2021, 22, "Abu Dhabi Grand Prix"), [])
+        self.assertIn("classified **P15**", r["text"])
+        self.assertNotIn("finished **DNF", r["text"])
+
+    def test_disqualified(self):
+        r = ask("How did Hamilton do?", view(2023, 18, "United States Grand Prix"), [])
+        self.assertIn("disqualified", r["text"])
+
+
+class ConversationRace(unittest.TestCase):
+    MIAMI_SQ = {"year": 2026, "round": 4, "session": "sprint_qualifying", "race": "Miami Grand Prix"}
+
+    def _talk(self, questions):
+        history = []
+        for q in questions:
+            history += [{"role": "user", "content": q, "view": "2026-4"},
+                        {"role": "assistant", "content": "...", "view": "2026-4"}]
+        return history
+
+    def test_follow_ups_keep_the_named_race(self):
+        from app.tools.race_agent import race_from_history
+        h = self._talk(["Who won the 2021 Abu Dhabi Grand Prix?", "Who finished second?", "And who was third?"])
+        self.assertEqual(race_from_history(h, 2026), (2021, 22))
+
+    def test_circuit_takes_the_year_from_an_earlier_question_only(self):
+        from app.tools.race_agent import race_from_history
+        h = self._talk(["Who won the 2021 Abu Dhabi Grand Prix?", "What about Monaco?"])
+        self.assertEqual(race_from_history(h, 2026), (2021, 5))
+
+    def test_no_phantom_race_from_a_later_season_question(self):
+        from app.tools.race_agent import race_from_history
+        h = self._talk(["Who won the 2021 Abu Dhabi Grand Prix?", "What about Monaco?",
+                        "Who won the 2024 world championship?", "What about 2016?"])
+        self.assertIsNone(race_from_history(h, 2026))  # a season question ends the race focus
+
+    def test_unspecific_question_returns_to_the_screen_after_season_talk(self):
+        h = self._talk(["Who won the 2021 Abu Dhabi Grand Prix?", "Who won the 2024 world championship?"])
+        r = ask("How did Piastri do?", self.MIAMI_SQ, h)
+        self.assertIn("Sprint Qualifying", r["text"])
+        self.assertIn("P3", r["text"])
+
+
 if __name__ == "__main__":
     unittest.main()
