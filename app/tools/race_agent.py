@@ -1429,7 +1429,9 @@ def answer_race_engineer_query(
             }
 
     # 3.3 RACE WINNER / PODIUM / STORY
-    if any(w in q for w in ["who won", "winner", "podium", "p1", "summary", "how did"]):
+    # "how did ..." is a race summary only when no driver is named ("how did Lindblad do?"
+    # belongs to the driver handler below).
+    if any(w in q for w in ["who won", "winner", "podium", "p1", "summary"]) or ("how did" in q and not target_driver):
         # Classify by official finishing position, not list order: in the 1950s two
         # drivers who shared a car are both classified P1 (e.g. Fangio/Musso, 1956 Argentina).
         def _at(pos):
