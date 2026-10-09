@@ -89,6 +89,7 @@ jobs:
         run: |
           python tests/eval_cross_era.py
           python tests/eval_multi_turn.py
+          python tests/eval_session_scope.py
           python tests/test_guardrails_matrix.py
           python tests/test_mcp_server.py
 
