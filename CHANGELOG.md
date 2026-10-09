@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## v1.3.0 — 2026-10-09
+
+Moved to this repository with a fresh history (October 2026).
 
 ### Added
 - The Pit Wall Agent answers for the session on screen. A question that doesn't name a race or session ("Who won?", "How did Hamilton do?", "Who was P3?") is answered from the Race, Sprint, Qualifying or Sprint Qualifying being viewed; anything the question names (another race, "the sprint", "the grand prix") overrides it. Qualifying "winner" questions name the pole-sitter and note that qualifying has no winner (`app/tools/session_scope.py`).
@@ -12,6 +14,13 @@
 
 ### Removed
 - All data and tooling sourced from the official F1 results website, including its cache, the scrapers that fetched it and the admin `/api/verify` endpoint. Cached data now comes only from Jolpica and OpenF1.
+
+### Fixed
+- After a restart the app opens the newest finished race: the season winners list refreshes while races are recent, and the current year replaces hard-coded 2026 in the season list and latest-race lookup.
+- The Pit Wall Agent answers about the race on screen, not one discussed earlier in the chat (chat turns carry the race being viewed); a driver from earlier turns is only used when the question refers back to one.
+- "How did <driver> do?" answers about that driver instead of the race winner.
+- Accuracy fixes from a 230-turn live multi-turn run across 1950–2026 (now 230/230): race story pages no longer take driver or pit-strategy questions; "When did <driver> retire?" at a race they didn't finish gives the race retirement; drivers in the race beat fuzzy career-name matches; the conversation's race comes from the latest question that names one (no phantom races); classified non-finishers and disqualifications are worded correctly.
+- CodeQL runs as a workflow so pull requests (including Dependabot's) get the required checks.
 
 ## v1.2.0
 

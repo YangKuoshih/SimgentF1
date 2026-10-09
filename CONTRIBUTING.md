@@ -55,7 +55,7 @@ never merge an old clone's history after the October 2026 cleanup.
 The Signed release archives workflow archives an existing tag, records its exact
 source commit, and signs the archive's provenance with GitHub's workload identity.
 Download the `.tar.gz` and `.intoto.jsonl` assets, then run
-`gh attestation verify f1-simgent-v1.2.0.tar.gz --bundle f1-simgent-v1.2.0.tar.gz.intoto.jsonl --repo YangKuoshih/SimgentF1 --predicate-type https://github.com/YangKuoshih/SimgentF1/source-archive/v1`.
+`gh attestation verify f1-simgent-v1.3.0.tar.gz --bundle f1-simgent-v1.3.0.tar.gz.intoto.jsonl --repo YangKuoshih/SimgentF1 --predicate-type https://github.com/YangKuoshih/SimgentF1/source-archive/v1`.
 Use the downloaded bundle because GitHub’s API filter does not accept custom predicate URIs.
 Confirm `resolvedDependencies` identifies the intended tag and commit. Historical
 archives are produced from rewritten tags; signatures are generated now and do not

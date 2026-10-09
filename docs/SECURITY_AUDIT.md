@@ -7,9 +7,9 @@ replace review, operational testing, or maintainership.
 
 ## Public clone and history
 
-Published branches and v1.0.0–v1.2.0 tags were rewritten to remove historical
-feedback, learned memory, and the local workshop guide. A fresh ordinary clone
-contains none of those paths in reachable history. Curated seed memory remains
+In October 2026 the project moved to this repository with a single fresh initial
+commit, so no earlier history (historical feedback, learned memory, the local
+workshop guide, or data from the official F1 website) is reachable from a clone. Curated seed memory remains
 public; runtime feedback and learned corrections are excluded from Git, Docker,
 and Cloud uploads. Local agent/cloud configuration and generated artifacts are
 excluded consistently.
@@ -27,7 +27,7 @@ held by others. No sensitive records or original backups are included in this re
 | --- | --- | --- |
 | Main protection | Required PR/check policy in `MAIN_PROTECTION.json` | No administrator bypass; check GitHub Rules for live enforcement |
 | Code review | Policy requires one approval, stale approvals dismissed, latest push reviewed, conversations resolved | The sole maintainer needs another collaborator for independent approval; historical direct commits cannot gain retrospective review |
-| Release provenance | Signed source archives and signature bundles for cleaned v1.0.0–v1.2.0 tags | Signatures identify archive source and publishing workflow; Git tags are unsigned and earlier releases were not retrospectively reviewed |
+| Release provenance | Signed source archives and signature bundles for release tags from v1.3.0 (the first release in this repository) | Signatures identify archive source and publishing workflow; Git tags are unsigned |
 | Fuzz testing | Synthetic corpus and bounded Atheris runs in Linux CI | A 60-second run is not exhaustive fuzzing |
 | Dependency pinning | Hash-locked application, audit/fuzz tools, and budget-alert tool; Docker digest and Actions commit pins | Locks need reviewed maintenance and new advisories can appear |
 | Advisory discrepancy | Traced to loose budget-tool dependencies resolving to Starlette 0.52.1; separate lock now resolves 1.7.0 and is included in CI audits | Main-only audits would miss this separate tool |
@@ -46,8 +46,8 @@ The application environment, full CI, data-sync job and Docker base target Pytho
   vulnerabilities. The older OSV scanner used by Scorecard also reports no findings
   after the budget-tool lock fix.
 - GitHub CodeQL and Dependabot showed zero open alerts at audit time.
-- All three downloaded release archives passed cryptographic signature verification.
-  The v1.2.0 statement's source commit matches the cleaned tag exactly.
+- Release archives published before the October 2026 repository move passed
+  cryptographic signature verification; releases in this repository start at v1.3.0.
 - Deployed public pages and curated memory statistics respond successfully;
   protected memory/admin endpoints return 503 when no admin token is configured.
 
