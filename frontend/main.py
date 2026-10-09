@@ -97,9 +97,11 @@ def _client_ip(request: Request) -> str:
 # ------------------------------------------------------------------ security headers
 # Inline scripts/handlers and Tailwind's browser build need 'unsafe-inline'; the policy still
 # blocks scripts from other sites, sending data to other origins, plugins and framing.
-_CSP = ("default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com; "
+# Cloudflare (already in front of every request) injects its Web Analytics beacon.
+_CSP = ("default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com "
+        "https://static.cloudflareinsights.com; "
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; "
-        "img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; object-src 'none'; "
+        "img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://cloudflareinsights.com; object-src 'none'; "
         "base-uri 'self'; form-action 'self'; frame-ancestors 'none'")
 _SECURITY_HEADERS = {
     "Content-Security-Policy": _CSP,
