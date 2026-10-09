@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [
-    { name = "Tony Yang", email = "kuoshihtyang@gmail.com" }
+    { name = "Tony Yang" }
 ]
 keywords = [
     "formula-1",
