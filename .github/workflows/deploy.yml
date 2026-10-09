@@ -62,6 +62,7 @@ jobs:
             --source . \
             --region us-central1 \
             --project f1-simgent \
+            --service-account simgent-runtime@f1-simgent.iam.gserviceaccount.com \
             --min-instances 0 \
             --max-instances 1 \
             --memory 512Mi \
