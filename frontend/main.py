@@ -5,6 +5,7 @@ WDC/WCC Championship standings, Technical Regulations Era comparisons,
 and proxies natural language requests to the AI agent engine.
 """
 
+import datetime
 import secrets
 import logging
 import os
@@ -103,7 +104,7 @@ HISTORIC_SEASON_HIGHLIGHTS = {
 @app.get("/api/seasons")
 async def api_seasons():
     seasons = []
-    for y in range(2026, 1949, -1):
+    for y in range(datetime.date.today().year, 1949, -1):
         lbl = HISTORIC_SEASON_HIGHLIGHTS.get(y)
         seasons.append({
             "year": y,
@@ -145,7 +146,8 @@ async def api_standings(year: int = Query(2026)):
 @app.get("/api/latest_race")
 async def api_latest_race():
     """Returns the most recent completed Grand Prix race on the calendar."""
-    for y in (2026, 2025, 2024):
+    this_year = datetime.date.today().year
+    for y in range(this_year, this_year - 3, -1):
         races = race_replay.season_races(y)
         completed = [r for r in races if r.get("completed")]
         if completed:

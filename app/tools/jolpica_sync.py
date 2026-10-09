@@ -155,9 +155,27 @@ def schedule(year: int, net: bool = True) -> List[Dict[str, Any]]:
     return d["MRData"]["RaceTable"]["Races"] if d else []
 
 
+def _had_recent_race(year: int) -> bool:
+    """True when a round of this season ran in the last RECENT_DAYS days."""
+    import datetime as _dt
+    p = _path(f"{year}_schedule")
+    if not os.path.exists(p):
+        return False
+    try:
+        with open(p) as f:
+            races = json.load(f)["MRData"]["RaceTable"]["Races"]
+        today = _dt.date.today()
+        return any(0 <= (today - _dt.date.fromisoformat(r["date"])).days <= RECENT_DAYS for r in races)
+    except Exception:
+        return False
+
+
 def season_winners(year: int, net: bool = True) -> Dict[int, Dict[str, Any]]:
-    """Fetches P1 winners for all rounds of a season in ONE request."""
-    d = cached(f"{year}_winners", f"{BASE}/{year}/results/1.json?limit=100", net)
+    """Fetches P1 winners for all rounds of a season in ONE request. Refreshed every
+    RECENT_MAX_AGE_S while the season has recent races, so a restarted server (which only
+    has the data baked into its image) still picks up races run since the last deploy."""
+    d = cached(f"{year}_winners", f"{BASE}/{year}/results/1.json?limit=100", net,
+               max_age_s=RECENT_MAX_AGE_S if _had_recent_race(year) else None)
     if not d:
         return {}
     races = d.get("MRData", {}).get("RaceTable", {}).get("Races", [])

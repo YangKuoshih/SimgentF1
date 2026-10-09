@@ -10,6 +10,7 @@ The client derives position-on-track, running order, gaps, pit laps and retireme
 from that — so the lap counter and the cars are always in sync.
 """
 
+import datetime
 import json
 import math
 import os
@@ -588,12 +589,19 @@ def circuit_geometry(circuit_id: str, n_points: int = 720) -> Optional[Dict[str,
 def season_races(year: int, net: bool = True) -> List[Dict[str, Any]]:
     sched = J.schedule(year, net)
     winners_map = J.season_winners(year, net)
+    today = datetime.date.today()
     out = []
     for r in sched:
         rnd = _safe_int(r.get("round"), fallback=1)
         w = winners_map.get(rnd)
         if not w:
-            res = J.results(year, rnd, net=False)
+            # A round run in the last few weeks but missing from the winners list: ask
+            # Jolpica for its result (older rounds come from the local cache only).
+            try:
+                recent = 0 <= (today - datetime.date.fromisoformat(r.get("date", ""))).days <= J.RECENT_DAYS
+            except ValueError:
+                recent = False
+            res = J.results(year, rnd, net=net and recent)
             if res and res.get("Results"):
                 w = res["Results"][0]
         winner = None
@@ -605,7 +613,7 @@ def season_races(year: int, net: bool = True) -> List[Dict[str, Any]]:
                 "team": w.get("Constructor", {}).get("name", "F1 Team"),
                 "color": TEAM_COLOURS.get(cid, "#FFFFFF")
             }
-        is_completed = (winner is not None) or (year < 2026)
+        is_completed = (winner is not None) or (year < today.year)
         # The Jolpica schedule flags every sprint weekend (2021-2026). The old hard-coded
         # fallback lists were wrong (e.g. listed 2023 R19 Mexico instead of R20 Sao Paulo).
         has_sprint = "Sprint" in r

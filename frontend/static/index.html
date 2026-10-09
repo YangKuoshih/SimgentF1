@@ -1699,8 +1699,10 @@
   // =====================================================================
   // STATE
   // =====================================================================
+  // The season in progress; earlier seasons are complete. Uses the viewer's clock.
+  const CURRENT_SEASON = new Date().getFullYear();
   const S = {
-    season: 2026, round: null, session: 'race', model: null, races: [],
+    season: CURRENT_SEASON, round: null, session: 'race', model: null, races: [],
     t: 0, endT: 1, playing: false, speed: 30,
     selected: null, hover: null, lastTowerRender: 0, lastLapForChart: -1,
     seenEvents: new Set(),
@@ -1811,16 +1813,16 @@
       return;
     }
 
-    const done = S.races.filter(r => r.completed || (year < 2026));
+    const done = S.races.filter(r => r.completed || (year < CURRENT_SEASON));
     sel.innerHTML = S.races.map(r => {
-      const isDone = r.completed || (year < 2026);
+      const isDone = r.completed || (year < CURRENT_SEASON);
       const spTag = r.has_sprint ? ' · SPRINT' : '';
       return `<option value="${r.round}" ${isDone ? '' : 'disabled'}>R${r.round} · ${esc(r.race_name.replace(/^\d{4}\s+/, '').replace(' Grand Prix',' GP'))}${spTag}${isDone ? '' : ' — upcoming'}</option>`;
     }).join('');
     sel.disabled = false;
 
     // Default to preferred round, or if current/active season (2026) default to latest completed race
-    const target = preferRound || (done.length ? (year >= 2026 ? done[done.length - 1].round : done[0].round) : S.races[0].round);
+    const target = preferRound || (done.length ? (year >= CURRENT_SEASON ? done[done.length - 1].round : done[0].round) : S.races[0].round);
     if (target) {
       sel.value = String(target);
       updateSessionSelect(target, S.session || 'race');
@@ -4975,7 +4977,7 @@
       fetch(`/api/standings?year=${S.season}`).then(r => r.json()),
       fetch(`/api/season?year=${S.season}`).then(r => r.json()),
     ]);
-    const done = races.filter(r => r.completed || (S.season < 2026)).length;
+    const done = races.filter(r => r.completed || (S.season < CURRENT_SEASON)).length;
     $('st-title').textContent = `${S.season} World Championship Standings`;
     $('st-sub').textContent = `${done} of ${races.length} rounds completed · Jolpica / Ergast historical telemetry record`;
 
@@ -5005,7 +5007,7 @@
     if (st.drivers && st.drivers.length > 0) {
       $('wdc').innerHTML = st.drivers.map(d => row(d.rank, d.color, d.driver, d.team, d.points, d.wins)).join('');
     } else {
-      $('wdc').innerHTML = `<div class="text-slate-400 text-xs p-4 bg-white/5 rounded border border-white/5 font-mono">${S.season === 2026 ? '2026 Season Championship Standings will update live as rounds are completed.' : 'Drivers\' Championship standings unavailable for this season.'}</div>`;
+      $('wdc').innerHTML = `<div class="text-slate-400 text-xs p-4 bg-white/5 rounded border border-white/5 font-mono">${S.season === CURRENT_SEASON ? `${CURRENT_SEASON} Season Championship Standings will update live as rounds are completed.` : 'Drivers\' Championship standings unavailable for this season.'}</div>`;
     }
 
     // Constructors
@@ -5027,7 +5029,7 @@
 
     // Calendar
     $('calendar').innerHTML = races.map(r => {
-      const isDone = r.completed || (S.season < 2026);
+      const isDone = r.completed || (S.season < CURRENT_SEASON);
       return `
         <div data-round="${r.round}" class="cal-card f1-glass p-4 rounded border border-white/10 ${isDone ? 'hover:border-f1red cursor-pointer hover:bg-white/5' : 'opacity-40'} space-y-2 transition shadow-lg">
           <div class="flex justify-between text-[11px] font-mono">
@@ -5859,7 +5861,7 @@
   const bootParams = new URLSearchParams(window.location.search);
   const bootHasYear = bootParams.has('year');
   const bootHasRound = bootParams.has('round');
-  const bootYear = bootHasYear ? parseInt(bootParams.get('year')) : 2026;
+  const bootYear = bootHasYear ? parseInt(bootParams.get('year')) : CURRENT_SEASON;
   const bootRound = bootHasRound ? parseInt(bootParams.get('round')) : null;
   const bootSession = bootParams.get('session') || 'race';
   const bootCircuit = bootParams.get('circuit') || null;
