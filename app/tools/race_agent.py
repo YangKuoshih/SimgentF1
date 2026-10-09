@@ -330,7 +330,7 @@ def _season_title_from_data(year: int, constructor: bool = False) -> Optional[Di
         f"• **{label}**: **{name}**{team_str}\n"
         f"• **Championship Record**: **{wins} Grand Prix victories**, scoring **{pts:g} points**\n"
         f"• **Runner-Up**: {ru_name} ({ru_pts:g} points, {pts - ru_pts:+g})\n\n"
-        f"> *Source: official {year} final standings data.*"
+        f"> *Source: {year} final standings data (Jolpica-F1).*"
     )
     card = {
         "type": "championship_card",
@@ -1186,7 +1186,7 @@ def _answer_core(
                     "metrics": [
                         {"label": f"Grid Slot P{target_slot}", "value": f"{slot_drv['name']} ({slot_drv['code']})", "color": slot_drv["color"]},
                         {"label": "Team / Car", "value": f"{slot_drv['team']} #{slot_drv['number']}", "color": slot_drv["color"]},
-                        {"label": "Official Finish", "value": f"P{slot_drv.get('finish')}" if slot_drv.get('status', '').startswith(('Finished', 'Lapped', '+')) else slot_drv.get('status', 'Retired'), "color": "#10B981" if slot_drv.get('status', '').startswith(('Finished', 'Lapped', '+')) else "#E10600"},
+                        {"label": "Finish", "value": f"P{slot_drv.get('finish')}" if slot_drv.get('status', '').startswith(('Finished', 'Lapped', '+')) else slot_drv.get('status', 'Retired'), "color": "#10B981" if slot_drv.get('status', '').startswith(('Finished', 'Lapped', '+')) else "#E10600"},
                         {"label": "Session", "value": f"{year} Round {round_no}", "color": "#64748B"}
                     ],
                     "action": "VIEW STARTING GRID REPLAY",
@@ -1267,7 +1267,7 @@ def _answer_core(
                         "type": "retirement_card",
                         "title": f"Retirement Debrief — {d['name']} (#{d['number']})",
                         "metrics": [
-                            {"label": "Official Exit Lap", "value": f"Lap {curated['exit_lap']}", "color": "#E10600"},
+                            {"label": "Exit Lap", "value": f"Lap {curated['exit_lap']}", "color": "#E10600"},
                             {"label": "Laps Completed", "value": f"{curated['completed_laps']} Laps", "color": "#FFFFFF"},
                             {"label": "Failure Cause", "value": curated["cause"][:24], "color": "#FFB703"},
                             {"label": "Team / Car", "value": d["team"], "color": d["color"]}
@@ -1305,7 +1305,7 @@ def _answer_core(
                     "metrics": [
                         {"label": "Exit Lap", "value": f"Lap {retire_lap}", "color": "#E10600"},
                         {"label": "Laps Completed", "value": f"{completed_laps} Laps", "color": "#FFFFFF"},
-                        {"label": "Official Status", "value": d['status'][:20], "color": "#FFB703"},
+                        {"label": "Status", "value": d['status'][:20], "color": "#FFB703"},
                         {"label": "Team", "value": d['team'], "color": d['color']}
                     ],
                     "action": f"JUMP TO LAP {retire_lap} REPLAY",
@@ -1484,7 +1484,7 @@ def _answer_core(
                 "intent": f"{year} Fastest Lap Telemetry Record",
                 "a2ui_card": {
                     "type": "fastest_lap_card",
-                    "title": f"Official Fastest Lap — {meta.get('race_name', 'Grand Prix')}",
+                    "title": f"Fastest Lap — {meta.get('race_name', 'Grand Prix')}",
                     "metrics": [
                         {"label": "Fastest Lap Driver", "value": f"{fl_name} ({fl_code})", "color": fl_driver["color"] if fl_driver else "#A855F7"},
                         {"label": "Lap Time", "value": fl.get("time"), "color": "#A855F7"},
@@ -1546,7 +1546,7 @@ def _answer_core(
                 "intent": "Podium & Race Classification",
                 "a2ui_card": {
                     "type": "race_summary_card",
-                    "title": f"Official Podium & Race Results — {meta.get('race_name', 'Grand Prix')}",
+                    "title": f"Podium & Race Results — {meta.get('race_name', 'Grand Prix')}",
                     "metrics": [
                         {"label": "Winner (P1)", "value": f"{p1['name']} ({p1['code']})", "color": p1['color']},
                         {"label": "Runner-Up (P2)", "value": f"{p2['name']} ({p2['code']})" if p2 else "—", "color": p2['color'] if p2 else "#64748B"},

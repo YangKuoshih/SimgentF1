@@ -1041,7 +1041,7 @@ def _build_sprint_replay(year: int, rnd: int, net: bool = True, circuit_override
             "total_laps": max(1, winner_laps), "has_lap_data": True,
             "session_type": "sprint",
             "session_name": "F1 Sprint Race (100km)",
-            "source": "Jolpica-F1 (Official Sprint Classification)",
+            "source": "Jolpica-F1 (Sprint Classification)",
         },
         "track": geo,
         "drivers": drivers,
