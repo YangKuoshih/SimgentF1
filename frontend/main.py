@@ -6,6 +6,7 @@ and proxies natural language requests to the AI agent engine.
 """
 
 import datetime
+import re
 import secrets
 import logging
 import os
@@ -359,7 +360,14 @@ async def api_chat(msg: ChatMessage, request: Request):
                 is_inj, _ = check_prompt_injection(c)
                 is_dang, _ = check_dangerous_content(c)
                 if not is_inj and not is_dang and c:
-                    safe_history.append({"role": r, "content": c})
+                    entry = {"role": r, "content": c}
+                    view = turn.get("view")
+                    if isinstance(view, str) and re.fullmatch(r"\d{4}-\d{1,2}", view):
+                        entry["view"] = view  # race on screen when the turn happened
+                    safe_history.append(entry)
+
+    # Only turns asked while the current race was on screen count as context.
+    safe_history = race_agent.scope_history_to_view(safe_history, msg.context)
 
     start_t = time.perf_counter()
 

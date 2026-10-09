@@ -4464,7 +4464,8 @@
       id: 'msg-u-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
       role: 'user',
       text: q,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      view: S.model ? `${S.season}-${S.round}` : null  // race on screen when asked
     };
     feed.insertAdjacentHTML('beforeend', renderUserMessageHtml(userMsg));
     feed.scrollTop = feed.scrollHeight;
@@ -4480,9 +4481,12 @@
     } : null;
 
     // Multi-turn stream: last 8 messages (before current userMsg)
+    // Each turn carries the race that was on screen, so the agent ignores turns from
+    // before the viewer switched races.
     const historyPayload = history.slice(-9, -1).map(m => ({
       role: m.role,
-      content: m.text
+      content: m.text,
+      view: m.view || null
     }));
 
     try {
@@ -4530,7 +4534,8 @@
         tool: res.tool || '',
         a2ui_card: res.a2ui_card || null,
         timestamp: Date.now(),
-        context: context
+        context: context,
+        view: userMsg.view
       };
 
       feed.insertAdjacentHTML('beforeend', renderAssistantMessageHtml(asstMsg));

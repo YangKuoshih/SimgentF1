@@ -610,6 +610,35 @@ def _get_driver_tyre_stints(d: Dict[str, Any], events: List[Dict[str, Any]], tot
     }
 
 
+def scope_history_to_view(history: Optional[List[Dict[str, Any]]],
+                          context: Optional[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Drop turns from before the viewer switched to the race now on screen.
+
+    The UI tags each turn with the race that was on screen ("view": "2026-16"). Without
+    this, a question about the current race ("explain VER's pit strategy") was answered
+    for a race discussed earlier in the chat (e.g. the Australian GP). History with no
+    view tags at all (other clients, tests) is used as-is; once tags exist, an untagged
+    turn counts as a different view.
+    """
+    turns = list(history or [])
+    ctx = context or {}
+    if not turns or not ctx.get("year") or not ctx.get("round"):
+        return turns
+    if not any(t.get("view") for t in turns):
+        return turns
+    view = f"{ctx['year']}-{ctx['round']}"
+    kept: List[Dict[str, Any]] = []
+    for t in reversed(turns):
+        if t.get("view") != view:
+            break
+        kept.append(t)
+    return list(reversed(kept))
+
+
+# A driver from an earlier turn is only meant when the question points back to it.
+_DRIVER_BACKREF = re.compile(r"\b(he|his|him|she|her|they|their|them|that|it|its|same driver)\b")
+
+
 def answer_race_engineer_query(
     query: str,
     context: Optional[Dict[str, Any]] = None,
@@ -621,6 +650,7 @@ def answer_race_engineer_query(
     across any season (1950-2026) and any Grand Prix.
     Supports multi-turn context and pronoun resolution from conversation history.
     """
+    history = scope_history_to_view(history, context)
     query = resolve_follow_up(query, history)  # "what about 2025?", "where did he start?"
     q = query.lower().strip()
     q_words = set(re.findall(r'\b[a-z0-9_-]+\b', q))
@@ -1042,7 +1072,7 @@ def answer_race_engineer_query(
     # Multi-turn conversational resolution: search history for referenced driver
     # (skipped for race-level result questions so "who won that race?" is not hijacked
     #  by a driver named in a previous turn).
-    if not target_driver and history and not is_race_result_query:
+    if not target_driver and history and not is_race_result_query and _DRIVER_BACKREF.search(q):
         for turn in reversed(history):
             turn_text = (turn.get("content") or turn.get("text") or "")
             found = _find_driver(turn_text, drivers)
