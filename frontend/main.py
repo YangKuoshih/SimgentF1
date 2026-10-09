@@ -398,7 +398,15 @@ async def api_what_if(req: WhatIfRequest):
 class ChatMessage(BaseModel):
     query: str = Field(..., max_length=500, description="Natural language telemetry or race query (max 500 chars)")
     context: Optional[Dict[str, Any]] = None
-    history: Optional[list] = Field(None, description="Recent conversation turns for multi-turn conversational context")
+    history: Optional[list] = Field(None, max_length=50, description="Recent conversation turns for multi-turn conversational context")
+
+    @field_validator("context")
+    @classmethod
+    def _bounded_context(cls, v):
+        # The app sends a few hundred bytes (race, session, top-10 order); refuse anything far larger.
+        if v is not None and len(json.dumps(v, default=str)) > 4000:
+            raise ValueError("context too large")
+        return v
 
 @app.post("/api/chat")
 async def api_chat(msg: ChatMessage, request: Request):
