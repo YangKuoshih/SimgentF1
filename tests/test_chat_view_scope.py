@@ -58,5 +58,18 @@ class ChatViewScopeTests(unittest.TestCase):
         self.assertIn("Hamilton", r["text"])
 
 
+class DriverPhrasingTests(unittest.TestCase):
+    def test_how_did_driver_do_answers_about_that_driver(self):
+        for q in ["How did Lindblad do?", "How did Arvid Lindblad perform?"]:
+            with self.subTest(q=q):
+                r = ask(q, R16, [])
+                self.assertTrue(r["text"].lstrip("*").startswith("Arvid Lindblad"), r["text"][:80])
+                self.assertIn("P10", r["text"])
+
+    def test_how_did_the_race_go_is_still_a_race_summary(self):
+        r = ask("How did the race go?", R16, [])
+        self.assertEqual(r.get("tool"), "race_classification_lookup")
+
+
 if __name__ == "__main__":
     unittest.main()
