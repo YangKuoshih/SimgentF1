@@ -2,13 +2,24 @@
 import os
 import sys
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.tools import jolpica_sync as J  # noqa: E402
 from app.tools.session_scope import explicit_session, resolve_scope  # noqa: E402
 
-J._http = lambda url, retries=4: None  # offline
+# Offline only while these tests run (a module-level replacement would leak into other
+# test modules in the same `unittest discover` process).
+_offline = patch.object(J, "_http", lambda url, retries=4: None)
+
+
+def setUpModule():
+    _offline.start()
+
+
+def tearDownModule():
+    _offline.stop()
 
 MIAMI_SQ = {"year": 2026, "round": 4, "session": "sprint_qualifying", "race": "Miami Grand Prix"}
 

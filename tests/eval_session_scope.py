@@ -97,12 +97,15 @@ def main():
     stats = defaultdict(lambda: [0, 0])
     failures = []
     for kind, ctx, q, expect in cases():
-        text = ask(q, ctx, []).get("text", "")
+        resp = ask(q, ctx, [])
+        text = resp.get("text", "")
         ok = all(e.lower() in text.lower() for e in expect)
         stats[kind][0] += ok
         stats[kind][1] += 1
         if not ok:
-            failures.append(f"{kind} | {ctx['year']} R{ctx['round']} {ctx['session']} | {q!r} expected {expect}\n    got: {text[:220]!r}")
+            # Like the other evals, report the case and what was expected, not the response text.
+            failures.append(f"{kind} | {ctx['year']} R{ctx['round']} {ctx['session']} | {q!r} "
+                            f"expected {expect} (answered by {resp.get('tool')})")
     for f in failures:
         print("FAIL", f)
     total = [sum(v[0] for v in stats.values()), sum(v[1] for v in stats.values())]
