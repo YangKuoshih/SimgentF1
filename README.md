@@ -28,7 +28,7 @@
 > **Legal Notice & Trademark Disclaimer (Nominative Fair Use)**:
 > **SimGent** (*Simulator Agent*) is an independent, non-commercial open-source research and educational demonstration project developed by fans. **SimGent is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Formula One Licensing B.V., Formula One World Championship Limited, the FIA (Fédération Internationale de l'Automobile), Formula One Management (FOM), or any Formula 1 constructor, team, or driver.**
 >
-> All trademarks, service marks, trade names, and team identities referenced within this repository and application (including but not limited to *F1*, *FORMULA ONE*, *FORMULA 1*, *FIA FORMULA ONE WORLD CHAMPIONSHIP*, *GRAND PRIX*, team marks, and circuit names) are the property of their respective owners. Their use herein is strictly for historical identification, comparative technical analysis, and educational simulation purposes under the **Nominative Fair Use doctrine (15 U.S.C. § 1125(c)(3))** and international equivalent fair-use provisions. No commercial relationship, sponsorship, license, or endorsement is expressed or implied.
+> All trademarks, service marks, trade names, and team identities referenced within this repository and application (including but not limited to *F1*, *FORMULA ONE*, *FORMULA 1*, *FIA FORMULA ONE WORLD CHAMPIONSHIP*, team marks, and circuit names) are the property of their respective owners. They are used only to refer to the real teams, drivers, events and circuits, for historical identification, technical analysis and education. No commercial relationship, sponsorship, license, or endorsement is expressed or implied.
 
 ---
 
@@ -48,7 +48,7 @@ What started as a family race-day side project became **SimGent** (short for **S
 ## 📸 Application Showcase
 
 ### 1. High-Performance 2D Vector Replay Cockpit (Dark Mode)
-*Unobstructed racing line view across 40+ Grand Prix circuits, 20+ synchronized car models in official team liveries, live timing tower, multi-driver telemetry curves, and real-time session debriefs.*
+*Unobstructed racing line view across 40+ Grand Prix circuits, 20+ synchronized car models in team-inspired colors, live timing tower, multi-driver telemetry curves, and real-time session debriefs.*
 
 ![SimGent - 2D Vector Race Replay (Dark Mode)](docs/assets/01_race_replay_dark.png)
 
@@ -82,7 +82,7 @@ What started as a family race-day side project became **SimGent** (short for **S
 
 ### 1. Interactive 2D Vector Circuit Replay
 - Full normalized vector track maps rendered from real geospatial circuit coordinates (`f1-circuits.geojson`).
-- Dynamic heading rotation \(\theta = \arctan2(\Delta y, \Delta x)\) synchronizing micro-car models with official team liveries (Ferrari `#E80020`, Red Bull `#3671C6`, McLaren `#FF8000`, Mercedes `#27F4D2`, Aston Martin `#229971`, etc.).
+- Dynamic heading rotation \(\theta = \arctan2(\Delta y, \Delta x)\) synchronizing micro-car models with team-inspired colors (Ferrari `#E80020`, Red Bull `#3671C6`, McLaren `#FF8000`, Mercedes `#27F4D2`, Aston Martin `#229971`, etc.).
 - Real-time **Race Control event transponders**: Safety Car (SC), Virtual Safety Car (VSC), Red Flags, Yellow Flags, and non-finisher (DNF) markers.
 - Fully collapsible, movable HUDs: minimizes the Driver Telemetry Card and Circuit Intel HUD for an unobstructed view of the racing line.
 
@@ -391,7 +391,7 @@ Then navigate to [http://localhost:8080](http://localhost:8080).
 
 ## ⚖️ Trademark Disclaimer & Legal Information
 
-This repository and the hosted application at [`simgent.tonyyang.work`](https://simgent.tonyyang.work) are provided strictly for educational, analytical, and archival purposes under the **Nominative Fair Use doctrine** (United States Trademark Act, 15 U.S.C. § 1125(c)(3)) and applicable international fair practice standards.
+This repository and the hosted application at [`simgent.tonyyang.work`](https://simgent.tonyyang.work) are provided strictly for non-commercial educational, analytical, and archival purposes. Names and marks are used only to refer to the real teams, drivers, events and circuits.
 
 ### Non-Affiliation Declaration
 - **SimGent** is an independent, community-driven simulation and engineering demonstration project.
@@ -403,20 +403,25 @@ This repository and the hosted application at [`simgent.tonyyang.work`](https://
   - Any official World Championship constructor, team, driver, or commercial entity.
 
 ### Trademark Ownership
-- `F1`, `FORMULA ONE`, `FORMULA 1`, `FIA FORMULA ONE WORLD CHAMPIONSHIP`, `GRAND PRIX`, `PADDOCK CLUB`, and related logos, designs, and word marks are registered trademarks of **Formula One Licensing B.V.**
+- `F1`, `FORMULA ONE`, `FORMULA 1`, `FIA FORMULA ONE WORLD CHAMPIONSHIP`, `PADDOCK CLUB`, and related logos, designs, and word marks are registered trademarks of **Formula One Licensing B.V.**
 - All constructor, team, and manufacturer names (e.g., Ferrari, Red Bull, Mercedes, McLaren, Aston Martin, Alpine, Williams, Haas, Sauber/Stake, RB/Racing Bulls), driver names, and circuit identifiers are trademarks, trade names, or registered marks of their respective owners.
-- The use of these names, marks, and livery colors in this project serves purely to identify historical competitors, events, locations, and telemetry data points without creating any likelihood of consumer confusion or implying endorsement or sponsorship.
+- The use of these names, marks, and team-inspired colors in this project serves purely to identify historical competitors, events, locations, and telemetry data points without creating any likelihood of consumer confusion or implying endorsement or sponsorship.
 
-### Factual Data Sources
-Timing, transponder, and historical records are retrieved from public community open APIs, including the OpenF1 Project and the Jolpica-F1 (Ergast compatible) API. Telemetry and timing records are non-copyrightable factual data presented solely for non-commercial statistical analysis and education.
+### Data Sources and Data License
+Results, timing and historical records come from two community APIs, neither affiliated with Formula 1:
+
+- [Jolpica-F1](https://github.com/jolpica/jolpica-f1) (Ergast-compatible), whose data is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) ([terms](https://github.com/jolpica/jolpica-f1/blob/main/TERMS.md)).
+- [OpenF1](https://openf1.org), whose data is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+
+The cached copies in `data/cache/` (and anything derived from them) stay under CC BY-NC-SA 4.0: credit the source, **non-commercial use only**, and share adaptations under the same license. See [`data/cache/LICENSE.md`](data/cache/LICENSE.md).
 
 ---
 
 ## 📄 License & Attribution
 
-Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more information.
+The **source code** is distributed under the **MIT License**. See [`LICENSE`](LICENSE).
 
-- Motorsport timing and telemetry data accessed via community OpenF1 and Jolpica/Ergast open APIs.
+The **race data** in `data/cache/` is **not** covered by the MIT License. It comes from Jolpica-F1 and OpenF1 and is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) (attribution, non-commercial, share-alike). See [`data/cache/LICENSE.md`](data/cache/LICENSE.md) and [`NOTICE.md`](NOTICE.md).
 - Built with passion by **Tony Yang** ([tonyyang.work](https://tonyyang.work) | [GitHub @YangKuoshih](https://github.com/YangKuoshih)).
 
 ## Contributing and security
