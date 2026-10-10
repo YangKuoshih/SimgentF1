@@ -2,7 +2,10 @@ name: Auto-Sync F1 Data (fetch, verify, then propose)
 
 # Data only reaches main after it has been fetched from the sources (Jolpica, plus OpenF1
 # for Sprint Qualifying), re-checked against Jolpica, passed the offline integrity gate
-# and passed the agent evals. Any failing step stops the job before proposing a review branch.
+# and passed the agent evals. Any failing step stops the job before anything is published.
+# Verified data is then committed to main and deployed to Cloud Run automatically. If main
+# rejects the push (branch protection), the data goes to a review branch instead and no
+# deploy runs.
 
 on:
   schedule:
@@ -34,8 +37,10 @@ jobs:
   sync:
     permissions:
       contents: write
-    name: Sync, verify and propose F1 data
+    name: Sync, verify and publish F1 data
     runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.publish.outputs.changed }}
     env:
       YEAR: ${{ github.event.inputs.year || '2026' }}
       FULL: ${{ github.event.schedule == '43 3 * * 3' || github.event.inputs.full_revalidate == 'true' }}
@@ -94,16 +99,53 @@ jobs:
           python tests/test_guardrails_matrix.py
           python tests/test_mcp_server.py
 
-      - name: 5. Propose verified data for review
+      - name: 5. Publish verified data to main
+        id: publish
+        env:
+          REF: ${{ github.ref }}
+          RUN_ID: ${{ github.run_id }}
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/cache/
           if git diff --staged --quiet; then
             echo "No data changes."
-          else
-            git checkout -b "automation/verified-data-${GITHUB_RUN_ID}"
-            git commit -m "chore(data): verified F1 data sync for $YEAR"
-            git push origin HEAD
-            echo "Open a pull request from automation/verified-data-${GITHUB_RUN_ID}; main requires review and CI." >> "$GITHUB_STEP_SUMMARY"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
           fi
+          # Only verified cache files may ever be published automatically.
+          if git diff --staged --name-only | grep -v '^data/cache/'; then
+            echo "::error::Files outside data/cache/ are staged; refusing to publish."
+            exit 1
+          fi
+          git commit -m "chore(data): verified F1 data sync for $YEAR"
+          published=false
+          if [ "$REF" = "refs/heads/main" ]; then
+            for attempt in 1 2 3; do
+              if git pull --rebase origin main && git push origin HEAD:main; then
+                published=true
+                break
+              fi
+              git rebase --abort 2>/dev/null || true
+              sleep 5
+            done
+          fi
+          if [ "$published" = "true" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "Verified data pushed to main; deploying." >> "$GITHUB_STEP_SUMMARY"
+          else
+            # Not on main, or main refused the push: keep the old review-branch behaviour.
+            git checkout -b "automation/verified-data-${RUN_ID}"
+            git push origin HEAD
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Could not push to main. Open a pull request from automation/verified-data-${RUN_ID}; main requires review and CI." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+  deploy:
+    name: Deploy refreshed data to Cloud Run
+    needs: sync
+    if: needs.sync.outputs.changed == 'true'
+    permissions:
+      contents: read
+      id-token: write
+    uses: $/.github/workflows/deploy.yml

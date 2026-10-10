@@ -19,7 +19,7 @@ OpenF1 data is licensed CC BY-NC-SA 4.0 (non-commercial, share-alike, see `data/
 
 ## When it runs
 
-- `sync_data.yml`, every 6 hours: fetch Jolpica → fetch OpenF1 Sprint Qualifying → revalidate → integrity gate → agent evals → propose a review branch. A failing step stops the job, so bad data never reaches `main`.
+- `sync_data.yml`, every 6 hours: fetch Jolpica → fetch OpenF1 Sprint Qualifying → revalidate → integrity gate → agent evals → commit the verified `data/cache/` files to `main` → deploy to Cloud Run (`deploy.yml`, called only when data changed). A failing step stops the job, so bad data never reaches `main` or the live site. If `main` rejects the push (branch protection), the data goes to an `automation/verified-data-*` review branch instead and nothing is deployed. The commit step refuses to publish anything outside `data/cache/`.
 - `sync_data.yml`, Wednesdays (or manual with *full_revalidate*): the same, with every cached season re-checked against Jolpica and every Sprint Qualifying re-fetched from OpenF1.
 - `ci.yml`, every push and PR: integrity gate, manifest check and both agent evals (`eval_cross_era.py`, `eval_multi_turn.py`).
 
