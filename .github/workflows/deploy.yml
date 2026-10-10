@@ -3,11 +3,6 @@ name: Deploy to Google Cloud Run
 on:
   workflow_dispatch: # Allows manual trigger from the GitHub Actions web UI
   workflow_call: # Called by sync_data.yml after verified data lands on main
-    inputs:
-      ref:
-        description: 'Git ref to deploy (the sync passes main so the freshly pushed data commit is used)'
-        type: string
-        default: ''
 
 permissions:
   contents: read
@@ -20,7 +15,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.ref }}
+          ref: refs/heads/main # always deploy main's latest commit (includes freshly synced data)
           persist-credentials: false
 
       - name: Set up Python 3.14.8
@@ -42,6 +37,10 @@ jobs:
   deploy:
     name: Deploy to GCP Cloud Run
     needs: test
+    # One deploy at a time; a newer request waits instead of racing an older one.
+    concurrency:
+      group: deploy-cloud-run
+      cancel-in-progress: false
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
@@ -52,7 +51,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          ref: ${{ inputs.ref }}
+          ref: refs/heads/main # always deploy main's latest commit (includes freshly synced data)
           persist-credentials: false
 
       # Google Cloud only trusts this repository's main branch (provider attribute condition);
