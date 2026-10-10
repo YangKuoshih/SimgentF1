@@ -114,6 +114,39 @@ def check_sprints():
                 fail(f"{y} R{rnd} sprint qualifying: drivers not in the sprint classification {missing}")
 
 
+def check_openf1_sessions():
+    """Sprint and Qualifying rows from OpenF1 (used until Jolpica publishes): one row per car,
+    real codes, plausible grid and lap times, the same drivers as Sprint Qualifying."""
+    lap = re.compile(r"^\d:\d\d\.\d{3}$")
+    for session in ("sprint", "qualifying"):
+        for p in sorted(glob.glob(os.path.join(OPENF1, f"*_{session}.json"))):
+            m = re.match(rf"(\d{{4}})_(\d+)_{session}\.json$", os.path.basename(p))
+            if not m:
+                continue
+            y, rnd, rows = int(m.group(1)), int(m.group(2)), load(p)
+            label = f"{y} R{rnd} {session} (OpenF1)"
+            nums = [x.get("num") for x in rows]
+            if not rows or len(set(nums)) != len(nums) or any(not x.get("driver_code") for x in rows):
+                fail(f"{label}: empty, duplicate car numbers or missing driver codes")
+                continue
+            if session == "qualifying":
+                bad = [x["driver_code"] for x in rows for q in ("q1", "q2", "q3")
+                       if x.get(q) and x[q] not in ("DNF", "DNS") and not lap.match(x[q])]
+                if bad:
+                    fail(f"{label}: malformed lap times for {sorted(set(bad))}")
+                continue
+            grids = [x.get("grid") for x in rows if x.get("grid")]
+            if grids and all(x.get("grid") == x.get("pos") for x in rows):
+                fail(f"{label}: every grid slot equals the finishing position (grid looks invented)")
+            if any(x.get("status") not in ("Finished", "Lapped", "Retired", "Did not start", "Disqualified") for x in rows):
+                fail(f"{label}: unexpected status values")
+            sq = os.path.join(OPENF1, f"{y}_{rnd}_sprint_qualifying.json")
+            if os.path.exists(sq):
+                missing = {x["driver_code"] for x in load(sq)} ^ {x["driver_code"] for x in rows}
+                if missing:
+                    fail(f"{label}: drivers differ from Sprint Qualifying {sorted(missing)}")
+
+
 # ---------------------------------------------------------------- laps & pit stops
 def check_laps_and_stops():
     for p in sorted(glob.glob(os.path.join(CACHE, "*_laps_all.json"))):
@@ -229,6 +262,7 @@ def main():
     check_results()
     check_sprints()
     check_laps_and_stops()
+    check_openf1_sessions()
     check_standings()
     check_winners()
     if not args.no_manifest:

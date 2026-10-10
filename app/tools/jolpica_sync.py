@@ -12,6 +12,8 @@ Usage:
   .venv/bin/python -m app.tools.jolpica_sync 2026 2025 2024 [--laps]
 """
 
+import datetime
+import glob
 import json
 import logging
 import os
@@ -21,7 +23,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger("simgent.jolpica")
 
@@ -257,11 +259,132 @@ def sprint_results(year: int, rnd: int, net: bool = True) -> Optional[Dict[str, 
                 _manifest_forget(p)
             except OSError:
                 pass
-        return None
+        return _sprint_from_openf1(year, rnd, net)
     return races[0]
 
 
 OPENF1_CACHE = os.path.join(os.path.dirname(CACHE), "openf1")
+_OPENF1_TRIED: Dict[Tuple[int, int, str], float] = {}
+
+
+def _openf1_rows(year: int, rnd: int, session: str, net: bool) -> Optional[List[Dict[str, Any]]]:
+    """OpenF1 rows for a session Jolpica hasn't published, fetched on demand at most every
+    10 minutes per session (OpenF1 closes during live sessions; don't hammer it)."""
+    path = os.path.join(OPENF1_CACHE, f"{year}_{rnd}_{session}.json")
+    if not os.path.exists(path) and net and year >= 2023:
+        last = _OPENF1_TRIED.get((year, rnd, session), 0.0)
+        if time.time() - last > 600:
+            _OPENF1_TRIED[(year, rnd, session)] = time.time()
+            try:
+                from app.tools import openf1_sync
+                when = openf1_sync.scheduled(year, rnd, session)
+                if when and when.get("date", "9999") <= datetime.date.today().isoformat():
+                    openf1_sync.fetch_session(year, rnd, session)
+            except Exception as e:
+                logger.warning(f"⚠️ [OPENF1] {session} fetch failed for {year} R{rnd}: {e}")
+    if not os.path.exists(path):
+        return None
+    with open(path, encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _season_people(year: int, rnd: int) -> Dict[str, Tuple[Dict[str, Any], Dict[str, Any]]]:
+    """Car number -> (Jolpica Driver, Constructor) from this season's cached results, the
+    nearest earlier round winning (seat changes), later rounds only as a fallback."""
+    found = []
+    for f in glob.glob(os.path.join(CACHE, f"{year}_*_*.json")):
+        m = re.match(rf"{year}_(\d+)_(results|sprint|qualifying)\.json$", os.path.basename(f))
+        if m:
+            found.append((int(m.group(1)), f))
+    order = sorted((x for x in found if x[0] <= rnd), reverse=True) + sorted(x for x in found if x[0] > rnd)
+    people: Dict[str, Tuple[Dict[str, Any], Dict[str, Any]]] = {}
+    for _, f in order:
+        try:
+            with open(f, encoding="utf-8") as fh:
+                races = json.load(fh)["MRData"]["RaceTable"]["Races"]
+        except (OSError, ValueError, KeyError):
+            continue
+        for race in races:
+            for row in race.get("Results", []) + race.get("SprintResults", []) + race.get("QualifyingResults", []):
+                num = str(row.get("number") or row["Driver"].get("permanentNumber") or "")
+                if num and num not in people:
+                    people[num] = (row["Driver"], row["Constructor"])
+    return people
+
+
+def _person(r: Dict[str, Any], people) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+    """Jolpica-style Driver/Constructor for an OpenF1 row (minimal record if unknown)."""
+    if r.get("num") in people:
+        driver, constructor = people[r["num"]]
+        if not r.get("driver_code") or driver.get("code") == r.get("driver_code"):
+            return driver, constructor
+    given, _, family = (r.get("driver_name") or r.get("driver_code", "")).partition(" ")
+    return ({"driverId": (r.get("driver_code") or "").lower(), "code": r.get("driver_code", ""),
+             "permanentNumber": r.get("num", ""), "givenName": given.title(), "familyName": (family or given).title()},
+            {"constructorId": (r.get("team") or "").lower().replace(" ", "_"), "name": r.get("team", "")})
+
+
+def _event(year: int, rnd: int, net: bool) -> Dict[str, Any]:
+    return next((r for r in schedule(year, net) if str(r.get("round")) == str(rnd)), {})
+
+
+def _sprint_from_openf1(year: int, rnd: int, net: bool) -> Optional[Dict[str, Any]]:
+    """Sprint result from OpenF1 while Jolpica hasn't published it, in Jolpica's format.
+    The grid comes from OpenF1's position feed (see openf1_sync.fetch_session); if that is
+    missing, the Sprint Qualifying order is used."""
+    rows = _openf1_rows(year, rnd, "sprint", net)
+    if not rows:
+        return None
+    people = _season_people(year, rnd)
+    sq = _openf1_rows(year, rnd, "sprint_qualifying", False) or []
+    grid = {x.get("num"): str(i + 1) for i, x in enumerate(sq)}
+    out = []
+    for i, r in enumerate(rows):
+        driver, constructor = _person(r, people)
+        row = {"number": r["num"], "position": str(i + 1), "positionText": r["pos"],
+               "points": str(r.get("points") or 0).removesuffix(".0"), "Driver": driver, "Constructor": constructor,
+               "grid": r.get("grid") or grid.get(r["num"], "0"), "laps": str(r.get("laps", 0)), "status": r["status"]}
+        if r.get("time"):
+            row["Time"] = {"time": r["time"], **({"millis": str(r["millis"])} if r.get("millis") else {})}
+        out.append(row)
+    ev = _event(year, rnd, net)
+    return {"season": str(year), "round": str(rnd), "raceName": ev.get("raceName", f"Round {rnd}"),
+            "date": (ev.get("Sprint") or {}).get("date", ev.get("date", "")), "Circuit": ev.get("Circuit", {}),
+            "source": "OpenF1 (Jolpica not published yet)", "SprintResults": out}
+
+
+def _quali_rows(rows: List[Dict[str, Any]], people) -> List[Dict[str, Any]]:
+    """OpenF1 qualifying-type rows -> Jolpica QualifyingResults rows."""
+    out = []
+    for i, r in enumerate(rows):
+        driver, constructor = _person(r, people)
+        pos = r.get("pos", "")
+        row = {"number": r.get("num", ""), "position": pos if pos.isdigit() else str(i + 1), "positionText": pos,
+               "Driver": driver, "Constructor": constructor, "Q1": r.get("q1", ""), "laps": r.get("laps", 0)}
+        # Same convention as Jolpica: a Q2/Q3 field exists only if the driver reached that
+        # segment ("DNF"/"DNS" there when they reached it but set no time).
+        if r.get("q2"):
+            row["Q2"] = r["q2"]
+        if r.get("q3"):
+            row["Q3"] = r["q3"]
+        out.append(row)
+    return out
+
+
+def _qualifying_from_openf1(year: int, rnd: int, net: bool) -> Optional[Dict[str, Any]]:
+    """Grand Prix qualifying from OpenF1 while Jolpica hasn't published it, in Jolpica's format."""
+    rows = _openf1_rows(year, rnd, "qualifying", net)
+    if not rows:
+        return None
+    ev = _event(year, rnd, net)
+    out = _quali_rows(rows, _season_people(year, rnd))
+    for row in out:  # Jolpica's Grand Prix qualifying leaves a reached-but-no-time segment empty
+        for seg in ("Q1", "Q2", "Q3"):
+            if row.get(seg) in ("DNF", "DNS"):
+                row[seg] = ""
+    return {"season": str(year), "round": str(rnd), "raceName": ev.get("raceName", f"Round {rnd}"),
+            "date": (ev.get("Qualifying") or {}).get("date", ev.get("date", "")), "Circuit": ev.get("Circuit", {}),
+            "source": "OpenF1 (Jolpica not published yet)", "QualifyingResults": out}
 
 
 def sprint_qualifying(year: int, rnd: int, net: bool = True) -> Optional[Dict[str, Any]]:
@@ -290,33 +413,7 @@ def sprint_qualifying(year: int, rnd: int, net: bool = True) -> Optional[Dict[st
         with open(meta_path, encoding="utf-8") as f:
             meta = json.load(f).get(f"{year}_{rnd}", {})
     sprint = sprint_results(year, rnd, net) or {}
-    by_code = {x["Driver"].get("code"): x for x in sprint.get("SprintResults", [])}
-    out_rows = []
-    for i, r in enumerate(rows):
-        src = by_code.get(r.get("driver_code"))
-        if src:
-            driver, constructor = src["Driver"], src["Constructor"]
-        else:  # driver not in the sprint classification: build a minimal record
-            given, _, family = (r.get("driver_name") or r.get("driver_code", "")).partition(" ")
-            driver = {"driverId": (r.get("driver_code") or "").lower(), "code": r.get("driver_code", ""),
-                      "givenName": given, "familyName": family or given}
-            constructor = {"constructorId": (r.get("team") or "").lower().replace(" ", "_"), "name": r.get("team", "")}
-        pos = r.get("pos", "")
-        row = {
-            "number": r.get("num", ""),
-            "position": pos if pos.isdigit() else str(i + 1),
-            "positionText": pos,
-            "Driver": driver, "Constructor": constructor,
-            "Q1": r.get("q1", ""),
-            "laps": r.get("laps", 0),
-        }
-        # Same convention as Jolpica: a Q2/Q3 field exists only if the driver reached that
-        # segment ("DNF"/"DNS" there when they reached it but set no time).
-        if r.get("q2"):
-            row["Q2"] = r["q2"]
-        if r.get("q3"):
-            row["Q3"] = r["q3"]
-        out_rows.append(row)
+    out_rows = _quali_rows(rows, _season_people(year, rnd))
     # Sprint Qualifying runs before the sprint, so on Friday/Saturday the sprint result (and
     # its race name, date and circuit) may not exist yet; the season schedule always has them.
     event = sprint or next((r for r in schedule(year, net) if str(r.get("round")) == str(rnd)), {})
@@ -345,7 +442,7 @@ def qualifying_results(year: int, rnd: int, net: bool = True) -> Optional[Dict[s
                 _manifest_forget(p)
             except OSError:
                 pass
-        return None
+        return _qualifying_from_openf1(year, rnd, net)
     return races[0]
 
 
