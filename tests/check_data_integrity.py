@@ -136,6 +136,9 @@ def check_openf1_sessions():
                     fail(f"{label}: malformed lap times for {sorted(set(bad))}")
                 continue
             grids = [x.get("grid") for x in rows if x.get("grid")]
+            dups = sorted({g for g in grids if g != "0" and grids.count(g) > 1}, key=int)
+            if dups:
+                fail(f"{label}: duplicate grid slots {dups}")
             if grids and all(x.get("grid") == x.get("pos") for x in rows):
                 fail(f"{label}: every grid slot equals the finishing position (grid looks invented)")
             if any(x.get("status") not in ("Finished", "Lapped", "Retired", "Did not start", "Disqualified") for x in rows):

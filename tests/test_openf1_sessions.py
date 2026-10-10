@@ -105,5 +105,31 @@ class FallbackUntilJolpicaPublishes(unittest.TestCase):
         self.assertNotIn("Q3", rus)
 
 
+class SprintStartingGrid(unittest.TestCase):
+    def test_a_stray_early_entry_is_not_the_grid(self):
+        # 2026 Singapore Sprint feed: car 1 at P1 alone, then the full grid with car 1 at P5.
+        feed = [{"date": "08:17:42", "driver_number": 1, "position": 1}] + [
+            {"date": "08:19:05", "driver_number": n, "position": i + 1} for i, n in enumerate([3, 63, 16, 81, 1])] + [
+            {"date": "09:36:39", "driver_number": 63, "position": 1}]
+        self.assertEqual(O.starting_grid(feed, [3, 63, 16, 81, 1]), {3: 1, 63: 2, 16: 3, 81: 4, 1: 5})
+
+    def test_no_complete_grid_gives_none(self):
+        feed = [{"date": "a", "driver_number": 1, "position": 1}, {"date": "b", "driver_number": 3, "position": 1}]
+        self.assertEqual(O.starting_grid(feed, [1, 3]), {})
+
+    def test_cached_singapore_sprint_grid_matches_sprint_qualifying(self):
+        sprint = os.path.join(O.CACHE, "2026_17_sprint.json")
+        sq = os.path.join(O.CACHE, "2026_17_sprint_qualifying.json")
+        if not (os.path.exists(sprint) and os.path.exists(sq)):
+            self.skipTest("Singapore OpenF1 files not cached")
+        with open(sprint) as f, open(sq) as g:
+            grid = {r["driver_code"]: r["grid"] for r in json.load(f)}
+            order = [r["driver_code"] for r in json.load(g)]
+        self.assertEqual([c for c, _ in sorted(grid.items(), key=lambda x: int(x[1]))], order)  # no penalties
+        self.assertEqual(grid["RUS"], "2")
+        self.assertEqual(grid["NOR"], "5")
+        self.assertEqual(len(set(grid.values())), len(grid))
+
+
 if __name__ == "__main__":
     unittest.main()
