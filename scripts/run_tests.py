@@ -50,7 +50,8 @@ def main():
                     log.seek(0)
                     raise RuntimeError('Test server failed to start:\n' + log.read())
                 for suite in ('e2e_playwright_suite.js', 'test_mobile_replay_speed.js',
-                              'test_albon_retirement_replay.js', 'test_starting_grid_replay.js'):
+                              'test_albon_retirement_replay.js', 'test_starting_grid_replay.js',
+                              'test_mobile_session_bar.js'):
                     run('node', f'tests/{suite}', env=dict(os.environ, BASE_URL='http://localhost:8080'))
             finally:
                 server.terminate()
