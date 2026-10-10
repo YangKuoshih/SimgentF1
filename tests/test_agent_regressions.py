@@ -192,5 +192,35 @@ class EstimatedQualifyingQuotesNoTimes(unittest.TestCase):
         self.assertIn("isn't in the data", ask("Who was knocked out in Q1?", ctx, [])["text"])
 
 
+class DriverExitQuestionsInSessions(unittest.TestCase):
+    """'When did Russell leave the qualifying race?' answered the pole sitter, not Russell."""
+    def test_leave_qualifying_answers_the_driver(self):
+        if not J.qualifying_results(2026, 17, net=False):
+            self.skipTest("needs Singapore qualifying cached")
+        r = ask("When did George Russell leave the qualifying race", view(2026, 17, "Singapore Grand Prix"), [])
+        self.assertEqual(r.get("tool"), "qualifying_driver_lookup")
+        self.assertIn("George Russell", r["text"])
+        self.assertIn("wasn't knocked out", r["text"])
+
+    def test_sprint_retirement_answers_the_driver(self):
+        ctx = view(2026, 17, "Singapore Grand Prix", "sprint_qualifying")
+        for q in ("When did George Russell leave the sprint?", "Why did Russell DNF in the sprint?"):
+            r = ask(q, ctx, [])
+            self.assertEqual(r.get("tool"), "sprint_driver_lookup", q)
+            self.assertIn("did not finish the **Sprint**", r["text"])
+
+    def test_who_retired_in_the_sprint(self):
+        r = ask("Who retired in the sprint?", view(2026, 17, "Singapore Grand Prix"), [])
+        self.assertEqual(r.get("tool"), "sprint_dnf_lookup")
+        self.assertIn("George Russell", r["text"])
+
+    def test_exit_this_race_is_not_a_career_profile(self):
+        r = ask("When did Max Verstappen exit this race?", view(2026, 16, "Bahrain Grand Prix in Malaysia"), [])
+        self.assertNotEqual(r.get("tool"), "driver_career_history_lookup")
+        self.assertIn("did not exit or retire", r["text"])
+        r = ask("When did Max Verstappen leave Red Bull?", view(2026, 16, "Bahrain Grand Prix in Malaysia"), [])
+        self.assertEqual(r.get("tool"), "driver_career_history_lookup")
+
+
 if __name__ == "__main__":
     unittest.main()
