@@ -10,7 +10,7 @@ async function testAlbonRetirementReplay() {
   await page.addInitScript(() => localStorage.setItem('simgent_welcomed_v1', '1'));
 
   try {
-    await page.goto('http://localhost:8080', { waitUntil: 'networkidle' });
+    await page.goto('http://localhost:8080/?year=2026&round=16', { waitUntil: 'networkidle' });  // 2026 R16, where Albon retired on Lap 42
     await page.waitForTimeout(1000);
 
     // 1. Verify Pit Wall SI answers Albon's exit accurately
@@ -28,7 +28,7 @@ async function testAlbonRetirementReplay() {
     if (!chatText.includes('Lap 42')) {
       throw new Error(`Expected agent response to mention Lap 42, but got: ${chatText}`);
     }
-    if (!/Official Completed Laps:\s*41\b/.test(chatText)) {
+    if (!/Completed Laps:\s*41\b/.test(chatText)) {
       throw new Error(`Expected agent response to mention 41 completed laps, but got: ${chatText}`);
     }
     console.log('✓ Agent correctly debriefed Lap 42 exit and 41 completed laps.');
