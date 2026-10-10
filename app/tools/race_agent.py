@@ -727,8 +727,10 @@ def answer_race_engineer_query(
         no_result = _NO_RACE_RESULT.get()
     finally:
         _NO_RACE_RESULT.reset(token)
+    # Only answers that need the Grand Prix result are replaced; qualifying/sprint lookups
+    # (e.g. the pole) have their own data.
     if no_result and resp.get("tool") not in _GENERAL_WITHOUT_A_RACE and (
-            resp.get("tool") in _RACE_DATA_TOOLS or resp.get("tool") == "session_telemetry_briefing"):
+            _RACE_DATA_TOOLS.get(resp.get("tool", "")) == "race" or resp.get("tool") == "session_telemetry_briefing"):
         return _race_not_run(*no_result)
     used = _RACE_DATA_TOOLS.get(resp.get("tool", ""))
     if scope and scope["from_screen"] and used:

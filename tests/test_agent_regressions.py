@@ -166,6 +166,13 @@ class NoAnswerFromAnotherRace(unittest.TestCase):
         self.assertIn("no race result for the **2026 Singapore Grand Prix** yet", r["text"])
         self.assertNotIn("Australian", r["text"])
 
+    def test_pole_is_answered_when_only_the_race_is_missing(self):
+        if J.results(2026, 17, net=False) or not J.qualifying_results(2026, 17, net=False):
+            self.skipTest("needs Singapore qualifying cached and its race not yet")
+        r = ask("Who took pole?", view(2026, 17, "Singapore Grand Prix", "qualifying"), [])
+        self.assertNotEqual(r.get("tool"), "race_not_run")
+        self.assertIn("Verstappen", r["text"])
+
     def test_general_questions_still_answered_when_the_race_has_no_result(self):
         if J.results(2026, 17, net=False):
             self.skipTest("the 2026 Singapore Grand Prix result is cached now")
