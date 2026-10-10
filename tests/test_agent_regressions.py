@@ -222,5 +222,48 @@ class DriverExitQuestionsInSessions(unittest.TestCase):
         self.assertEqual(r.get("tool"), "driver_career_history_lookup")
 
 
+class DriverWeekendSummary(unittest.TestCase):
+    """'What happened to Russell during the sprint weekend' answered the sprint winner."""
+    def test_sprint_weekend_lists_each_session(self):
+        r = ask("What happened to Russell during the sprint weekend", view(2026, 17, "Singapore Grand Prix"), [])
+        self.assertEqual(r.get("tool"), "weekend_driver_summary")
+        self.assertIn("**Sprint Qualifying**", r["text"])
+        self.assertIn("did not finish the **Sprint**", r["text"])
+        self.assertNotIn("Max Verstappen", r["text"])
+
+    def test_weekend_without_a_sprint_lists_no_sprint(self):
+        r = ask("What happened to Verstappen this weekend?", view(2026, 16, "Bahrain Grand Prix in Malaysia"), [])
+        self.assertEqual(r.get("tool"), "weekend_driver_summary")
+        self.assertNotIn("Sprint", r["text"])
+        self.assertIn("**Race**", r["text"])
+
+
+class NoSprintWeekend(unittest.TestCase):
+    """A weekend without a Sprint once got a Sprint made up from the Grand Prix result."""
+    def test_sprint_question_on_a_weekend_without_one(self):
+        for q in ("Who won the sprint?", "When did Russell leave the sprint?", "Who took sprint pole?"):
+            r = ask(q, view(2026, 16, "Bahrain Grand Prix in Malaysia"), [])
+            self.assertEqual(r.get("tool"), "no_sprint_weekend", q)
+            self.assertIn("had **no Sprint**", r["text"])
+            self.assertIn("R17 Singapore", r["text"])
+
+    def test_no_sprint_is_built_from_the_grand_prix(self):
+        from app.tools import race_replay
+        rep = race_replay.build_replay(2026, 16, net=False, session_type="sprint")
+        self.assertNotEqual((rep or {}).get("meta", {}).get("session_type"), "sprint")
+
+    def test_which_sprint_when_none_is_named(self):
+        r = ask("Who won the sprint in 2024?", None, [])
+        self.assertEqual(r.get("tool"), "no_sprint_weekend")
+        self.assertIn("Which Sprint do you mean?", r["text"])
+        r = ask("Who won the sprint in 1995?", None, [])
+        self.assertIn("introduced Sprint races in **2021**", r["text"])
+
+    def test_real_sprints_still_answered(self):
+        r = ask("Who won the sprint?", view(2026, 17, "Singapore Grand Prix"), [])
+        self.assertEqual(r.get("tool"), "sprint_classification_lookup")
+        self.assertIn("Max Verstappen", r["text"])
+
+
 if __name__ == "__main__":
     unittest.main()

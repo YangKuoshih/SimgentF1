@@ -636,6 +636,35 @@ def _race_not_run(year: int, r: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _sprint_weekends_text(year: int) -> str:
+    sprints = [r for r in race_replay.season_races(year) if r.get("has_sprint")]
+    if not sprints:
+        return f"There were no Sprints in {year}."
+    return f"Sprint weekends in {year}: " + ", ".join(
+        f"R{r['round']} {re.sub(r' Grand Prix', '', r.get('race_name', ''))}" for r in sprints) + "."
+
+
+def _no_sprint_reply(year: int, round_no: Optional[int]) -> Dict[str, Any]:
+    """A Sprint question about a weekend (or season) with no Sprint: say so and ask which one."""
+    if year < 2021:
+        text = (f"There were no Sprints in **{year}**: Formula 1 introduced Sprint races in **2021**. "
+                f"Which year and race do you mean? (e.g. \"Who won the sprint at the 2026 Singapore GP?\")")
+        intent = f"{year} — no Sprints"
+    elif round_no is None:
+        first = next((r for r in race_replay.season_races(year) if r.get("has_sprint")), None)
+        place = re.sub(r" Grand Prix", "", first.get("race_name", "")) if first else "Singapore"
+        text = (f"Which Sprint do you mean? {_sprint_weekends_text(year)} "
+                f"Name the race (and year), e.g. \"Who won the {year} {place} sprint?\"")
+        intent = f"{year} Sprint — which race?"
+    else:
+        r = next((x for x in race_replay.season_races(year) if x.get("round") == round_no), {})
+        name = r.get("race_name") or f"Round {round_no}"
+        text = (f"The **{year} {name}** (Round {round_no}) had **no Sprint**, so there's no Sprint result to give. "
+                f"{_sprint_weekends_text(year)} Which one do you mean?")
+        intent = f"{year} {name} — no Sprint"
+    return {"role": "assistant", "text": text, "tool": "no_sprint_weekend", "intent": intent, "a2ui_card": None}
+
+
 def race_from_history(history: Optional[List[Dict[str, Any]]], default_year: int) -> Optional[Tuple[int, int]]:
     """The race a conversation is about, from the user's own questions.
 
@@ -717,6 +746,11 @@ def answer_race_engineer_query(
     from app.tools import session_scope as SS
     history = scope_history_to_view(history, context)
     scope = SS.resolve_scope(query, context, history)
+    if scope and scope["from_screen"]:
+        resp = SS.answer_weekend(query, scope)
+        if resp:
+            label = resp.pop("label")
+            return {**resp, "text": f"{resp['text'].rstrip()}\n\n*{label}*"}
     if scope and scope["from_screen"] and scope["session"] != "race":
         resp = SS.answer_in_session(query, scope, context, history)
         if resp:
@@ -951,7 +985,7 @@ def _answer_core(
             }
 
     # E. Historical World Championship Outcome (1950–2025)
-    if year_match and not race_named and not any(w in q for w in ["grand prix", "gp", "race", "circuit", "round"]):
+    if year_match and not race_named and not any(w in q for w in ["grand prix", "gp", "race", "circuit", "round", "sprint"]):
         hist_yr = int(year_match.group(1))
         if 1950 <= hist_yr <= 2025 and any(w in q for w in ["champion", "championship", "title", "who won", "winner of the season", "won the"]):
             # Prefer the official final standings data; the hand-written roster in
@@ -969,6 +1003,20 @@ def _answer_core(
                     "driver_id": champ_data.get("driver_id"),
                     "a2ui_card": champ_data["card"]
                 }
+
+    # Sprint questions about a weekend without a Sprint (or no race named at all) never get
+    # another session's result: say so and ask which Sprint is meant.
+    if re.search(r"\bsprint\b|\bsq[123]?\b", q) and not re.search(
+            r"\b(how many|career|most|all-time|record|rules?|regulations?|format|points? system|what is a sprint|explain)\b", q):
+        race_known = (ctx.get("round") is not None or race_named or bool(round_match)
+                      or bool(history and race_from_history(history, datetime.date.today().year)))
+        weekend = next((r for r in race_replay.season_races(year) if r.get("round") == round_no), None)
+        if year < 2021:
+            return _no_sprint_reply(year, None)
+        if not race_known:
+            return _no_sprint_reply(year, None)
+        if weekend is not None and not weekend.get("has_sprint"):
+            return _no_sprint_reply(year, round_no)
 
     # F0. Sprint Qualifying / Sprint Shootout (who took sprint pole, SQ times)
     is_sq_query = bool(re.search(
@@ -1026,7 +1074,7 @@ def _answer_core(
     is_sprint_query = any(w in q for w in ["sprint", "sprint race"])
     if is_sprint_query:
         sp_model = race_replay.build_replay(year, round_no, session_type="sprint")
-        if sp_model and sp_model.get("drivers"):
+        if sp_model and sp_model.get("drivers") and sp_model["meta"].get("session_type") == "sprint":
             sp_winner = sp_model["drivers"][0]
             sp_p2 = sp_model["drivers"][1] if len(sp_model["drivers"]) > 1 else None
             sp_p3 = sp_model["drivers"][2] if len(sp_model["drivers"]) > 2 else None

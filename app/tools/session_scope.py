@@ -106,7 +106,8 @@ _RESULT_Q = re.compile(
     r"|podium|results?|classification|standings? (?:in|for) (?:this|the) session|front row)\b")
 _DRIVER_Q = re.compile(
     r"\b(how did|how was|how'd|where did|what position|which position|finish|finished|place[d]?|result|qualif(?:y|ied)"
-    r"|do(?:ing)?|perform(?:ed|ance)?|p\d+|position|best lap|lap ?time|time|gap|delta|knocked out|eliminated)\b")
+    r"|do(?:ing)?|perform(?:ed|ance)?|p\d+|position|best lap|lap ?time|time|gap|delta|knocked out|eliminated"
+    r"|what happened|what about|how about)\b")
 # A driver leaving the session ("when did Russell leave qualifying?", "why did he DNF in the sprint?")
 _EXIT_Q = re.compile(r"\b(leave|left|exit(?:ed)?|retire[ds]?|retirement|dnf|did ?n[o']t finish|drop(?:ped)? out|stop(?:ped)?"
                      r"|crash(?:ed)?|out of)\b")
@@ -244,6 +245,43 @@ def _card(scope, session, title, metrics):
             "title": title, "metrics": metrics,
             "action": f"VIEW {_LABEL[session].upper()}",
             "target": {"action_type": "switch_session", "year": scope["year"], "round": scope["round"], "session": session}}
+
+
+_WEEKEND = re.compile(r"\b(weekend|all (?:the |his |her |their )?sessions|each session|every session)\b")
+_WEEKEND_ORDER = ("sprint_qualifying", "sprint", "qualifying", "race")
+
+
+def answer_weekend(query: str, scope: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """'What happened to Russell during the sprint weekend?': the driver in every session of
+    the weekend that has a result. None unless the question asks about a driver's weekend."""
+    from app.tools.race_agent import _find_driver
+    q = query.lower()
+    if not _WEEKEND.search(q) or re.search(r"\b(career|season|championship|standings)\b", q):
+        return None
+    sched = next((r for r in race_replay.season_races(scope["year"]) if r.get("round") == scope["round"]), {})
+    held = set(sched.get("sessions") or ("race", "qualifying"))  # only sessions this weekend actually had
+    lines, driver, race_name = [], None, ""
+    for session in (s for s in _WEEKEND_ORDER if s in held):
+        model = race_replay.build_replay(scope["year"], scope["round"], session_type=session)
+        if not model or not model.get("drivers") or model["meta"].get("session_type", "race") != session:
+            continue
+        drivers, meta = model["drivers"], model["meta"]
+        d = _find_driver(q, drivers) if driver is None else next(
+            (x for x in drivers if x.get("code") == driver.get("code")), None)
+        if not d:
+            continue
+        driver = driver or d
+        race_name = race_name or re.sub(r"\s+-\s+.*$", "", meta.get("race_name", ""))
+        name = (meta.get("session_name") or _LABEL[session]) if session == "sprint_qualifying" else _LABEL[session]
+        knockout = (not meta.get("times_estimated")
+                    and any(str(x.get("qualifying_stage", "")).endswith(("2", "3")) for x in drivers))
+        lines.append(f"• {_driver_line(d, session, name, knockout)}")
+    if not driver or not lines:
+        return None
+    label = f"{scope['year']} {race_name or scope.get('race') or 'Round ' + str(scope['round'])} · Weekend"
+    return {"role": "assistant", "tool": "weekend_driver_summary", "intent": f"{label} — {driver['name']}",
+            "a2ui_card": None, "label": label,
+            "text": f"**{driver['name']}** across the **{race_name}** weekend:\n\n" + "\n".join(lines)}
 
 
 def answer_in_session(query: str, scope: Dict[str, Any], context: Optional[Dict[str, Any]] = None,

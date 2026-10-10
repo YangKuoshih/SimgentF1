@@ -1020,7 +1020,6 @@ def _build_qualifying_replay(year: int, rnd: int, net: bool = True, circuit_over
 
 def _build_sprint_replay(year: int, rnd: int, net: bool = True, circuit_override: Optional[str] = None) -> Optional[Dict[str, Any]]:
     sp = J.sprint_results(year, rnd, net)
-    res = J.results(year, rnd, net)
     circuit_info = None
     race_name = f"Round {rnd} Sprint"
     date_str = ""
@@ -1030,25 +1029,13 @@ def _build_sprint_replay(year: int, rnd: int, net: bool = True, circuit_override
     country = ""
     drivers_raw = []
 
+    # Only a real Sprint classification. (Results were once synthesised from the Grand
+    # Prix for weekends without a Sprint, so the agent reported Sprints that never ran.)
     if sp and sp.get("SprintResults"):
         drivers_raw = sp["SprintResults"]
         race_name = sp.get("raceName", race_name)
         date_str = sp.get("date", "")
         circuit_info = sp.get("Circuit", {})
-    elif res and res.get("Results"):
-        race_name = res.get("raceName", race_name)
-        date_str = res.get("date", "")
-        circuit_info = res.get("Circuit", {})
-        gp_laps = _safe_int(res["Results"][0].get("laps"), fallback=50) if res.get("Results") else 50
-        sprint_laps = max(15, int(gp_laps * 0.33))
-        for idx, r in enumerate(res.get("Results", [])):
-            entry = dict(r)
-            pos = _safe_int(r.get("position"), fallback=idx + 1)
-            pts_table = {1: 8, 2: 7, 3: 6, 4: 5, 5: 4, 6: 3, 7: 2, 8: 1}
-            entry["points"] = pts_table.get(pos, 0)
-            r_laps = _safe_int(r.get("laps"), fallback=0)
-            entry["laps"] = sprint_laps if r.get("status", "").startswith(("Finished", "Lapped", "+")) else max(1, int(r_laps * 0.33))
-            drivers_raw.append(entry)
     else:
         return None
 
