@@ -2,6 +2,12 @@ name: Deploy to Google Cloud Run
 
 on:
   workflow_dispatch: # Allows manual trigger from the GitHub Actions web UI
+  workflow_call: # Called by sync_data.yml after verified data lands on main
+    inputs:
+      ref:
+        description: 'Git ref to deploy (the sync passes main so the freshly pushed data commit is used)'
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -14,6 +20,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.ref }}
           persist-credentials: false
 
       - name: Set up Python 3.14.8
@@ -45,6 +52,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ inputs.ref }}
           persist-credentials: false
 
       # Google Cloud only trusts this repository's main branch (provider attribute condition);
