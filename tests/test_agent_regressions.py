@@ -166,6 +166,13 @@ class NoAnswerFromAnotherRace(unittest.TestCase):
         self.assertIn("no race result for the **2026 Singapore Grand Prix** yet", r["text"])
         self.assertNotIn("Australian", r["text"])
 
+    def test_general_questions_still_answered_when_the_race_has_no_result(self):
+        if J.results(2026, 17, net=False):
+            self.skipTest("the 2026 Singapore Grand Prix result is cached now")
+        r = ask("How can I simulate an undercut strategy?", view(2026, 17, "Singapore Grand Prix", "sprint_qualifying"), [])
+        self.assertEqual(r.get("tool"), "pit_strategy_explanation")
+        self.assertTrue(r.get("a2ui_card"))
+
 
 class EstimatedQualifyingQuotesNoTimes(unittest.TestCase):
     def test_grid_estimate_has_no_lap_times(self):

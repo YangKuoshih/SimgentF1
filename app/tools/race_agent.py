@@ -613,6 +613,9 @@ def _get_driver_tyre_stints(d: Dict[str, Any], events: List[Dict[str, Any]], tot
 
 
 _SESSION_NAMES = {"sprint_qualifying": "Sprint Qualifying", "sprint": "Sprint", "qualifying": "Qualifying"}
+# Race-data tools that still give a useful general answer without a race (e.g. how an
+# undercut works); everything else in _RACE_DATA_TOOLS needs the race's result.
+_GENERAL_WITHOUT_A_RACE = {"pit_strategy_explanation"}
 # Set by _answer_core when the race in question has no result yet (year, schedule entry).
 _NO_RACE_RESULT: contextvars.ContextVar = contextvars.ContextVar("no_race_result", default=None)
 
@@ -724,7 +727,8 @@ def answer_race_engineer_query(
         no_result = _NO_RACE_RESULT.get()
     finally:
         _NO_RACE_RESULT.reset(token)
-    if no_result and (resp.get("tool") in _RACE_DATA_TOOLS or resp.get("tool") == "session_telemetry_briefing"):
+    if no_result and resp.get("tool") not in _GENERAL_WITHOUT_A_RACE and (
+            resp.get("tool") in _RACE_DATA_TOOLS or resp.get("tool") == "session_telemetry_briefing"):
         return _race_not_run(*no_result)
     used = _RACE_DATA_TOOLS.get(resp.get("tool", ""))
     if scope and scope["from_screen"] and used:
