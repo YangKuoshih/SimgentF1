@@ -129,5 +129,61 @@ class SprintQualifyingBeforeTheSprint(unittest.TestCase):
         self.assertNotIn("Round 17", r["text"])
 
 
+class QualifyingSegmentQuestions(unittest.TestCase):
+    Q = view(2026, 16, "Bahrain Grand Prix in Malaysia", "qualifying")
+
+    def test_knocked_out_in_q1(self):
+        r = ask("Who was knocked out in Q1?", self.Q, [])
+        self.assertIn("Knocked out in **Q1** (6)", r["text"])
+        self.assertIn("Sergio Pérez (P22)", r["text"])
+        self.assertNotIn("retirement", r["text"])
+
+    def test_made_it_to_q3(self):
+        self.assertIn("**10 drivers** made it to **Q3**", ask("Who made it to Q3?", self.Q, [])["text"])
+
+    def test_fastest_in_a_segment_is_not_the_pole_lap(self):
+        r = ask("Who was fastest in Q2?", self.Q, [])
+        self.assertIn("fastest in **Q2** with **1:35.696**", r["text"])
+
+    def test_driver_without_a_time_in_a_segment(self):
+        self.assertIn("set no time", ask("Did Colapinto set a time in Q2?", self.Q, [])["text"])
+
+    def test_didnt_make_q3_means_out_in_q2(self):
+        self.assertIn("Knocked out in **Q2**", ask("Who didn't make Q3?", self.Q, [])["text"])
+
+    def test_sprint_qualifying_segments(self):
+        sq = view(2026, 17, "Singapore Grand Prix", "sprint_qualifying")
+        self.assertIn("Knocked out in **SQ1**", ask("Who was eliminated in SQ1?", sq, [])["text"])
+        self.assertIn("best lap of **1:31.399**", ask("What was Leclerc's best lap?", sq, [])["text"])
+
+
+class NoAnswerFromAnotherRace(unittest.TestCase):
+    def test_grand_prix_not_run_yet(self):
+        if J.results(2026, 17, net=False):
+            self.skipTest("the 2026 Singapore Grand Prix result is cached now")
+        r = ask("Who won the grand prix?", view(2026, 17, "Singapore Grand Prix", "sprint_qualifying"), [])
+        self.assertEqual(r.get("tool"), "race_not_run")
+        self.assertIn("no race result for the **2026 Singapore Grand Prix** yet", r["text"])
+        self.assertNotIn("Australian", r["text"])
+
+    def test_general_questions_still_answered_when_the_race_has_no_result(self):
+        if J.results(2026, 17, net=False):
+            self.skipTest("the 2026 Singapore Grand Prix result is cached now")
+        r = ask("How can I simulate an undercut strategy?", view(2026, 17, "Singapore Grand Prix", "sprint_qualifying"), [])
+        self.assertEqual(r.get("tool"), "pit_strategy_explanation")
+        self.assertTrue(r.get("a2ui_card"))
+
+
+class EstimatedQualifyingQuotesNoTimes(unittest.TestCase):
+    def test_grid_estimate_has_no_lap_times(self):
+        if J.qualifying_results(2021, 22, net=False):
+            self.skipTest("2021 Abu Dhabi qualifying is cached now")
+        ctx = view(2021, 22, "Abu Dhabi Grand Prix", "qualifying")
+        r = ask("Where did Hamilton qualify?", ctx, [])
+        self.assertIn("P2", r["text"])
+        self.assertNotRegex(r["text"], r"\d:\d\d\.\d{3}")
+        self.assertIn("isn't in the data", ask("Who was knocked out in Q1?", ctx, [])["text"])
+
+
 if __name__ == "__main__":
     unittest.main()
