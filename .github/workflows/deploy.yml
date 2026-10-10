@@ -1,6 +1,10 @@
 name: Deploy to Google Cloud Run
 
 on:
+  push: # Every merge to main deploys
+    branches: [main]
+    # Data-only pushes come from sync_data.yml, which calls this workflow itself.
+    paths-ignore: ['data/cache/**']
   workflow_dispatch: # Allows manual trigger from the GitHub Actions web UI
   workflow_call: # Called by sync_data.yml after verified data lands on main
 
