@@ -119,6 +119,10 @@ async def _security_headers(request: Request, call_next):
     response = await call_next(request)
     for k, v in _SECURITY_HEADERS.items():
         response.headers.setdefault(k, v)
+    # Pages must be re-checked on every visit, or browsers keep showing the pre-deploy app
+    # (no Cache-Control lets them reuse it heuristically). Unchanged pages cost a 304.
+    if response.headers.get("content-type", "").startswith("text/html"):
+        response.headers.setdefault("Cache-Control", "no-cache")
     return response
 
 def require_admin(request: Request):
