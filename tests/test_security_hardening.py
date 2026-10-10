@@ -87,6 +87,25 @@ class SecurityHeaderTests(unittest.TestCase):
         self.assertIn("connect-src 'self'", sent["content-security-policy"])
 
 
+class PageCachingTests(unittest.TestCase):
+    def test_html_pages_are_revalidated(self):
+        sent = {}
+
+        async def receive():
+            return {"type": "http.request", "body": b"", "more_body": False}
+
+        async def send(msg):
+            if msg["type"] == "http.response.start":
+                sent.update({k.decode().lower(): v.decode() for k, v in msg["headers"]})
+
+        scope = {"type": "http", "method": "GET", "path": "/", "raw_path": b"/",
+                 "headers": [], "query_string": b"", "client": ("127.0.0.1", 1), "server": ("t", 80),
+                 "scheme": "http", "root_path": "", "http_version": "1.1"}
+        asyncio.run(M.app(scope, receive, send))
+        self.assertTrue(sent.get("content-type", "").startswith("text/html"))
+        self.assertEqual(sent.get("cache-control"), "no-cache")
+
+
 class RequestBoundTests(unittest.TestCase):
     def test_simulation_iterations_are_bounded(self):
         with self.assertRaises(ValidationError):
