@@ -717,6 +717,11 @@ def answer_race_engineer_query(
     from app.tools import session_scope as SS
     history = scope_history_to_view(history, context)
     scope = SS.resolve_scope(query, context, history)
+    if scope and scope["from_screen"]:
+        resp = SS.answer_weekend(query, scope)
+        if resp:
+            label = resp.pop("label")
+            return {**resp, "text": f"{resp['text'].rstrip()}\n\n*{label}*"}
     if scope and scope["from_screen"] and scope["session"] != "race":
         resp = SS.answer_in_session(query, scope, context, history)
         if resp:

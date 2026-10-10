@@ -158,6 +158,20 @@ async function runTestSuite() {
     const memBadge = await page.locator('#copilot-mem-count').innerText();
     assert(memBadge.includes('MSG'), `Pit Wall Agent header tracks session memory: ${memBadge}`);
 
+    // An over-long question (e.g. pasted chat text) is explained, not sent as an HTTP 422 "[object Object]"
+    let chatPosts = 0;
+    const countChat = req => { if (new URL(req.url()).pathname === '/api/chat') chatPosts++; };
+    page.on('request', countChat);
+    const longQuery = 'PIT WALL AGENT '.repeat(40) + 'When did George Russell leave the sprint race';
+    await chatInput.fill(longQuery);
+    await sendBtn.click();
+    await page.waitForSelector('#chat-feed >> text=Questions can be up to 500 characters', { timeout: 3000 });
+    page.off('request', countChat);
+    const feedTooLong = await page.locator('#chat-feed').innerText();
+    assert(chatPosts === 0 && !feedTooLong.includes('[object Object]'), `Over-long question explained and not sent`);
+    assert((await chatInput.inputValue()) === longQuery, `Over-long question stays in the box to be shortened`);
+    await chatInput.fill('');
+
     // -------------------------------------------------------------
     // SUITE 3: Local Storage Persistence Across Page Reloads
     // -------------------------------------------------------------

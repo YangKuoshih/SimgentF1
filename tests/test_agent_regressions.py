@@ -222,5 +222,21 @@ class DriverExitQuestionsInSessions(unittest.TestCase):
         self.assertEqual(r.get("tool"), "driver_career_history_lookup")
 
 
+class DriverWeekendSummary(unittest.TestCase):
+    """'What happened to Russell during the sprint weekend' answered the sprint winner."""
+    def test_sprint_weekend_lists_each_session(self):
+        r = ask("What happened to Russell during the sprint weekend", view(2026, 17, "Singapore Grand Prix"), [])
+        self.assertEqual(r.get("tool"), "weekend_driver_summary")
+        self.assertIn("**Sprint Qualifying**", r["text"])
+        self.assertIn("did not finish the **Sprint**", r["text"])
+        self.assertNotIn("Max Verstappen", r["text"])
+
+    def test_weekend_without_a_sprint_lists_no_sprint(self):
+        r = ask("What happened to Verstappen this weekend?", view(2026, 16, "Bahrain Grand Prix in Malaysia"), [])
+        self.assertEqual(r.get("tool"), "weekend_driver_summary")
+        self.assertNotIn("Sprint", r["text"])
+        self.assertIn("**Race**", r["text"])
+
+
 if __name__ == "__main__":
     unittest.main()

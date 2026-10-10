@@ -1710,6 +1710,19 @@
   window.S = S;
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  // The server accepts questions of up to 500 characters (ChatMessage.query in frontend/main.py).
+  const MAX_QUERY_CHARS = 500;
+  const TOO_LONG_MSG = `Questions can be up to ${MAX_QUERY_CHARS} characters. Ask just the question (pasted chat text counts too).`;
+  // FastAPI sends validation errors (HTTP 422) as a list of objects; show them as text.
+  const apiErrorText = (detail, fallback) => {
+    if (!detail) return fallback;
+    if (typeof detail === 'string') return detail;
+    if (Array.isArray(detail)) {
+      if (detail.some(d => d && d.type === 'string_too_long' && (d.loc || []).includes('query'))) return TOO_LONG_MSG;
+      return detail.map(d => (d && d.msg) || String(d)).join('; ');
+    }
+    return detail.msg || fallback;
+  };
   const fmtClock = (s) => { s = Math.max(0, s); const h = Math.floor(s/3600), m = Math.floor(s%3600/60), x = Math.floor(s%60); return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`; };
   const fmtLap = (s) => { if (!s || !isFinite(s)) return '—'; const m = Math.floor(s/60); return `${m}:${(s - m*60).toFixed(3).padStart(6,'0')}`; };
 
@@ -4575,7 +4588,7 @@
 
       if (!response.ok) {
         const status = response.status;
-        const errDetail = res.detail || (status === 429 ? 'Pit Wall Radio rate limit exceeded (max 60 queries/min). Please wait a moment.' : 'Pit wall telemetry link error.');
+        const errDetail = apiErrorText(res.detail, status === 429 ? 'Pit Wall Radio rate limit exceeded (max 60 queries/min). Please wait a moment.' : 'Pit wall telemetry link error.');
         const isRateLimit = status === 429;
         feed.insertAdjacentHTML('beforeend', `
           <div class="self-start max-w-[95%] f1-glass border ${isRateLimit ? 'border-amber-500/40 bg-amber-500/10' : 'border-rose-500/40 bg-rose-500/10'} rounded-lg p-3 space-y-1 text-xs shadow-lg">
@@ -4624,7 +4637,19 @@
     feed.scrollTop = feed.scrollHeight;
   }
 
-  $('btn-chat-send').addEventListener('click', () => { const i = $('chat-input'); if (i.value.trim()) { sendChat(i.value.trim()); i.value = ''; } });
+  $('btn-chat-send').addEventListener('click', () => {
+    const i = $('chat-input');
+    const q = i.value.trim();
+    if (!q) return;
+    if (q.length > MAX_QUERY_CHARS) { showChatNotice(`${TOO_LONG_MSG} This one is ${q.length}.`); return; }
+    sendChat(q); i.value = '';
+  });
+  function showChatNotice(text) {
+    const feed = $('chat-feed');
+    if (!feed) return;
+    feed.insertAdjacentHTML('beforeend', `<div class="self-start max-w-[95%] bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 text-xs font-mono text-amber-300">${esc(text)}</div>`);
+    feed.scrollTop = feed.scrollHeight;
+  }
   $('chat-input').addEventListener('keydown', e => { if (e.key === 'Enter') $('btn-chat-send').click(); });
 
   async function executeAgentAction(btn) {
@@ -6712,7 +6737,7 @@
       if (thEl) thEl.remove();
 
       if (!response.ok) {
-        const errDetail = res.detail || (response.status === 429 ? 'Pit Wall Radio rate limit exceeded. Please wait a moment.' : 'Telemetry query error.');
+        const errDetail = apiErrorText(res.detail, response.status === 429 ? 'Pit Wall Radio rate limit exceeded. Please wait a moment.' : 'Telemetry query error.');
         feed.insertAdjacentHTML('beforeend', `
           <div class="self-start max-w-[95%] bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 text-xs font-mono text-amber-300">
             [RADIO ERROR ${response.status}] ${esc(errDetail)}
@@ -6812,6 +6837,7 @@
     $('pg-btn-send')?.addEventListener('click', () => {
       const inp = $('pg-chat-input');
       if (inp && inp.value.trim()) {
+        if (inp.value.trim().length > MAX_QUERY_CHARS) { alert(TOO_LONG_MSG); return; }
         sendPlaygroundQuery(inp.value.trim());
         inp.value = '';
       }
