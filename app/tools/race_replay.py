@@ -649,10 +649,19 @@ def season_races(year: int, net: bool = True) -> List[Dict[str, Any]]:
             "has_sprint": has_sprint,
             "sessions": sessions,
             "available": available,
+            "session_times": _session_times(r),
             "in_progress": (not is_completed) and bool(available),
             "completed": is_completed, "winner": winner,
         })
     return out
+
+
+def _session_times(r: Dict[str, Any]) -> Dict[str, str]:
+    """Scheduled start (UTC, ISO 8601) of each session from the Jolpica schedule entry."""
+    fields = {"race": r, "qualifying": r.get("Qualifying"), "sprint": r.get("Sprint"),
+              "sprint_qualifying": r.get("SprintQualifying") or r.get("SprintShootout")}
+    return {k: f"{v['date']}T{v['time']}" for k, v in fields.items()
+            if isinstance(v, dict) and v.get("date") and v.get("time")}
 
 
 # Weekend order, earliest first: the last available one is the newest session.
@@ -794,6 +803,11 @@ def standings(year: int, net: bool = True) -> Dict[str, Any]:
 
 
 # ------------------------------------------------------------------ replay
+QUALI_SEGMENT_GAP_S = 6.0  # pause between the last car's lap and the next segment's start
+QUALI_STAGGER_S = 2.5  # cars start their flying laps this far apart within a segment
+KNOCKOUT_QUALIFYING_FROM = 2006  # Q1/Q2/Q3 knockout format; earlier seasons had one session
+
+
 def _build_qualifying_replay(year: int, rnd: int, net: bool = True, circuit_override: Optional[str] = None,
                              sprint: bool = False) -> Optional[Dict[str, Any]]:
     """Qualifying replay. sprint=True builds the Sprint Qualifying / Sprint Shootout session
@@ -839,7 +853,9 @@ def _build_qualifying_replay(year: int, rnd: int, net: bool = True, circuit_over
             time_str = f"{m_part}:{s_part:06.3f}"
             entry = dict(r)
             entry["position"] = str(pos)
-            if pos <= 10:
+            if year < KNOCKOUT_QUALIFYING_FROM:
+                entry["Q1"] = time_str  # one qualifying session, no knockout segments
+            elif pos <= 10:
                 entry["Q1"] = f"{m_part}:{s_part + 1.2:06.3f}"
                 entry["Q2"] = f"{m_part}:{s_part + 0.5:06.3f}"
                 entry["Q3"] = time_str
@@ -883,16 +899,13 @@ def _build_qualifying_replay(year: int, rnd: int, net: bool = True, circuit_over
         # can reach Q2 and set no time (empty string), e.g. when saving engine parts for a penalty.
         stage = "Q3" if "Q3" in r else ("Q2" if "Q2" in r else "Q1")
 
-        s_q1 = _secs(r.get("Q1"))
-        t_q1 = s_q1 if (s_q1 is not None and s_q1 > 0) else (pole_secs + 1.4 + 0.05 * pos)
-
-        s_q2 = _secs(r.get("Q2"))
-        t_q2 = s_q2 if (s_q2 is not None and s_q2 > 0) else (t_q1 + 40.0)
-
-        s_q3 = _secs(r.get("Q3"))
-        t_q3 = s_q3 if (s_q3 is not None and s_q3 > 0) else (t_q2 + 45.0)
-
-        cum = [round(t_q1, 3), round(t_q1 + t_q2, 3), round(t_q1 + t_q2 + t_q3, 3)]
+        # One flying lap per segment the driver reached, at their real time (None = no time
+        # set in that segment). Timing is laid out per segment after the loop.
+        reached = 3 if stage == "Q3" else (2 if stage == "Q2" else 1)
+        seg_laps = []
+        for key in ("Q1", "Q2", "Q3")[:reached]:
+            t_seg = _secs(r.get(key))
+            seg_laps.append(t_seg if (t_seg is not None and t_seg > 0) else None)
 
         drivers.append({
             "id": did,
@@ -907,9 +920,9 @@ def _build_qualifying_replay(year: int, rnd: int, net: bool = True, circuit_over
             "status": f"{stage} ({delta_str})",
             "classified_text": r.get("positionText") or str(pos),
             "points": 0.0,
-            "laps": 3,
-            "cum": cum,
-            "pits": [2] if stage == "Q1" else ([3] if stage == "Q2" else []),
+            "laps": reached,
+            "_seg_laps": seg_laps,
+            "pits": [],
             "synthetic": "Q3" not in r and "Q2" not in r,
             "best_lap": best_str,
             "pole_delta": delta_str,
@@ -919,21 +932,54 @@ def _build_qualifying_replay(year: int, rnd: int, net: bool = True, circuit_over
     n_cars = len(drivers)
     seg = "SQ" if sprint else "Q"
     pole_label = "SPRINT POLE" if sprint else "POLE POSITION"
+
+    # Knockout replay: each segment starts together; everyone still in it runs one flying lap
+    # at their real time, so the fastest cross the line first. Eliminated drivers run no
+    # further laps. Older single-session qualifying is one segment with no eliminations.
+    n_seg = max((len(d["_seg_laps"]) for d in drivers), default=1)
+    segments, start = [], 0.0
+    lap_start = {}  # (driver id, segment) -> when that driver starts their flying lap
+    for k in range(n_seg):
+        # Cars leave the garage a few seconds apart (slower cars first), so they spread out
+        # round the track; the tower still ranks them by lap time.
+        runners = sorted((d for d in drivers if len(d["_seg_laps"]) > k), key=lambda d: -d["finish"])
+        ends = []
+        for i, d in enumerate(runners):
+            lap_start[(d["id"], k)] = start + i * QUALI_STAGGER_S
+            ends.append(lap_start[(d["id"], k)] + (d["_seg_laps"][k] or pole_secs * 1.05))
+        end = (max(ends) if ends else start + pole_secs) + QUALI_SEGMENT_GAP_S
+        segments.append({"name": f"{seg}{k + 1}" if n_seg > 1 else ("Sprint Qualifying" if sprint else "Qualifying"),
+                         "start": round(start, 3), "end": round(end, 3), "cars": len(runners)})
+        start = end
+    for d in drivers:
+        laps = d.pop("_seg_laps")
+        d["seg_start"] = [round(lap_start[(d["id"], k)], 3) for k in range(len(laps))]
+        # No time in a segment: the driver stays in the garage for it (lap shown as None).
+        d["no_time"] = [t is None for t in laps]
+        d["cum"] = [round(lap_start[(d["id"], k)] + (t or pole_secs * 1.05), 3) for k, t in enumerate(laps)]
+        d["lap_times"] = [round(t, 3) if t else None for t in laps]
+        d["eliminated_in"] = segments[len(laps) - 1]["name"] if len(laps) < n_seg else None
     pole_time_txt = "" if times_estimated else f" ({pole_time_str})"
     p2_delta_txt = "" if times_estimated else (f" ({drivers[1]['pole_delta']})" if n_cars > 1 else "")
     # Cut-offs from the data (20 cars: 15/10, 22 cars from 2026: 16/10) instead of assuming 20
     n_q2 = sum(1 for d in drivers if d["qualifying_stage"] in ("Q2", "Q3")) or min(15, n_cars)
     n_q3 = sum(1 for d in drivers if d["qualifying_stage"] == "Q3") or min(10, n_cars)
-    events = [
-        {"lap": 1, "type": "FLAG", "message": f"{seg}1 END — P{n_q2 + 1}–P{n_cars} eliminated",
-         "consequence": f"Top {n_q2} advance to {seg}2."},
-        {"lap": 2, "type": "FLAG", "message": f"{seg}2 END — P{n_q3 + 1}–P{n_q2} eliminated",
-         "consequence": f"Top {n_q3} advance to {seg}3."},
-        {"lap": 3, "type": "CHEQUERED", "message": f"{seg}3 {pole_label} — {drivers[0]['code'] if drivers else 'Pole'}{pole_time_txt}",
-         "consequence": f"Front row: {drivers[1]['code']} lines up P2{p2_delta_txt}." if n_cars > 1 else "Pole decided."},
-    ]
+    events = []
+    if n_seg == 3:
+        events += [
+            {"lap": 1, "type": "FLAG", "message": f"{seg}1 END — P{n_q2 + 1}–P{n_cars} eliminated",
+             "consequence": f"Top {n_q2} advance to {seg}2."},
+            {"lap": 2, "type": "FLAG", "message": f"{seg}2 END — P{n_q3 + 1}–P{n_q2} eliminated",
+             "consequence": f"Top {n_q3} advance to {seg}3."},
+        ]
+    elif n_seg == 2:
+        events.append({"lap": 1, "type": "FLAG", "message": f"{seg}1 END — P{n_q2 + 1}–P{n_cars} eliminated",
+                       "consequence": f"Top {n_q2} advance to {seg}2."})
+    events.append({"lap": n_seg, "type": "CHEQUERED",
+                   "message": f"{segments[-1]['name'] + ' ' if n_seg > 1 else ''}{pole_label} — {drivers[0]['code'] if drivers else 'Pole'}{pole_time_txt}",
+                   "consequence": f"Front row: {drivers[1]['code']} lines up P2{p2_delta_txt}." if n_cars > 1 else "Pole decided."})
     for note in (qres.get("notes") or []) if sprint else []:
-        events.append({"lap": 3, "type": "FLAG", "message": "STEWARDS NOTE", "consequence": note})
+        events.append({"lap": n_seg, "type": "FLAG", "message": "STEWARDS NOTE", "consequence": note})
 
     clean_qname = re.sub(r'^(?:\d{4}\s+|Flag of [^—\-]+?\s+)', '', race_name)
     if clean_qname.casefold().endswith('qualifying'):
@@ -945,15 +991,15 @@ def _build_qualifying_replay(year: int, rnd: int, net: bool = True, circuit_over
                         "notes": qres.get("notes", []), "source_url": qres.get("source_url", "")}
     else:
         session_meta = {"race_name": f"{clean_qname} - Qualifying", "session_type": "qualifying",
-                        "session_name": "Official Qualifying Shootout",
+                        "session_name": "Qualifying",
                         "source": ("Estimated from race grid (no qualifying data cached)" if times_estimated
-                                   else "Jolpica-F1 (Official Qualifying)")}
+                                   else "Jolpica-F1 (Qualifying)")}
     return {
         "meta": {
             "year": year, "round": rnd,
             "date": date_str, "circuit_id": cid, "circuit_name": cname,
             "locality": loc, "country": country,
-            "total_laps": 3, "has_lap_data": True,
+            "total_laps": n_seg, "has_lap_data": True, "segments": segments,
             "pole_time": None if times_estimated else pole_time_str,
             "times_estimated": times_estimated,
             "pole_driver": drivers[0]["code"] if drivers else "",
