@@ -133,6 +133,9 @@
       border-color: #D1D5DB !important;
       box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
     }
+    body.theme-light #mobile-session-bar button[aria-selected="true"] {
+      color: #FFFFFF !important; /* the selected session stays white on red */
+    }
     body.theme-light header {
       background: #FFFFFF !important;
       border-color: #E5E7EB !important;
@@ -322,6 +325,8 @@
       </button>
     </div>
   </header>
+  <!-- Phones: the header has no room for the session dropdown, so the weekend's sessions get their own row -->
+  <div id="mobile-session-bar" role="tablist" aria-label="Session" class="sm:hidden hidden shrink-0 z-20 w-full flex gap-1 px-2.5 py-1.5 border-b border-white/10 f1-glass overflow-x-auto"></div>
 
   <!-- ===================== RACE REPLAY TAB ===================== -->
   <main id="view-race" class="tab-view flex-1 flex min-h-0 w-full overflow-hidden">
@@ -1750,6 +1755,9 @@
     const target = $('view-' + btn.dataset.tab);
     if (target) target.classList.remove('hidden');
 
+    const mSess = $('mobile-session-bar');
+    if (mSess) mSess.classList.toggle('hidden', btn.dataset.tab !== 'race' || mSess.children.length < 2);
+
     const mNav = $('mobile-nav-bar');
     if (mNav) {
       if (btn.dataset.tab === 'race') {
@@ -1813,7 +1821,35 @@
     } else {
       sSel.value = live ? newest : sessions[0];
     }
+    renderMobileSessionBar(sessions, available, ended, labels, sSel.value);
   }
+
+  // Same choices as #session-select, in weekend order, as buttons for phones.
+  function renderMobileSessionBar(sessions, available, ended, labels, current) {
+    const bar = $('mobile-session-bar');
+    if (!bar) return;
+    const short = { sprint_qualifying: 'Sprint Quali', sprint: 'Sprint', qualifying: 'Qualifying', race: 'Grand Prix' };
+    const order = ['sprint_qualifying', 'sprint', 'qualifying', 'race'].filter(s => sessions.includes(s));
+    bar.innerHTML = order.map(s => {
+      const ok = available.includes(s);
+      const on = s === current;
+      const title = `${labels[s] || s}${ok ? '' : (ended(s) ? ' — results pending' : ' — upcoming')}`;
+      return `<button type="button" role="tab" data-session="${s}" aria-selected="${on}" ${ok ? '' : 'disabled'} title="${esc(title)}"
+        class="shrink-0 px-2.5 py-1 rounded text-[11px] font-mono font-semibold border transition ${on
+          ? 'bg-f1red text-white border-f1red'
+          : ok ? 'text-slate-200 border-white/15 bg-white/5 active:bg-white/15' : 'text-slate-400 border-white/5 opacity-40 cursor-not-allowed'}">${short[s] || s}</button>`;
+    }).join('');
+    const onRace = !$('view-race') || !$('view-race').classList.contains('hidden');
+    bar.classList.toggle('hidden', order.length < 2 || !onRace);
+  }
+
+  $('mobile-session-bar')?.addEventListener('click', e => {
+    const b = e.target.closest('button[data-session]');
+    if (!b || b.disabled || b.dataset.session === S.session) return;
+    const sSel = $('session-select');
+    if (sSel) sSel.value = b.dataset.session;
+    loadRace(S.season, S.round, b.dataset.session);
+  });
 
   async function loadSeason(year, preferRound = null, preferCircuit = null) {
     S.season = year;
