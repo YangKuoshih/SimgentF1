@@ -113,5 +113,10 @@
     "session": "Sprint Qualifying",
     "session_key": 11344,
     "source_url": "https://api.openf1.org/v1/session_result?session_key=11344"
+  },
+  "2026_17": {
+    "session": "Sprint Qualifying",
+    "session_key": 11379,
+    "source_url": "https://api.openf1.org/v1/session_result?session_key=11379"
   }
 }
