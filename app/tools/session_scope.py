@@ -72,6 +72,10 @@ def resolve_scope(query: str, context: Optional[Dict[str, Any]],
     if (named == "qualifying" and from_screen and screen_session == "sprint_qualifying"
             and not re.search(r"\b(grand prix|gp|main|sunday)\b", q)):
         named = "sprint_qualifying"
+    # Qualifying has no race: "who won the race?" on a qualifying screen means the Grand Prix.
+    if (named is None and from_screen and screen_session in ("qualifying", "sprint_qualifying")
+            and re.search(r"\b(?:the|this|that) race\b", q)):
+        named = "race"
     session = named or (screen_session if from_screen else "race")
     return {"year": year, "round": rnd, "session": session, "from_screen": from_screen,
             "session_from_screen": from_screen and named is None, "race": ctx.get("race") or ""}

@@ -265,5 +265,32 @@ class NoSprintWeekend(unittest.TestCase):
         self.assertIn("Max Verstappen", r["text"])
 
 
+class LiveRunFindings(unittest.TestCase):
+    """Found by the 373-question Playwright run against the live site (October 2026)."""
+    def test_who_won_the_race_on_a_qualifying_screen_means_the_grand_prix(self):
+        if J.results(2026, 17, net=False):
+            self.skipTest("the 2026 Singapore Grand Prix result is cached now")
+        r = ask("Who won the race?", view(2026, 17, "Singapore Grand Prix", "qualifying"), [])
+        self.assertEqual(r.get("tool"), "race_not_run")
+        r = ask("Who won the race?", view(2026, 16, "Bahrain Grand Prix in Malaysia", "qualifying"), [])
+        self.assertIn("Max Verstappen", r["text"])
+        self.assertNotIn("pole", r["text"].lower().split("fastest lap")[0])
+
+    def test_another_season_named_ignores_the_round_on_screen(self):
+        r = ask("Who won the sprint in 2024?", view(2026, 16, "Bahrain Grand Prix in Malaysia"), [])
+        self.assertIn("Which Sprint do you mean?", r["text"])
+        self.assertNotIn("Italian", r["text"])
+
+    def test_estimated_qualifying_uses_the_real_qualifying_order(self):
+        from app.tools import race_replay
+        if J.qualifying_results(2021, 10, net=False):
+            self.skipTest("2021 British GP qualifying is cached now")
+        rep = race_replay.build_replay(2021, 10, net=False, session_type="qualifying")
+        self.assertTrue(rep["meta"]["times_estimated"])
+        codes = [d["code"] for d in rep["drivers"]]
+        self.assertEqual(codes[0], "HAM")  # 2021 sprint weekend: qualifying set the Sprint grid
+        self.assertNotEqual(codes[0], "PER")  # grid 0 (his pit-lane start in the GP) is not pole
+
+
 if __name__ == "__main__":
     unittest.main()
