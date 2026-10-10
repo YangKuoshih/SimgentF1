@@ -206,20 +206,28 @@ async def api_standings(year: int = Query(2026)):
 
 @app.get("/api/latest_race")
 async def api_latest_race():
-    """Returns the most recent completed Grand Prix race on the calendar."""
+    """The newest data on the calendar: a race weekend under way (opened on its newest
+    session with results) or else the most recent completed Grand Prix."""
     this_year = datetime.date.today().year
     for y in range(this_year, this_year - 3, -1):
         races = race_replay.season_races(y)
         completed = [r for r in races if r.get("completed")]
-        if completed:
-            latest = completed[-1]
-            return {
-                "year": y,
-                "round": latest["round"],
-                "race_name": latest["race_name"],
-                "circuit_id": latest.get("circuit_id"),
-                "date": latest.get("date"),
-            }
+        live = [r for r in races if r.get("in_progress")]
+        if live and (not completed or live[-1]["round"] > completed[-1]["round"]):
+            latest = live[-1]
+            session = [s for s in race_replay.WEEKEND_ORDER if s in latest["available"]][-1]
+        elif completed:
+            latest, session = completed[-1], "race"
+        else:
+            continue
+        return {
+            "year": y,
+            "round": latest["round"],
+            "session": session,
+            "race_name": latest["race_name"],
+            "circuit_id": latest.get("circuit_id"),
+            "date": latest.get("date"),
+        }
     return {"year": 2026, "round": 16, "race_name": "Bahrain Grand Prix", "circuit_id": "bahrain"}
 
 @app.get("/api/season")

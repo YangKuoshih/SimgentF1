@@ -622,6 +622,19 @@ def season_races(year: int, net: bool = True) -> List[Dict[str, Any]]:
             sessions.insert(1, "sprint")
             if year >= 2023:  # Sprint Shootout (2023) / Sprint Qualifying (2024+) session
                 sessions.insert(2, "sprint_qualifying")
+        # Sessions with results so far. A finished round has them all; a round whose weekend
+        # is under way (Friday to Sunday) lists the sessions already in the local cache, so the
+        # UI can open Sprint Qualifying, the Sprint or Qualifying before the Grand Prix is run.
+        if is_completed:
+            available = list(sessions)
+        else:
+            available = []
+            try:
+                days_to_race = (datetime.date.fromisoformat(r.get("date", "")) - today).days
+            except ValueError:
+                days_to_race = None
+            if days_to_race is not None and -3 <= days_to_race <= 3:
+                available = _weekend_sessions_with_results(year, rnd, sessions)
         _rc = r.get("Circuit", {})
         _cid = _rc.get("circuitId", ""); _cname = _rc.get("circuitName", "")
         _loc = _rc.get("Location", {}).get("locality", ""); _ctry = _rc.get("Location", {}).get("country", "")
@@ -635,9 +648,32 @@ def season_races(year: int, net: bool = True) -> List[Dict[str, Any]]:
             "has_geometry": True,
             "has_sprint": has_sprint,
             "sessions": sessions,
+            "available": available,
+            "in_progress": (not is_completed) and bool(available),
             "completed": is_completed, "winner": winner,
         })
     return out
+
+
+# Weekend order, earliest first: the last available one is the newest session.
+WEEKEND_ORDER = ("sprint_qualifying", "sprint", "qualifying", "race")
+
+
+def _weekend_sessions_with_results(year: int, rnd: int, sessions: List[str]) -> List[str]:
+    """Sessions of an unfinished round that already have a cached classification (no network)."""
+    found = []
+    if "sprint_qualifying" in sessions:
+        sq = J.sprint_qualifying(year, rnd, net=False)
+        if sq and sq.get("QualifyingResults"):
+            found.append("sprint_qualifying")
+    if "sprint" in sessions:
+        sp = J.sprint_results(year, rnd, net=False)
+        if sp and sp.get("SprintResults"):
+            found.append("sprint")
+    q = J.qualifying_results(year, rnd, net=False)
+    if q and q.get("QualifyingResults"):
+        found.append("qualifying")
+    return found
 
 
 def _standings_round(year: int) -> Optional[int]:

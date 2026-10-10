@@ -87,5 +87,35 @@ class LatestRaceFreshnessTests(unittest.TestCase):
         self.assertEqual((latest["year"], latest["round"]), (YEAR, 2))
 
 
+class WeekendInProgressTests(LatestRaceFreshnessTests):
+    """Saturday of a race weekend: qualifying has a result, the Grand Prix doesn't yet."""
+
+    def setUp(self):
+        super().setUp()
+        cache = J.CACHE
+        weekend = (TODAY + dt.timedelta(days=1)).isoformat()
+        with open(os.path.join(cache, f"{YEAR}_schedule.json"), "w") as f:
+            json.dump(_doc([_race(1, OLD), _race(2, NEW), _race(3, weekend)]), f)
+        quali = _race(3, weekend)
+        quali["QualifyingResults"] = [{"position": "1", "Driver": {"code": "CCC", "givenName": "Test", "familyName": "Ccc"},
+                                       "Constructor": {"constructorId": "ferrari", "name": "Ferrari"}, "Q1": "1:30.000"}]
+        with open(os.path.join(cache, f"{YEAR}_3_qualifying.json"), "w") as f:
+            json.dump(_doc([quali]), f)
+
+    def test_race_finished_after_build_is_completed(self):
+        races = {r["round"]: r for r in R.season_races(YEAR)}
+        self.assertTrue(races[2]["completed"])
+        self.assertFalse(races[3]["completed"])
+        self.assertTrue(races[3]["in_progress"])
+        self.assertEqual(races[3]["available"], ["qualifying"])
+
+    def test_latest_race_endpoint_returns_newest_finished_race(self):
+        from frontend import main as M
+        with patch.object(M.race_replay, "season_races", R.season_races):
+            latest = asyncio.run(M.api_latest_race())
+        # The weekend under way is newer than the last finished race; open its newest session.
+        self.assertEqual((latest["year"], latest["round"], latest["session"]), (YEAR, 3, "qualifying"))
+
+
 if __name__ == "__main__":
     unittest.main()

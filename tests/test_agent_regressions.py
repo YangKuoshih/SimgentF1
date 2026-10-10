@@ -117,5 +117,17 @@ class ConversationRace(unittest.TestCase):
         self.assertIn("P3", r["text"])
 
 
+class SprintQualifyingBeforeTheSprint(unittest.TestCase):
+    """Sprint Qualifying is cached before the sprint has a result (Friday/Saturday)."""
+
+    def test_race_name_comes_from_the_schedule(self):
+        if J.sprint_results(2026, 17, net=False):
+            self.skipTest("the 2026 Singapore sprint result is cached now")
+        r = ask("Who was fastest?", view(2026, 17, "Singapore Grand Prix", "sprint_qualifying"), [])
+        self.assertIn("Verstappen", r["text"])
+        self.assertIn("2026 Singapore Grand Prix · Sprint Qualifying", r["text"])
+        self.assertNotIn("Round 17", r["text"])
+
+
 if __name__ == "__main__":
     unittest.main()

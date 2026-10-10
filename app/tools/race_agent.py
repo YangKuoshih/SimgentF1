@@ -397,7 +397,7 @@ CURATED_RETIREMENTS = {
         "cause": "Gearbox problem; stopped on track",
         "explanation": (
             "**Alexander Albon (#23 Williams)** retired from the 2026 Bahrain Grand Prix (held at Sepang) on **Lap 42**.\n\n"
-            "• **Official Completed Laps**: 41 full laps.\n"
+            "• **Completed Laps**: 41 full laps.\n"
             "• **Retirement Race Lap**: **Lap 42** (of 55 laps).\n"
             "• **Cause**: Stopped on track with a gearbox problem.\n"
             "• **Race Impact**: His stop brought out a Virtual Safety Car, then a full Safety Car; Verstappen made his third pit stop under it on Lap 43."
@@ -410,7 +410,7 @@ CURATED_RETIREMENTS = {
         "cause": "Went off track at the end of Lap 8",
         "explanation": (
             "**Valtteri Bottas (#77 Cadillac)** retired from the 2026 Bahrain Grand Prix (held at Sepang) on **Lap 8**.\n\n"
-            "• **Official Completed Laps**: 7 full laps.\n"
+            "• **Completed Laps**: 7 full laps.\n"
             "• **Retirement Race Lap**: **Lap 8** (of 55 laps).\n"
             "• **Cause**: Went off track at the end of Lap 8 in wet conditions.\n"
             "• **Race Impact**: Triggered the first Safety Car (Laps 9–12); most of the field switched from intermediates to slicks on Lap 9."
@@ -423,7 +423,7 @@ CURATED_RETIREMENTS = {
         "cause": "Stopped on track under the Safety Car (cause not published)",
         "explanation": (
             "**George Russell (#63 Mercedes)** retired from the 2026 Bahrain Grand Prix (held at Sepang) on **Lap 50**.\n\n"
-            "• **Official Completed Laps**: 49 full laps (classified 20th).\n"
+            "• **Completed Laps**: 49 full laps (classified 20th).\n"
             "• **Retirement Race Lap**: **Lap 50**, during the late Safety Car period.\n"
             "• **Cause**: Stopped on track; no official cause has been published.\n"
             "• **Race Impact**: Antonelli and Hamilton completed the podium behind Verstappen."
@@ -436,7 +436,7 @@ CURATED_RETIREMENTS = {
         "cause": "Loss of water pressure / terminal engine cooling failure",
         "explanation": (
             "**Lance Stroll (#18 Aston Martin)** exited the 2026 Azerbaijan Grand Prix on **Lap 9**.\n\n"
-            "• **Official Completed Laps**: 7 full laps (Fastest Lap: 1:51.723 on Lap 7).\n"
+            "• **Completed Laps**: 7 full laps (Fastest Lap: 1:51.723 on Lap 7).\n"
             "• **Retirement Race Lap**: **Lap 9** (official Race Control timing / media consensus).\n"
             "• **Primary Cause**: Loss of water pressure / terminal engine cooling failure.\n"
             "• **Incident Telemetry**: Starting P22, Stroll was running on Lap 8 when alarms triggered on the Aston Martin pit wall. "
@@ -452,7 +452,7 @@ CURATED_RETIREMENTS = {
         "cause": "Power Unit (ICE) catastrophic failure",
         "explanation": (
             "**Lewis Hamilton (#44 Mercedes)** retired from the 2024 Australian Grand Prix on **Lap 17**.\n\n"
-            "• **Official Completed Laps**: 15 full laps.\n"
+            "• **Completed Laps**: 15 full laps.\n"
             "• **Retirement Race Lap**: **Lap 17**.\n"
             "• **Primary Cause**: Sudden Power Unit (Internal Combustion Engine) catastrophic failure.\n"
             "• **Incident Telemetry**: Running in P9 on Lap 17, Hamilton suffered a sudden complete loss of engine drive exiting Turn 10. "
@@ -467,7 +467,7 @@ CURATED_RETIREMENTS = {
         "cause": "Right-rear brake caliper seizure & fire",
         "explanation": (
             "**Max Verstappen (#1 Red Bull)** retired from the 2024 Australian Grand Prix on **Lap 4**.\n\n"
-            "• **Official Completed Laps**: 3 full laps.\n"
+            "• **Completed Laps**: 3 full laps.\n"
             "• **Retirement Race Lap**: **Lap 4**.\n"
             "• **Primary Cause**: Right-rear brake caliper stuck locked from lights out, leading to extreme brake overheating and fire.\n"
             "• **Incident Telemetry**: From the race start, Verstappen reported the car felt like 'driving with the handbrake on'. Carlos Sainz passed him for the lead on Lap 2, and thick smoke poured from the right-rear wheel before the brake assembly exploded as he entered pit lane on Lap 4 to retire, ending his 43-race consecutive finish streak."
@@ -480,7 +480,7 @@ CURATED_RETIREMENTS = {
         "cause": "51G collision with Lewis Hamilton at Copse",
         "explanation": (
             "**Max Verstappen (#33 Red Bull)** crashed out of the 2021 British Grand Prix on **Lap 1**.\n\n"
-            "• **Official Completed Laps**: 0 laps (Lap 1 incident).\n"
+            "• **Completed Laps**: 0 laps (Lap 1 incident).\n"
             "• **Retirement Race Lap**: **Lap 1**.\n"
             "• **Primary Cause**: High-speed wheel-to-wheel contact with Lewis Hamilton at Copse corner (51G barrier impact).\n"
             "• **Incident Telemetry**: Contesting the race lead down the Wellington and National pit straights, Hamilton attempted an inside move into the 290 km/h Copse corner. Hamilton's front-left touched Verstappen's right-rear, causing an immediate rear tyre failure that pitched Verstappen through the gravel trap into the tyre wall at 51G. The race was red-flagged immediately."
@@ -493,7 +493,7 @@ CURATED_RETIREMENTS = {
         "cause": "Single-car barrier crash at Turn 14",
         "explanation": (
             "**Nicholas Latifi (#6 Williams)** crashed and retired from the 2021 Abu Dhabi Grand Prix on **Lap 53**.\n\n"
-            "• **Official Completed Laps**: 50 full laps.\n"
+            "• **Completed Laps**: 50 full laps.\n"
             "• **Retirement Race Lap**: **Lap 53**.\n"
             "• **Primary Cause**: Rear-end snap into the barrier under dirty air at Turn 14.\n"
             "• **Incident Telemetry**: While battling Mick Schumacher for P15, Latifi ran wide off-line, gathered marbles on his tyres, and lost control under braking into Turn 14, slamming the barrier. "
@@ -507,7 +507,7 @@ CURATED_RETIREMENTS = {
         "cause": "Torrential rain collision with lapped David Coulthard",
         "explanation": (
             "**Michael Schumacher (#3 Ferrari)** retired from the torrential 1998 Belgian Grand Prix on **Lap 25**.\n\n"
-            "• **Official Completed Laps**: 24 full laps.\n"
+            "• **Completed Laps**: 24 full laps.\n"
             "• **Retirement Race Lap**: **Lap 25**.\n"
             "• **Primary Cause**: Collision with David Coulthard's McLaren in zero-visibility spray.\n"
             "• **Incident Telemetry**: Schumacher led the race by over 40 seconds in torrential rain. Approaching Coulthard to lap him on the descent to Pouhon, Coulthard eased off the throttle while remaining directly on the racing line in blinding spray. Schumacher unsighted rear-ended the McLaren, ripping off his Ferrari's right-front suspension. Both cars limped back to the pit lane, leading to the infamous scene of Schumacher storming into the McLaren garage."
@@ -520,7 +520,7 @@ CURATED_RETIREMENTS = {
         "cause": "Beau Rivage high-speed collision with Kevin Magnussen",
         "explanation": (
             "**Sergio Pérez (#11 Red Bull)** retired from the 2024 Monaco Grand Prix on **Lap 1**.\n\n"
-            "• **Official Completed Laps**: 0 laps (Lap 1 incident).\n"
+            "• **Completed Laps**: 0 laps (Lap 1 incident).\n"
             "• **Retirement Race Lap**: **Lap 1**.\n"
             "• **Primary Cause**: Heavy collision on the climb up Beau Rivage with Kevin Magnussen's Haas.\n"
             "• **Incident Telemetry**: Heading up the hill toward Massenet on the opening lap, Magnussen attempted to squeeze up the inside of Pérez into a closing gap. The cars touched, sending Pérez's Red Bull into the barrier and ricocheting back across the track to collect Nico Hülkenberg. The chassis was completely destroyed, triggering a 45-minute red flag."
@@ -533,7 +533,7 @@ CURATED_RETIREMENTS = {
         "cause": "Chicane collision with Jean-Louis Schlesser",
         "explanation": (
             "**Ayrton Senna (#12 McLaren-Honda)** retired from the 1988 Italian Grand Prix on **Lap 49**.\n\n"
-            "• **Official Completed Laps**: 48 full laps.\n"
+            "• **Completed Laps**: 48 full laps.\n"
             "• **Retirement Race Lap**: **Lap 49** (of 51 laps).\n"
             "• **Primary Cause**: Collision at the Rettifilo Chicane while attempting to lap Jean-Louis Schlesser's Williams.\n"
             "• **Incident Telemetry**: Senna had led comfortably from pole position and was only 2 laps away from victory, which would have preserved McLaren's clean sweep of all 16 races in 1988. Heading into the Prima Variante chicane, Schlesser locked up and went wide. As Senna cut inside, Schlesser turned back across the kerb, launching Senna's McLaren onto the kerbing with damaged suspension, handing Ferrari's Gerhard Berger an emotional 1-2 victory weeks after Enzo Ferrari's passing."
