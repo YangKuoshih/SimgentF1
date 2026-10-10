@@ -7,6 +7,7 @@ and FIA technical regulations. Returns authoritative text plus rich A2UI cards.
 
 import datetime
 import re
+import contextvars
 from typing import Dict, Any, List, Optional, Tuple
 from app.tools import race_replay, f1_telemetry, f1_history
 from app.tools import jolpica_sync as J
@@ -611,6 +612,27 @@ def _get_driver_tyre_stints(d: Dict[str, Any], events: List[Dict[str, Any]], tot
     }
 
 
+_SESSION_NAMES = {"sprint_qualifying": "Sprint Qualifying", "sprint": "Sprint", "qualifying": "Qualifying"}
+# Set by _answer_core when the race in question has no result yet (year, schedule entry).
+_NO_RACE_RESULT: contextvars.ContextVar = contextvars.ContextVar("no_race_result", default=None)
+
+
+def _race_not_run(year: int, r: Dict[str, Any]) -> Dict[str, Any]:
+    """Reply for a Grand Prix with no result yet (instead of answering from another race)."""
+    name = r.get("race_name", "Grand Prix")
+    have = [_SESSION_NAMES[x] for x in race_replay.WEEKEND_ORDER if x in (r.get("available") or []) and x in _SESSION_NAMES]
+    so_far = (f" Results so far this weekend: **{', '.join(have)}** — switch the session or ask about "
+              f"{'it' if len(have) == 1 else 'them'} directly (e.g. \"who took {'sprint ' if 'Sprint Qualifying' in have else ''}pole?\").") if have else ""
+    when = f" (race day {r['date']})" if r.get("date") else ""
+    return {
+        "role": "assistant",
+        "text": f"There's no race result for the **{year} {name}** yet{when}, so I can't answer that from the Grand Prix.{so_far}",
+        "tool": "race_not_run",
+        "intent": f"{year} {name} — no race result yet",
+        "a2ui_card": None,
+    }
+
+
 def race_from_history(history: Optional[List[Dict[str, Any]]], default_year: int) -> Optional[Tuple[int, int]]:
     """The race a conversation is about, from the user's own questions.
 
@@ -696,7 +718,14 @@ def answer_race_engineer_query(
         resp = SS.answer_in_session(query, scope, context, history)
         if resp:
             return SS.with_scope(resp, scope, resp.pop("label"))
-    resp = _answer_core(query, context, history)
+    token = _NO_RACE_RESULT.set(None)
+    try:
+        resp = _answer_core(query, context, history)
+        no_result = _NO_RACE_RESULT.get()
+    finally:
+        _NO_RACE_RESULT.reset(token)
+    if no_result and (resp.get("tool") in _RACE_DATA_TOOLS or resp.get("tool") == "session_telemetry_briefing"):
+        return _race_not_run(*no_result)
     used = _RACE_DATA_TOOLS.get(resp.get("tool", ""))
     if scope and scope["from_screen"] and used:
         answered = dict(scope, session=used)
@@ -790,7 +819,14 @@ def _answer_core(
     # Load replay model for the session
     model = race_replay.build_replay(year, round_no)
     if not model and races:
-        model = race_replay.build_replay(year, races[0]["round"])
+        scheduled = next((r for r in races if r.get("round") == round_no), None)
+        if scheduled and not scheduled.get("completed"):
+            # Never substitute another race: this one hasn't been run, or its result isn't
+            # published yet. Questions that don't need it (rules, standings, careers) are
+            # answered as usual; race-data answers are replaced by answer_race_engineer_query.
+            _NO_RACE_RESULT.set((year, scheduled))
+        else:
+            model = race_replay.build_replay(year, races[0]["round"])
 
     meta = model["meta"] if model else {}
     drivers = model["drivers"] if model else []

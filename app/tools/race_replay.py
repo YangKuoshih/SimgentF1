@@ -959,6 +959,13 @@ def _build_qualifying_replay(year: int, rnd: int, net: bool = True, circuit_over
         d["cum"] = [round(lap_start[(d["id"], k)] + (t or pole_secs * 1.05), 3) for k, t in enumerate(laps)]
         d["lap_times"] = [round(t, 3) if t else None for t in laps]
         d["eliminated_in"] = segments[len(laps) - 1]["name"] if len(laps) < n_seg else None
+        if times_estimated:
+            # Grid-order estimate: the animation needs lap durations, but none of these times
+            # are real, so nothing quotable (lap times, best lap, gap to pole) is exposed.
+            d["lap_times"] = [None] * len(laps)
+            d["best_lap"] = None
+            d["pole_delta"] = None
+            d["status"] = d["qualifying_stage"]
     pole_time_txt = "" if times_estimated else f" ({pole_time_str})"
     p2_delta_txt = "" if times_estimated else (f" ({drivers[1]['pole_delta']})" if n_cars > 1 else "")
     # Cut-offs from the data (20 cars: 15/10, 22 cars from 2026: 16/10) instead of assuming 20

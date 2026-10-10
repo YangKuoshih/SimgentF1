@@ -106,8 +106,94 @@ _RESULT_Q = re.compile(
     r"|podium|results?|classification|standings? (?:in|for) (?:this|the) session|front row)\b")
 _DRIVER_Q = re.compile(
     r"\b(how did|how was|how'd|where did|what position|which position|finish|finished|place[d]?|result|qualif(?:y|ied)"
-    r"|do(?:ing)?|perform(?:ed|ance)?|p\d+|position)\b")
+    r"|do(?:ing)?|perform(?:ed|ance)?|p\d+|position|best lap|lap ?time|time|gap|delta|knocked out|eliminated)\b")
 _POS_Q = re.compile(r"\bwho (?:finished|was|came|placed|qualified)\s+(?:in\s+)?p\s*(\d{1,2})\b|\bp\s*(\d{1,2})\b")
+
+
+_SEGMENT = re.compile(r"\b(s?q)\s*([123])\b")
+_KNOCKED_OUT = re.compile(r"\b(knocked out|eliminated|elimination|dropped out|went out|out in"
+                          r"|didn'?t (?:make|get|reach)|did not (?:make|get|reach)|missed (?:the )?cut|failed to (?:make|reach))\b")
+_MADE_IT = re.compile(r"\b(made it|make it|made|reached|advanced|through to|got (?:in)?to|went through|progressed)\b")
+_FASTEST = re.compile(r"\b(fastest|quickest|top(?:ped)?|best time|p1)\b")
+_SET_TIME = re.compile(r"\b(set a time|lap time|time in|best lap|no time|his time|her time|their time)\b")
+
+
+def _fmt_lap(t: Optional[float]) -> str:
+    if not t:
+        return "no time"
+    m, sec = divmod(t, 60)
+    return f"{int(m)}:{sec:06.3f}"
+
+
+def _segment_answer(q: str, drivers: List[Dict[str, Any]], segments: List[Dict[str, Any]], session: str,
+                    session_name: str, label: str, scope: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """Answers about the knockout segments (Q1/Q2/Q3 or SQ1/SQ2/SQ3) from per-segment lap times."""
+    from app.tools.race_agent import _find_driver
+    names = [g["name"] for g in segments]
+    m = _SEGMENT.search(q)
+    k = int(m.group(2)) - 1 if m else None
+    if k is not None and k >= len(segments):
+        return None
+    reached = lambda d, i: len(d.get("lap_times") or []) > i
+    who = lambda ds: ", ".join(f"{d['name']} (P{d.get('finish')})" for d in ds)
+    out = lambda tool, text: {"role": "assistant", "text": text, "tool": f"{session}_{tool}",
+                              "intent": label, "a2ui_card": None, "label": label}
+    driver = _find_driver(q, drivers)
+
+    # One driver in one segment: "did Colapinto set a time in Q2?", "Hamilton's Q1 time?"
+    if driver and k is not None:
+        if not reached(driver, k):
+            return out("segment_driver_lookup",
+                       f"**{driver['name']}** didn't take part in **{names[k]}**: knocked out in "
+                       f"**{driver.get('eliminated_in')}** and classified **P{driver.get('finish')}**.")
+        t = driver["lap_times"][k]
+        if not t:
+            return out("segment_driver_lookup",
+                       f"**{driver['name']}** reached **{names[k]}** but **set no time** there, "
+                       f"and was classified **P{driver.get('finish')}**.")
+        ranked = sorted((d for d in drivers if reached(d, k) and d["lap_times"][k]), key=lambda d: d["lap_times"][k])
+        rank = next(i for i, d in enumerate(ranked) if d is driver) + 1
+        gap = t - ranked[0]["lap_times"][k]
+        gap_txt = "fastest of anyone" if rank == 1 else f"+{gap:.3f}s to the fastest, {ranked[0]['name']}"
+        return out("segment_driver_lookup",
+                   f"**{driver['name']}** set **{_fmt_lap(t)}** in **{names[k]}**, the **P{rank}** time "
+                   f"of the segment ({gap_txt}).")
+    if driver:
+        return None  # the driver question handlers answer the session as a whole
+
+    # Knocked out: "who was knocked out in Q1?", "who didn't make Q3?"
+    if _KNOCKED_OUT.search(q):
+        if k is not None and re.search(r"didn'?t|did not|missed|failed", q):
+            k = k - 1  # "didn't make Q3" = knocked out in Q2
+        groups = [i for i in range(len(segments) - 1)] if k is None else [k]
+        parts = []
+        for i in groups:
+            if not 0 <= i < len(segments) - 1:
+                continue
+            gone = sorted((d for d in drivers if len(d.get("lap_times") or []) == i + 1), key=lambda d: d.get("finish") or 99)
+            if gone:
+                parts.append(f"**{names[i]}** ({len(gone)}): {who(gone)}")
+        if not parts:
+            return out("segment_lookup", f"Nobody is knocked out in **{names[-1]}**: it decides the top of the grid.")
+        return out("segment_lookup", "Knocked out in " + "; ".join(parts) + ".")
+
+    # Made it through: "who made it to Q3?", "how many cars made SQ3?"
+    if k is not None and k > 0 and (_MADE_IT.search(q) or re.search(r"how many", q)):
+        through = sorted((d for d in drivers if reached(d, k)), key=lambda d: d.get("finish") or 99)
+        return out("segment_lookup", f"**{len(through)} drivers** made it to **{names[k]}**: {who(through)}.")
+
+    # Fastest in a segment: "who was fastest in Q2?"
+    if k is not None and _FASTEST.search(q):
+        ranked = sorted((d for d in drivers if reached(d, k) and d["lap_times"][k]), key=lambda d: d["lap_times"][k])
+        if not ranked:
+            return None
+        best = ranked[0]
+        second = (f", {ranked[1]['lap_times'][k] - best['lap_times'][k]:.3f}s ahead of **{ranked[1]['name']}**"
+                  if len(ranked) > 1 else "")
+        final = "" if k == len(segments) - 1 else (f" (final position P{best.get('finish')})")
+        return out("segment_lookup", f"**{best['name']}** was fastest in **{names[k]}** with "
+                                     f"**{_fmt_lap(best['lap_times'][k])}**{second}{final}.")
+    return None
 
 
 def _stage_label(session: str, status: str) -> str:
@@ -173,7 +259,20 @@ def answer_in_session(query: str, scope: Dict[str, Any], context: Optional[Dict[
     race_name = re.sub(r"\s+-\s+.*$", "", meta.get("race_name", ""))
     label = scope_label(scope, session_name, race_name)
     is_quali = session in ("qualifying", "sprint_qualifying")
-    knockout = any(str(d.get("qualifying_stage", "")).endswith(("2", "3")) for d in drivers)
+    # Grid-order estimates carry no real segments, so no knockout stages are claimed.
+    knockout = (not meta.get("times_estimated")
+                and any(str(d.get("qualifying_stage", "")).endswith(("2", "3")) for d in drivers))
+    if is_quali and meta.get("times_estimated") and (_SEGMENT.search(q) or _KNOCKED_OUT.search(q) or _SET_TIME.search(q)):
+        return {"role": "assistant", "tool": f"{session}_not_in_data", "intent": label, "a2ui_card": None, "label": label,
+                "text": (f"The {session_name} classification for this race isn't in the data (the replay uses the race "
+                         f"grid as an estimate), so I can't say who was knocked out in each segment or quote lap times.")}
+
+    # Knockout segment questions ("who was knocked out in Q1?", "who made SQ3?",
+    # "fastest in Q2?", "did Colapinto set a time in Q2?") use the per-segment lap times.
+    if is_quali and knockout and meta.get("segments") and not meta.get("times_estimated"):
+        seg_answer = _segment_answer(q, drivers, meta["segments"], session, session_name, label, scope)
+        if seg_answer:
+            return seg_answer
 
     # A driver question: named in the question, or referred back to ("how did he do?")
     target = _find_driver(q, drivers)

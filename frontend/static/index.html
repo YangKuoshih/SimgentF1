@@ -2132,7 +2132,8 @@
         r.pos = i + 1;
         r.interval = null;
         const tm = timeIn(r);
-        if (r.state === 'ELIM') r.gap = `OUT ${r.d.eliminated_in}`;
+        if (S.model.meta.times_estimated) r.gap = r.state === 'RUN' ? 'ON LAP' : (r.state === 'FIN' ? `P${r.d.finish}` : '—');
+        else if (r.state === 'ELIM') r.gap = `OUT ${r.d.eliminated_in}`;
         else if (tm != null) r.gap = i === 0 ? fmt(tm) : `+${(tm - best).toFixed(3)}s`;
         else if (r.d.no_time && r.d.no_time[s]) r.gap = 'NO TIME';
         else r.gap = r.state === 'RUN' ? 'ON LAP' : 'GARAGE';
