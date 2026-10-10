@@ -1127,6 +1127,10 @@ def _answer_core(
             and not str(race_driver.get("status", "")).startswith(("Finished", "+"))
             and "Lap" not in str(race_driver.get("status", ""))):
         hist_driver = None  # "when did Senna retire?" at a race he didn't finish = the race retirement
+    if (hist_driver and (race_driver or _NO_RACE_RESULT.get())
+            and re.search(r"\b(exit(?:ed)?|leave|left|retire[ds]?|dnf)\b.*\b(this|the) (race|grand prix|gp)\b|\bdnf\b", q)
+            and not re.search(r"\b(career|from f1|from formula|stop racing|quit f1)\b", q)):
+        hist_driver = None  # "when did Verstappen exit this race?" is about this race, not his career
 
     if hist_driver:
         in_active_session = any(

@@ -107,6 +107,10 @@ _RESULT_Q = re.compile(
 _DRIVER_Q = re.compile(
     r"\b(how did|how was|how'd|where did|what position|which position|finish|finished|place[d]?|result|qualif(?:y|ied)"
     r"|do(?:ing)?|perform(?:ed|ance)?|p\d+|position|best lap|lap ?time|time|gap|delta|knocked out|eliminated)\b")
+# A driver leaving the session ("when did Russell leave qualifying?", "why did he DNF in the sprint?")
+_EXIT_Q = re.compile(r"\b(leave|left|exit(?:ed)?|retire[ds]?|retirement|dnf|did ?n[o']t finish|drop(?:ped)? out|stop(?:ped)?"
+                     r"|crash(?:ed)?|out of)\b")
+_CAREER_EXIT = re.compile(r"\b(career|from f1|from formula|stop racing|quit f1|leave f1|left f1)\b")
 _POS_Q = re.compile(r"\bwho (?:finished|was|came|placed|qualified)\s+(?:in\s+)?p\s*(\d{1,2})\b|\bp\s*(\d{1,2})\b")
 
 
@@ -223,11 +227,16 @@ def _driver_line(d: Dict[str, Any], session: str, session_name: str, knockout: b
         grid_txt = f" from P{grid} on the grid ({move})"
     pts = d.get("points")
     pts_txt = f", scoring {pts:g} point{'s' if pts != 1 else ''}" if isinstance(pts, (int, float)) and pts else ""
-    finished = status in ("Finished",) or status.startswith("+") or "Lap" in status
-    if isinstance(pos, int) and pos > 0 and finished:
+    if _finished(d):
         return f"**{d['name']}** finished **P{pos}** in the **{session_name}** for {d['team']}{grid_txt}{pts_txt}, completing {d.get('laps')} laps."
     return (f"**{d['name']}** did not finish the **{session_name}** for {d['team']} "
-            f"({status or 'not classified'}) after {d.get('laps', 0)} laps.")
+            f"({status or 'not classified'}) after {d.get('laps', 0)} lap{'' if d.get('laps') == 1 else 's'}.")
+
+
+def _finished(d: Dict[str, Any]) -> bool:
+    status = str(d.get("status") or "")
+    pos = d.get("finish")
+    return isinstance(pos, int) and pos > 0 and (status == "Finished" or status.startswith("+") or "Lap" in status)
 
 
 def _card(scope, session, title, metrics):
@@ -246,8 +255,12 @@ def answer_in_session(query: str, scope: Dict[str, Any], context: Optional[Dict[
     if session == "race":
         return None
     q = query.lower()
-    if re.search(r"\b(career|all-time|championship|standings|title|season|regulation|rule|era|history|strategy|pit|tyre|tire|stint"
-                 r"|safety car|incident|crash|retire|dnf|why|weather|lap record|grid penalty)\b", q):
+    # A named driver leaving this session is answered from its classification, even though
+    # retirements and "why" questions otherwise belong to the main engine.
+    exit_q = bool(_EXIT_Q.search(q)) and not _CAREER_EXIT.search(q)
+    generic = r"\b(career|all-time|championship|standings|title|season|regulation|rule|era|history|strategy|pit|tyre|tire|stint" \
+              r"|safety car|weather|lap record|grid penalty)\b"
+    if re.search(generic, q) or (not exit_q and re.search(r"\b(incident|crash|retire|dnf|why)\b", q)):
         return None
     model = race_replay.build_replay(scope["year"], scope["round"], session_type=session)
     if not model or not model.get("drivers") or model["meta"].get("session_type") != session:
@@ -283,8 +296,12 @@ def answer_in_session(query: str, scope: Dict[str, Any], context: Optional[Dict[
             if target:
                 break
             target = _find_driver(turn.get("content") or turn.get("text") or "", drivers)
-    if target and (_DRIVER_Q.search(q) or len(q.split()) <= 4):
-        return {"role": "assistant", "text": _driver_line(target, session, session_name, knockout),
+    if target and (_DRIVER_Q.search(q) or exit_q or len(q.split()) <= 4):
+        text = _driver_line(target, session, session_name, knockout)
+        last = (meta.get("segments") or [{}])[-1].get("name")
+        if exit_q and is_quali and knockout and last and target.get("qualifying_stage") == "Q3" and target.get("finish"):
+            text = f"{target['name']} wasn't knocked out: they made **{last}**. {text}"
+        return {"role": "assistant", "text": text,
                 "tool": f"{session}_driver_lookup", "intent": f"{label} — {target['name']}",
                 "a2ui_card": _card(scope, session, f"{target['name']} — {session_name}", [
                     {"label": "Position", "value": f"P{target.get('finish')}" if target.get("finish") else str(target.get("status")), "color": target.get("color", "#FFFFFF")},
@@ -294,6 +311,16 @@ def answer_in_session(query: str, scope: Dict[str, Any], context: Optional[Dict[
                 ]), "label": label}
     if target:
         return None
+    # "Who retired in the sprint?": the non-finishers of this session
+    if exit_q and session == "sprint":
+        out = [d for d in drivers if not _finished(d)]
+        text = ("Every driver finished the **Sprint**." if not out else
+                f"**{len(out)} driver{'s' if len(out) != 1 else ''}** didn't finish the **Sprint**: " + "; ".join(
+                    f"{d['name']} ({d.get('status') or 'not classified'}, {d.get('laps', 0)} "
+                    f"lap{'' if d.get('laps') == 1 else 's'})" for d in out) + ".")
+        return {"role": "assistant", "text": text, "tool": "sprint_dnf_lookup", "intent": label, "a2ui_card": None, "label": label}
+    if exit_q:
+        return None  # other exit questions with no driver go to the main engine
 
     # A specific position ("who was P3?", "who finished third?")
     m = _POS_Q.search(q)
