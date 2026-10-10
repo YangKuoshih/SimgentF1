@@ -200,6 +200,24 @@ def _write_json(path: str, doc: Any) -> None:
     os.replace(tmp, path)
 
 
+def starting_grid(positions: List[Dict[str, Any]], cars: List[int]) -> Dict[int, int]:
+    """The grid from OpenF1's position feed: the first moment every car has a position and
+    no two share one. A car's own first entry isn't enough: the feed can carry a stray early
+    entry (2026 Singapore Sprint: car 1 at P1, 80 seconds before the grid was posted with it
+    at P5). Empty when the feed never shows a complete grid."""
+    current: Dict[int, int] = {}
+    by_time: Dict[str, List[Dict[str, Any]]] = {}
+    for p in positions:
+        by_time.setdefault(p.get("date", ""), []).append(p)
+    for when in sorted(by_time):
+        for p in by_time[when]:
+            current[p["driver_number"]] = p["position"]
+        slots = [current.get(c) for c in cars]
+        if cars and None not in slots and len(set(slots)) == len(slots):
+            return {c: current[c] for c in cars}
+    return {}
+
+
 def fetch_session(year: int, rnd: int, session: str, refresh: bool = False) -> Optional[List[Dict[str, Any]]]:
     """Cache (and return) one session's classification ('sprint_qualifying', 'sprint' or
     'qualifying'). Returns None when the round has no such session or OpenF1 has no result
@@ -221,14 +239,11 @@ def fetch_session(year: int, rnd: int, session: str, refresh: bool = False) -> O
     by_number = {d["driver_number"]: d for d in drivers}
     rows = convert_sprint(results, by_number) if session == "sprint" else convert(results, by_number)
     if session == "sprint":
-        # OpenF1 has no sprint starting grid; each car's first entry in the position feed is
-        # its grid slot (matches Jolpica's grid, penalties included, on every 2026 sprint).
-        positions = _http(f"position?session_key={key}") or []
-        first: Dict[int, int] = {}
-        for p in sorted(positions, key=lambda x: x.get("date", "")):
-            first.setdefault(p["driver_number"], p["position"])
+        # OpenF1 has no sprint starting grid; the position feed's opening grid is it
+        # (matches Jolpica's grid, penalties included, on every 2026 sprint).
+        grid = starting_grid(_http(f"position?session_key={key}") or [], [int(r["num"]) for r in rows])
         for row in rows:
-            row["grid"] = str(first.get(int(row["num"]), "")) if first else ""
+            row["grid"] = str(grid.get(int(row["num"]), ""))
     if os.path.exists(path):
         with open(path, encoding="utf-8") as f:
             if json.load(f) == rows:

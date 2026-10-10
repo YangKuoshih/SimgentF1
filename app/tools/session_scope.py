@@ -234,7 +234,8 @@ def _driver_line(d: Dict[str, Any], session: str, session_name: str, knockout: b
     pts_txt = f", scoring {pts:g} point{'s' if pts != 1 else ''}" if isinstance(pts, (int, float)) and pts else ""
     if _finished(d):
         return f"**{d['name']}** finished **P{pos}** in the **{session_name}** for {d['team']}{grid_txt}{pts_txt}, completing {d.get('laps')} laps."
-    return (f"**{d['name']}** did not finish the **{session_name}** for {d['team']} "
+    start = f" from P{grid} on the grid" if isinstance(grid, int) and grid > 0 else ""
+    return (f"**{d['name']}** did not finish the **{session_name}** for {d['team']}{start} "
             f"({status or 'not classified'}) after {d.get('laps', 0)} lap{'' if d.get('laps') == 1 else 's'}.")
 
 
