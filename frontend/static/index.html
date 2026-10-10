@@ -1778,12 +1778,19 @@
     const sSel = $('session-select');
     if (!sSel) return;
     const sessions = (r && r.sessions) ? r.sessions : ['race', 'qualifying'];
+    // A weekend under way only offers the sessions that already have results.
+    const live = !!(r && r.in_progress);
+    const available = live ? (r.available || []) : sessions;
     const labels = { race: 'Grand Prix', sprint: 'Sprint Race', sprint_qualifying: 'Sprint Qualifying', qualifying: 'Qualifying' };
-    sSel.innerHTML = sessions.map(s => `<option value="${s}">${labels[s] || s}</option>`).join('');
-    if (preferredSession && sessions.includes(preferredSession)) {
+    sSel.innerHTML = sessions.map(s => {
+      const ok = available.includes(s);
+      return `<option value="${s}" ${ok ? '' : 'disabled'}>${labels[s] || s}${ok ? '' : ' — upcoming'}</option>`;
+    }).join('');
+    const newest = ['sprint_qualifying', 'sprint', 'qualifying', 'race'].filter(s => available.includes(s)).pop();
+    if (preferredSession && available.includes(preferredSession)) {
       sSel.value = preferredSession;
     } else {
-      sSel.value = sessions[0];
+      sSel.value = live ? newest : sessions[0];
     }
   }
 
@@ -1816,8 +1823,10 @@
     const done = S.races.filter(r => r.completed || (year < CURRENT_SEASON));
     sel.innerHTML = S.races.map(r => {
       const isDone = r.completed || (year < CURRENT_SEASON);
+      const live = !isDone && r.in_progress;  // weekend under way: some sessions have results
       const spTag = r.has_sprint ? ' · SPRINT' : '';
-      return `<option value="${r.round}" ${isDone ? '' : 'disabled'}>R${r.round} · ${esc(r.race_name.replace(/^\d{4}\s+/, '').replace(' Grand Prix',' GP'))}${spTag}${isDone ? '' : ' — upcoming'}</option>`;
+      const status = isDone ? '' : (live ? ' — weekend in progress' : ' — upcoming');
+      return `<option value="${r.round}" ${isDone || live ? '' : 'disabled'}>R${r.round} · ${esc(r.race_name.replace(/^\d{4}\s+/, '').replace(' Grand Prix',' GP'))}${spTag}${status}</option>`;
     }).join('');
     sel.disabled = false;
 
@@ -5888,6 +5897,7 @@
         if (latest && latest.year && latest.round) {
           targetYear = latest.year;
           targetRound = latest.round;
+          if (latest.session) S.session = latest.session;  // e.g. Sprint Qualifying mid-weekend
         }
       } catch (e) {
         targetYear = 2026;

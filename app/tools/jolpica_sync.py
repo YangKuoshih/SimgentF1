@@ -317,10 +317,13 @@ def sprint_qualifying(year: int, rnd: int, net: bool = True) -> Optional[Dict[st
         if r.get("q3"):
             row["Q3"] = r["q3"]
         out_rows.append(row)
+    # Sprint Qualifying runs before the sprint, so on Friday/Saturday the sprint result (and
+    # its race name, date and circuit) may not exist yet; the season schedule always has them.
+    event = sprint or next((r for r in schedule(year, net) if str(r.get("round")) == str(rnd)), {})
     return {
         "season": str(year), "round": str(rnd),
-        "raceName": sprint.get("raceName", f"Round {rnd}"),
-        "date": sprint.get("date", ""), "Circuit": sprint.get("Circuit", {}),
+        "raceName": event.get("raceName", f"Round {rnd}"),
+        "date": event.get("date", ""), "Circuit": event.get("Circuit", {}),
         "session": meta.get("session") or ("Sprint Shootout" if year == 2023 else "Sprint Qualifying"),
         "notes": meta.get("notes", []),
         "source_url": meta.get("source_url", ""),
