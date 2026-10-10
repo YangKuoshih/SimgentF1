@@ -1782,9 +1782,17 @@
     const live = !!(r && r.in_progress);
     const available = live ? (r.available || []) : sessions;
     const labels = { race: 'Grand Prix', sprint: 'Sprint Race', sprint_qualifying: 'Sprint Qualifying', qualifying: 'Qualifying' };
+    // A session that has ended but has no results yet says so, instead of "upcoming".
+    // Results usually appear within a few hours (OpenF1 and Jolpica publish after the session).
+    const minutes = { sprint_qualifying: 45, sprint: 60, qualifying: 60, race: 120 };
+    const ended = s => {
+      const at = r && r.session_times && r.session_times[s];
+      return at ? Date.now() > Date.parse(at) + (minutes[s] || 60) * 60000 : false;
+    };
     sSel.innerHTML = sessions.map(s => {
       const ok = available.includes(s);
-      return `<option value="${s}" ${ok ? '' : 'disabled'}>${labels[s] || s}${ok ? '' : ' — upcoming'}</option>`;
+      const tag = ok ? '' : (ended(s) ? ' — results pending' : ' — upcoming');
+      return `<option value="${s}" ${ok ? '' : 'disabled'}>${labels[s] || s}${tag}</option>`;
     }).join('');
     const newest = ['sprint_qualifying', 'sprint', 'qualifying', 'race'].filter(s => available.includes(s)).pop();
     if (preferredSession && available.includes(preferredSession)) {
@@ -1966,7 +1974,7 @@
 
     // Pre-compute per-driver lap times
     m.drivers.forEach((d, i) => {
-      d.lapTimes = (d.cum || []).map((c, k) => k === 0 ? c : c - d.cum[k - 1]);
+      d.lapTimes = d.lap_times ? d.lap_times.slice() : (d.cum || []).map((c, k) => k === 0 ? c : c - d.cum[k - 1]);
       d.gridIdx = d.grid > 0 ? d.grid - 1 : 21;
       d.finishedStatus = /^(Finished|Lapped|\+)/.test(d.status);
     });
@@ -2023,8 +2031,34 @@
     };
   }
 
+  // Qualifying segment (0-based) running at time t; segments come from the model.
+  function qualiSegmentAt(t) {
+    const segs = (S.model && S.model.meta && S.model.meta.segments) || [];
+    let s = 0;
+    segs.forEach((g, i) => { if (t >= g.start) s = i; });
+    return s;
+  }
+
+  // Knockout qualifying: every car still in the segment starts together and runs one flying
+  // lap at its real time. GARAGE = waiting / lap done / no time set; ELIM = knocked out.
+  function qualiDriverAt(d, t) {
+    const s = qualiSegmentAt(t);
+    const segs = S.model.meta.segments;
+    const n = d.seg_start.length;
+    if (s >= n) return { state: 'ELIM', prog: n, k: n, lapNo: n, seg: s };
+    const st = d.seg_start[s], en = d.cum[s];
+    if ((d.no_time && d.no_time[s]) || t < st) return { state: 'GARAGE', prog: s, k: s, frac: 0, lapNo: s + 1, seg: s };
+    if (t >= en) {
+      const last = s === segs.length - 1;
+      return { state: last ? 'FIN' : 'GARAGE', prog: s + 1, k: s + 1, frac: 1, lapNo: s + 1, seg: s, done: true };
+    }
+    const frac = (t - st) / (en - st);
+    return { state: 'RUN', prog: s + frac, k: s, frac, lapNo: s + 1, seg: s };
+  }
+
   function driverAt(d, t) {
     if (d.laps === 0) return { state: 'DNS', prog: -1, retireLap: 1 };
+    if (d.seg_start && S.model && S.model.meta && S.model.meta.segments) return qualiDriverAt(d, t);
 
     const isQuali = S.model && S.model.meta && /qualifying$/.test(S.model.meta.session_type || '');
     const gridOffset = isQuali ? 0.0 : GRID_PHASE_S;
@@ -2082,6 +2116,29 @@
   function classify(t) {
     const isQuali = S.model && S.model.meta && /qualifying$/.test(S.model.meta.session_type || '');
     const rows = S.model.drivers.map(d => ({ d, ...driverAt(d, t) }));
+    if (isQuali && S.model.meta.segments) {
+      // Built live: times set in the current segment (fastest first), then cars yet to set
+      // one, then knocked-out drivers in their final order. At the end it equals the result.
+      const s = qualiSegmentAt(t);
+      const timeIn = r => (r.state !== 'ELIM' && r.done && r.d.lap_times[s]) ? r.d.lap_times[s] : null;
+      // Before a time is set: previous segment's time (Q1 has none, so car number; never the result).
+      const prevRank = r => (s > 0 && r.d.lap_times[s - 1]) ? r.d.lap_times[s - 1] : 1e3 + (s > 0 ? r.d.finish : (r.d.number || 99));
+      const group = r => r.state === 'ELIM' ? 2 : (timeIn(r) != null ? 0 : 1);
+      rows.sort((a, b) => group(a) - group(b)
+        || (group(a) === 0 ? timeIn(a) - timeIn(b) : group(a) === 1 ? prevRank(a) - prevRank(b) : a.d.finish - b.d.finish));
+      const best = rows.length ? timeIn(rows[0]) : null;
+      const fmt = x => `${Math.floor(x / 60)}:${(x % 60).toFixed(3).padStart(6, '0')}`;
+      rows.forEach((r, i) => {
+        r.pos = i + 1;
+        r.interval = null;
+        const tm = timeIn(r);
+        if (r.state === 'ELIM') r.gap = `OUT ${r.d.eliminated_in}`;
+        else if (tm != null) r.gap = i === 0 ? fmt(tm) : `+${(tm - best).toFixed(3)}s`;
+        else if (r.d.no_time && r.d.no_time[s]) r.gap = 'NO TIME';
+        else r.gap = r.state === 'RUN' ? 'ON LAP' : 'GARAGE';
+      });
+      return rows;
+    }
     if (isQuali) {
       rows.sort((a, b) => a.d.finish - b.d.finish);
       rows.forEach((r, i) => {
@@ -2146,6 +2203,7 @@
   function leaderLap(t) {
     if (!S.model || !S.model.meta) return 1;
     const isQuali = /qualifying$/.test(S.model.meta.session_type || '');
+    if (isQuali && S.model.meta.segments) return qualiSegmentAt(t) + 1;
     if (!isQuali && t <= GRID_PHASE_S) return 1;
     const total = S.model.meta.total_laps || 50;
     if (!S.leaderCum || !S.leaderCum.length) return 1;
@@ -2689,7 +2747,7 @@
     const labelled = new Set([S.selected, S.hover, ...rows.slice(0, 3).map(r => r.d.id)]);
 
     [...rows].reverse().forEach(r => {
-      if (r.state === 'DNS' || r.state === 'FIN') return;
+      if (r.state === 'DNS' || r.state === 'FIN' || r.state === 'GARAGE' || r.state === 'ELIM') return;
       if (r.state === 'OUT') {
         if (r.prog > 0 && (r.d.id === S.selected || r.d.id === S.hover)) {
           const p = trackPoint(r.prog, r.d.gridIdx); if (!p) return;
@@ -2897,8 +2955,12 @@
       const sel = r.d.id === S.selected;
       let extraCell = '';
       if (isQuali) {
-        const stage = r.d.qualifying_stage || (r.pos <= 10 ? 'Q3' : (r.pos <= 15 ? 'Q2' : 'Q1'));
-        const stageCls = stage === 'Q3' ? 'bg-f1red/20 text-f1red border-f1red/40' : (stage === 'Q2' ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' : 'bg-slate-700/40 text-slate-400 border-slate-600/40');
+        const segs = S.model.meta.segments;
+        const stage = segs ? (r.state === 'ELIM' ? r.d.eliminated_in : segs[r.seg != null ? r.seg : 0].name)
+          : (r.d.qualifying_stage || (r.pos <= 10 ? 'Q3' : (r.pos <= 15 ? 'Q2' : 'Q1')));
+        const top = segs ? (r.state !== 'ELIM' && r.seg === segs.length - 1 && segs.length > 1) : stage === 'Q3';
+        const mid = segs ? (r.state !== 'ELIM' && r.seg === 1 && segs.length === 3) : stage === 'Q2';
+        const stageCls = top ? 'bg-f1red/20 text-f1red border-f1red/40' : (mid ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' : 'bg-slate-700/40 text-slate-400 border-slate-600/40');
         extraCell = `<span class="px-1 py-0.5 rounded text-[9px] font-bold border ${stageCls}">${stage}</span>`;
       } else if (isGrid || r.state === 'GRID') {
         extraCell = `<span class="text-slate-400 font-semibold text-[9px] px-1 py-0.5 rounded bg-white/5 border border-white/10 font-mono">${r.d.grid > 0 ? ('P' + r.d.grid) : 'PL'}</span>`;
@@ -2913,7 +2975,7 @@
       else if (r.pos === 2) posBadge = `<span class="w-5 h-4 rounded-sm bg-[#D4D4D8] text-black font-black text-[10px] flex items-center justify-center shadow-sm">2</span>`;
       else if (r.pos === 3) posBadge = `<span class="w-5 h-4 rounded-sm bg-[#CD7F32] text-white font-black text-[10px] flex items-center justify-center shadow-sm">3</span>`;
 
-      return `<div data-id="${r.d.id}" class="tower-row row-move px-3 py-[6px] grid grid-cols-[24px_1fr_72px_32px] gap-1.5 items-center cursor-pointer hover:bg-white/5 border-l-2 ${sel ? 'bg-white/10 border-f1red shadow-[inset_0_0_12px_rgba(225,6,0,0.15)]' : 'border-transparent'} ${r.state === 'OUT' || r.state === 'DNS' ? 'opacity-40' : ''}">
+      return `<div data-id="${r.d.id}" class="tower-row row-move px-3 py-[6px] grid grid-cols-[24px_1fr_72px_32px] gap-1.5 items-center cursor-pointer hover:bg-white/5 border-l-2 ${sel ? 'bg-white/10 border-f1red shadow-[inset_0_0_12px_rgba(225,6,0,0.15)]' : 'border-transparent'} ${r.state === 'OUT' || r.state === 'DNS' || r.state === 'ELIM' ? 'opacity-40' : ''}">
         <div class="flex items-center justify-center">${posBadge}</div>
         <div class="flex items-center gap-2 min-w-0">
           <span class="w-1 h-4 rounded-full shrink-0 shadow-sm" style="background:${r.d.color}"></span>
@@ -2960,7 +3022,7 @@
     // Mini driver badge for collapsed view
     const miniBadge = $('fc-mini-driver');
     if (miniBadge) {
-      const posStr = isQuali ? `P${d.finish}` : (isGrid ? `Grid P${d.grid || r.pos}` : (r.state === 'RUN' || r.state === 'PIT' ? `P${r.pos}` : (r.state === 'FIN' ? `P${d.finish}` : 'OUT')));
+      const posStr = isQuali ? (r.state === 'ELIM' ? `P${d.finish} (out ${d.eliminated_in})` : `P${r.pos}`) : (isGrid ? `Grid P${d.grid || r.pos}` : (r.state === 'RUN' || r.state === 'PIT' ? `P${r.pos}` : (r.state === 'FIN' ? `P${d.finish}` : 'OUT')));
       miniBadge.textContent = `${d.code} · ${posStr}`;
       miniBadge.style.color = d.color;
     }
@@ -4054,7 +4116,11 @@
   // =====================================================================
   // RACE CONTROL: banner, log, scrubber markers
   // =====================================================================
-  const evTime = (e) => timeAtProgress(S.leaderCum, Math.max(0, e.lap - 1));
+  const evTime = (e) => {
+    const segs = S.model && S.model.meta && S.model.meta.segments;
+    if (segs && segs[e.lap - 1]) return segs[e.lap - 1].end - (e.lap === segs.length ? 3.0 : 0.5);
+    return timeAtProgress(S.leaderCum, Math.max(0, e.lap - 1));
+  };
   function renderMarkers() {
     $('scrub-markers').innerHTML = S.model.events.map(e => {
       const pct = Math.min(100, evTime(e) / S.endT * 100);
@@ -4812,6 +4878,11 @@
     }
     const cur = leaderLap(S.t);
     const target = Math.max(1, Math.min(S.model.meta.total_laps, cur + delta));
+    if (isQuali && S.model.meta.segments) {
+      S.t = S.model.meta.segments[target - 1].start + 0.01;
+      S.forceUI = true;
+      return;
+    }
     const gridOffset = isQuali ? 0.0 : GRID_PHASE_S;
     S.t = gridOffset + timeAtProgress(S.leaderCum, target - 1) + 0.01;
     S.forceUI = true;
@@ -4935,9 +5006,12 @@
         S.wasFinished = false;
       }
       if (isQuali) {
-        const qStage = lap === 1 ? 'Q1' : (lap === 2 ? 'Q2' : 'Q3');
-        $('lap-pill').textContent = finished ? 'QUALIFYING DECIDED' : `STAGE ${lap} / 3 (${qStage})`;
-        $('lap-text').innerHTML = finished ? `<span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span><span>Pole Position Sealed · Q3</span>` : `<span class="w-2 h-2 rounded-full bg-f1red shrink-0"></span><span>Stage ${lap} of 3 (${qStage} Shootout)</span>`;
+        const segs = S.model.meta.segments || [{ name: 'Q1' }, { name: 'Q2' }, { name: 'Q3' }];
+        const qStage = (segs[lap - 1] || segs[segs.length - 1]).name;
+        const nSeg = segs.length;
+        const left = segs[lap - 1] ? (segs[lap - 1].cars || '') : '';
+        $('lap-pill').textContent = finished ? 'QUALIFYING DECIDED' : (nSeg > 1 ? `STAGE ${lap} / ${nSeg} (${qStage})` : qStage.toUpperCase());
+        $('lap-text').innerHTML = finished ? `<span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span><span>Pole Position Sealed · ${esc(segs[nSeg - 1].name)}</span>` : `<span class="w-2 h-2 rounded-full bg-f1red shrink-0"></span><span>${nSeg > 1 ? `Stage ${lap} of ${nSeg} · ${esc(qStage)} · ${left} cars` : esc(qStage)}</span>`;
         const railLap = $('tower-rail-lap');
         if (railLap) railLap.textContent = finished ? 'POLE' : qStage;
       } else if (isGrid) {
