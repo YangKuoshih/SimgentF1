@@ -9,7 +9,7 @@ async function testStartingGridReplay() {
   const page = await context.newPage();
 
   try {
-    await page.goto('http://localhost:8080', { waitUntil: 'networkidle' });
+    await page.goto('http://localhost:8080/?year=2026&round=16', { waitUntil: 'networkidle' });  // 2026 R16 grid: VER, HAM, ANT
     await page.waitForTimeout(1500);
 
     // Ensure replay model is loaded
