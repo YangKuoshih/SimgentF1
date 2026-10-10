@@ -842,7 +842,13 @@ def _build_qualifying_replay(year: int, rnd: int, net: bool = True, circuit_over
         race_name = res.get("raceName", race_name)
         date_str = res.get("date", "")
         circuit_info = res.get("Circuit", {})
-        sorted_res = sorted(res.get("Results", []), key=lambda r: _safe_int(r.get("grid") or r.get("position"), fallback=99))
+        rows = res.get("Results", [])
+        # 2021-2022 sprint weekends: qualifying set the Sprint grid; the Sprint set the GP grid.
+        sp = J.sprint_results(year, rnd, net) if year < 2023 else None
+        if sp and sp.get("SprintResults"):
+            rows = sp["SprintResults"]
+        # Grid 0 is a pit-lane start: last, not pole.
+        sorted_res = sorted(rows, key=lambda r: _safe_int(r.get("grid"), fallback=0) or 99)
         base_lap = 78.5
         for idx, r in enumerate(sorted_res):
             pos = idx + 1

@@ -1008,7 +1008,9 @@ def _answer_core(
     # another session's result: say so and ask which Sprint is meant.
     if re.search(r"\bsprint\b|\bsq[123]?\b", q) and not re.search(
             r"\b(how many|career|most|all-time|record|rules?|regulations?|format|points? system|what is a sprint|explain)\b", q):
-        race_known = (ctx.get("round") is not None or race_named or bool(round_match)
+        # The race on screen only counts when the question doesn't name another season.
+        screen_race = ctx.get("round") is not None and not (year_match and str(ctx.get("year")) != year_match.group(1))
+        race_known = (screen_race or race_named or bool(round_match)
                       or bool(history and race_from_history(history, datetime.date.today().year)))
         weekend = next((r for r in race_replay.season_races(year) if r.get("round") == round_no), None)
         if year < 2021:
