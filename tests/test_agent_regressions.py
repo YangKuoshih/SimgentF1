@@ -173,6 +173,13 @@ class NoAnswerFromAnotherRace(unittest.TestCase):
         self.assertNotEqual(r.get("tool"), "race_not_run")
         self.assertIn("Verstappen", r["text"])
 
+    def test_a_qualifying_question_is_not_blocked_by_the_missing_race(self):
+        if J.results(2026, 17, net=False) or not J.qualifying_results(2026, 17, net=False):
+            self.skipTest("needs Singapore qualifying cached and its race not yet")
+        r = ask("who got bounced in the first session?", view(2026, 17, "Singapore Grand Prix"), [])
+        self.assertEqual(r.get("tool"), "qualifying_segment_lookup")
+        self.assertIn("Knocked out in **Q1**", r["text"])
+
     def test_general_questions_still_answered_when_the_race_has_no_result(self):
         if J.results(2026, 17, net=False):
             self.skipTest("the 2026 Singapore Grand Prix result is cached now")
