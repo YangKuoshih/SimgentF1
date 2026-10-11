@@ -101,6 +101,34 @@ class RoutingTests(unittest.TestCase):
         self.assertNotEqual(router.route("fastest lap of Q1").intent, "fastest_lap")
 
 
+class CanonicalPhrasingTests(unittest.TestCase):
+    """Every intent's canonical phrasing (what the router asks the engine, step 3a) must be
+    answered by one of that intent's own tools, in a context where the answer exists."""
+    RACE = {"year": 2026, "round": 16, "session": "race", "race": "Bahrain Grand Prix in Malaysia"}
+    CONTEXT = {"qualifying_segments": dict(RACE, session="qualifying"),
+               "pole_position": dict(RACE, session="qualifying"),
+               "race_story": {"year": 2021, "round": 22, "session": "race", "race": "Abu Dhabi Grand Prix"}}
+    SLOTS = {"driver": "Albon", "driver_poss": "Hamilton's", "driver2": "Leclerc", "position": "P4",
+             "segment": "Q1", "year": "2008", "race": "", "race_name": "this race"}
+    # a driver with a career profile; Albon retired in this race (for driver_retirement)
+    SLOTS_FOR = {"driver_career": {"driver": "Hamilton"}, "head_to_head": {"driver": "Hamilton"}}
+
+    def test_canonical_phrasings_are_answered_by_their_intent(self):
+        from app.tools import jolpica_sync as J
+        from app.tools import race_agent as A
+        from unittest.mock import patch
+        with patch.object(J, "_http", lambda url, retries=4: None):
+            for intent in load_intents():
+                if not intent.canonical:
+                    continue
+                q = intent.canonical
+                for k, v in {**self.SLOTS, **self.SLOTS_FOR.get(intent.name, {})}.items():
+                    q = q.replace("{" + k + "}", v)
+                q = " ".join(q.split())
+                tool = A._answer_once(q, self.CONTEXT.get(intent.name, self.RACE), []).get("tool")
+                self.assertIn(tool, intent.tools, f"{intent.name}: {q!r} answered by {tool}")
+
+
 class ShadowLoggingTests(unittest.TestCase):
     def test_logs_names_and_scores_never_the_question(self):
         from frontend import main as M

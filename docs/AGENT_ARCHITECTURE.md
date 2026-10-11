@@ -1,6 +1,6 @@
 # Pit Wall Agent architecture: tools, intents, content and an optional model
 
-Status: **steps 1–2 done**; steps 3–4 in progress (see [Migration](#migration)).
+Status: **steps 1, 2 and 3a done**; 3b and 4 in progress (see [Migration](#migration)).
 Audience: contributors and maintainers.
 
 ## Goals
@@ -220,11 +220,22 @@ Each step is its own pull request; all evals must keep their scores.
    its first run caught a wrong lap count (Schumacher, Spa 1998: 24 → 25). Driver profiles
    (`f1_history.HISTORICAL_DRIVERS`) stay in code for now: they are mostly statistics that
    the data refresh keeps current, not prose.
-3. **Router in charge.** Tools become registered functions; the router chooses the tool and the
-   regex dispatch in `_answer_core` is removed tool by tool, each removal guarded by the evals.
-   While the router abstains on a question, the current dispatch answers it; the general
-   briefing only once paraphrase coverage is high. Exit: evals unchanged, plus a
-   paraphrase eval (new phrasings of every eval question) that the regex version fails.
+3. **Router in charge**, in two parts.
+   - **3a (done): the router checks every answer.** The engine answers first. If the router is
+     confident the question asks for another intent, the engine is asked again in that intent's
+     `canonical` phrasing (`agent/intents.toml`), filled with the question's own driver,
+     position, segment, race and session words; the retry is kept only if one of that intent's
+     tools answers it. Generic fallbacks are replaced at normal confidence; a specific answer
+     from another intent only at high confidence (score ≥ 0.60, margin ≥ 0.10); definitive
+     answers ("no race result yet", "no sprint that weekend") are never replaced.
+     End to end on the held-out paraphrases: **63.3% → 74.7%** answered by the right tool,
+     **0 broken** (a CI gate). A test checks every canonical phrasing is answered by its own
+     intent. Building this found and fixed engine bugs: "who started P3" returned Jackie
+     Stewart's career ("started" fuzzy-matched "Stewart"; typo matching now skips real English
+     words), the whole starting grid had no answer, and "FP1 lap times" returned race results.
+   - **3b (next): tools as registered functions.** Extract the `_answer_core` branches into
+     functions the router calls directly, and delete the regex dispatch intent by intent, each
+     removal guarded by the evals and the end-to-end gate.
 4. **Optional model via ADK.** `SIMGENT_LLM`, the ADK agent over the same registry, the fact
    checker and timeouts. Exit: with `SIMGENT_LLM=ollama` (Gemma 4 E2B) the evals keep their
    scores (facts are unchanged by design) and the checker rejects injected wrong numbers in tests.

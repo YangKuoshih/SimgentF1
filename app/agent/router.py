@@ -26,6 +26,18 @@ from app.agent.embedding import StaticEmbedder
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 INTENTS_FILE = os.path.join(ROOT, "agent", "intents.toml")
 
+# Step 3a: when the engine's answer doesn't fit a confident route, the engine is asked again in
+# the intent's canonical phrasing. Overriding a *specific* engine answer (another intent's tool)
+# needs this much more confidence than replacing a generic fallback.
+OVERRIDE_MIN_SCORE = 0.60
+OVERRIDE_MARGIN = 0.10
+FALLBACK_TOOLS = {"session_telemetry_briefing", "telemetry_memory_retrieval", ""}
+# Correct statements, never overridden: the race hasn't run, the weekend had no sprint, the
+# session isn't in the data.
+DEFINITIVE_TOOLS = {"race_not_run", "no_sprint_weekend", "qualifying_not_in_data", "sprint_not_in_data",
+                    "sprint_qualifying_not_in_data"}
+_SESSION_WORDS = re.compile(r"\b(sprint qualifying|sprint shootout|sprint|qualifying|quali|shootout|grand prix|gp|race)\b")
+
 # Tuned on tests/eval_router.py and its held-out paraphrases (docs/AGENT_ARCHITECTURE.md)
 LEX_WEIGHT = 0.3   # share of the score from BM25 keyword overlap (catches exact terms: Q1, pole, DNF)
 TOP_K = 2          # an intent scores the mean of its best TOP_K examples (one lucky example is not enough)
@@ -94,6 +106,87 @@ class Intent:
     not_examples: List[str] = field(default_factory=list)
     requires: List[str] = field(default_factory=list)
     excludes: List[str] = field(default_factory=list)
+    canonical: Optional[str] = None
+
+
+_SEGMENT_WORDS = re.compile(r"\b(first|second|third|final|last)\s+(?:segment|session|part|phase)\b")
+_SEGMENT_NUMBER = {"first": 1, "second": 2, "third": 3, "final": 3, "last": 3}
+_SUBJECT = re.compile(r"\b(he|she|they)\b")
+_POSSESSIVE = re.compile(r"\b(his|her|their)\b")
+
+
+def _name_groups(words: List[str], vocab: frozenset) -> List[str]:
+    """Consecutive words from the vocabulary, as phrases ("max verstappen", "abu dhabi")."""
+    groups, cur = [], []
+    for w in words:
+        if w in vocab:
+            cur.append(w)
+        elif cur:
+            groups.append(" ".join(cur))
+            cur = []
+    if cur:
+        groups.append(" ".join(cur))
+    return groups
+
+
+def slot_values(question: str) -> Dict[str, str]:
+    """The question's own words for each slot, to fill an intent's canonical phrasing."""
+    q = question.lower()
+    words = re.findall(r"[a-z\u00c0-\u024f]+", q)
+    drivers = _name_groups(words, driver_tokens())
+    places = [g for g in _name_groups(words, name_tokens() - driver_tokens()) if g]
+    out: Dict[str, str] = {}
+    if drivers:
+        out["driver"] = drivers[0]
+        out["driver_poss"] = drivers[0] + "'s"
+        if len(drivers) > 1:
+            out["driver2"] = drivers[1]
+    else:
+        subj, poss = _SUBJECT.search(q), _POSSESSIVE.search(q)
+        if subj or poss:
+            out["driver"] = subj.group(1) if subj else "he"
+            out["driver_poss"] = poss.group(1) if poss else "his"
+    pos = _POSITION.search(q)
+    if pos:
+        out["position"] = pos.group(0)
+    seg = _SEGMENT.search(q)
+    if seg:
+        out["segment"] = seg.group(0)
+    else:
+        w = _SEGMENT_WORDS.search(q)
+        if w:
+            out["segment"] = ("sq" if "sprint" in q else "q") + str(_SEGMENT_NUMBER[w.group(1)])
+    year = _YEAR.search(q)
+    if year:
+        out["year"] = year.group(1)
+    race = ([year.group(1)] if year else []) + places
+    if race:
+        out["race"] = "in the " + " ".join(race) + (" grand prix" if places else " season")
+    out["race_name"] = ("the " + " ".join(race) + " grand prix") if places else "this race"
+    return out
+
+
+def canonical(question: str, intent: "Intent") -> Optional[str]:
+    """The intent's canonical phrasing filled with the question's own slot values, or None when
+    the intent has none or a slot it needs is missing."""
+    if not intent.canonical:
+        return None
+    values = slot_values(question)
+    needed = re.findall(r"\{(\w+)\}", intent.canonical)
+    if any(n in ("driver", "driver2", "position") and n not in values for n in needed):
+        return None
+    text = intent.canonical
+    session = _SESSION_WORDS.search(question.lower())
+    for n in needed:
+        if n in values:
+            text = text.replace("{" + n + "}", values[n])
+        else:  # drop the empty slot and a preposition left dangling before it
+            text = re.sub(r"\b(?:in|at|for|of)\s+\{" + n + r"\}|\{" + n + r"\}", "", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    # Keep the session the question named ("who won the sprint" must not become "who won")
+    if session and not _SESSION_WORDS.search(text.lower()):
+        text += f" in the {session.group(1)}"
+    return text
 
 
 @dataclass
@@ -115,7 +208,8 @@ def load_intents(path: str = INTENTS_FILE) -> List[Intent]:
         if not spec.get("examples") or not spec.get("tools"):
             raise ValueError(f"intent {name!r} needs examples and tools")
         out.append(Intent(name, spec.get("description", ""), list(dict.fromkeys(spec["tools"])),
-                          spec["examples"], spec.get("not", []), spec.get("requires", []), spec.get("excludes", [])))
+                          spec["examples"], spec.get("not", []), spec.get("requires", []), spec.get("excludes", []),
+                          spec.get("canonical")))
     return out
 
 

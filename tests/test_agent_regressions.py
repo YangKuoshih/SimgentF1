@@ -292,5 +292,32 @@ class LiveRunFindings(unittest.TestCase):
         self.assertNotEqual(codes[0], "PER")  # grid 0 (his pit-lane start in the GP) is not pole
 
 
+class GridQuestions(unittest.TestCase):
+    RACE = view(2026, 16, "Bahrain Grand Prix in Malaysia")
+
+    def test_who_started_is_not_a_misspelled_driver(self):
+        # "started" fuzzy-matched "Stewart" and returned Jackie Stewart's career profile
+        r = ask("who started P3", self.RACE, [])
+        self.assertEqual(r.get("tool"), "starting_grid_lookup")
+        self.assertNotIn("Stewart", r["text"])
+
+    def test_whole_grid_and_front_row(self):
+        for q in ("what was the starting grid", "who was on the front row"):
+            r = ask(q, self.RACE, [])
+            self.assertEqual(r.get("tool"), "starting_grid_lookup", q)
+            self.assertIn("Front row", r["text"])
+
+    def test_misspelled_names_still_resolve(self):
+        from app.tools import f1_history as H
+        self.assertEqual(H.resolve_historical_driver("tell me about schmacur")["name"], "Michael Schumacher")
+        self.assertEqual(H.resolve_historical_driver("versappen career")["name"], "Max Verstappen")
+
+
+class PracticeBeforeResults(unittest.TestCase):
+    def test_fp1_is_not_answered_with_race_results(self):
+        r = ask("FP1 lap times", view(2026, 16, "Bahrain Grand Prix in Malaysia"), [])
+        self.assertEqual(r.get("tool"), "free_practice_telemetry_lookup")
+
+
 if __name__ == "__main__":
     unittest.main()
