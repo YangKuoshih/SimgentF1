@@ -91,7 +91,7 @@ Users can:
 
 | GCP Component | Role in SimGent | Implementation Details |
 | :--- | :--- | :--- |
-| **Vertex AI Agent Platform / ADK** | Brain & Agentic Runtime | Python agent in `app/agent.py` orchestrating deterministic tools, session state, and Gemini reasoning. |
+| **Pit Wall Agent** | Brain & Agentic Runtime | Deterministic tools over cached race data (`app/tools/race_agent.py`), a semantic router over `agent/intents.toml` (`app/agent/router.py`), and an optional model via ADK (see `docs/AGENT_ARCHITECTURE.md`). |
 | **Vertex AI Memory Bank** | Cross-Session User Memory | Remembers user preferences: favorite teams/drivers, home Grand Prix, preferred units (km/h vs mph), favorite regulation eras. |
 | **Cloud Firestore** | Structured Real-Time DB | Stores season calendars, driver profiles, cached race results, session bookmarks, WDC/WCC standings, and race control events. |
 | **Cloud Storage (GCS)** | High-Volume Blob Storage | Public bucket storing normalized circuit coordinate GeoJSON/SVG files, cached telemetry slices, and generated strategy cards. |

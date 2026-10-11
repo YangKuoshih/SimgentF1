@@ -1,0 +1,110 @@
+# Held-out paraphrases for the router (tests/eval_router.py --paraphrases).
+#
+# Written independently of agent/intents.toml: none of these may be copied into the intents'
+# examples, or the score stops measuring how well the router handles new phrasings.
+# Each entry: question = expected intent (or "none" when no intent should claim it).
+
+[cases]
+"who took the chequered flag" = "session_result"
+"which driver won it" = "session_result"
+"gimme the full results" = "session_result"
+"who were the top three finishers" = "session_result"
+"winner of the sprint race?" = "session_result"
+"who triumphed at Silverstone" = "session_result"
+"top five please" = "session_result"
+
+"who grabbed pole" = "pole_position"
+"pole sitter?" = "pole_position"
+"who set the fastest time in qualifying" = "pole_position"
+"who will start first on the grid after qualifying" = "pole_position"
+"who claimed sprint pole position" = "pole_position"
+
+"who ended up in 7th" = "finishing_position"
+"which driver took P4" = "finishing_position"
+"who crossed the line in second place" = "finishing_position"
+"who was runner-up in Japan" = "finishing_position"
+"who came last" = "finishing_position"
+
+"how did Alonso get on" = "driver_result"
+"what was Piastri's result" = "driver_result"
+"where did Ocon end up" = "driver_result"
+"how many points did Russell pick up" = "driver_result"
+"what place did Bearman take" = "driver_result"
+"how did his race go" = "driver_result"
+
+"did Leclerc finish on the podium" = "podium_check"
+"was Piastri top 3" = "podium_check"
+"did he make the rostrum" = "podium_check"
+
+"who lined up on pole for the start" = "starting_grid"
+"what slot did Stroll start from" = "starting_grid"
+"grid order please" = "starting_grid"
+"who started at the back" = "starting_grid"
+
+"which drivers were eliminated in Q1" = "qualifying_segments"
+"who went out in SQ2" = "qualifying_segments"
+"who reached the top ten shootout in Q3" = "qualifying_segments"
+"fastest lap of Q1" = "qualifying_segments"
+"did Hamilton get through to Q2" = "qualifying_segments"
+"who missed the cut in Q2" = "qualifying_segments"
+
+"how many retirements were there" = "retirements"
+"which cars failed to finish" = "retirements"
+"any crashes or mechanical failures" = "retirements"
+"who DNF'd" = "retirements"
+
+"why did Norris stop" = "driver_retirement"
+"what went wrong for Sainz" = "driver_retirement"
+"on which lap did Gasly retire" = "driver_retirement"
+
+"who had the best race lap" = "fastest_lap"
+"quickest lap in the race?" = "fastest_lap"
+"fastest lap award" = "fastest_lap"
+
+"what was Russell's tyre strategy" = "pit_strategy"
+"how many times did he pit" = "pit_strategy"
+"which compounds did Ferrari run" = "pit_strategy"
+"explain the undercut" = "pit_strategy"
+"when did Leclerc come in for tyres" = "pit_strategy"
+
+"did the safety car come out" = "safety_car"
+"was the race red flagged" = "safety_car"
+"any virtual safety car periods" = "safety_car"
+
+"who's top of the standings" = "championship_standings"
+"points table right now" = "championship_standings"
+"how far ahead is the championship leader" = "championship_standings"
+
+"who was champion in 2005" = "season_champion"
+"which driver won the 1988 title" = "season_champion"
+"constructors champions in 2014" = "season_champion"
+
+"how many races has Verstappen won in his career" = "driver_career"
+"how many titles does Alonso have" = "driver_career"
+"tell me about Jim Clark" = "driver_career"
+"career podiums for Russell" = "driver_career"
+
+"Hamilton or Verstappen, who is better" = "head_to_head"
+"Prost versus Senna" = "head_to_head"
+"compare Norris with Piastri" = "head_to_head"
+
+"most wins in F1 history" = "all_time_records"
+"who holds the record for most poles" = "all_time_records"
+
+"what were the cars like in the turbo years" = "era_regulations"
+"explain the ground effect era" = "era_regulations"
+
+"what is active aerodynamics in 2026" = "regulations_2026"
+"how does the new hybrid power unit split work" = "regulations_2026"
+
+"tell me what happened at the end of the 2021 season finale" = "race_story"
+"what was controversial about this race" = "race_story"
+
+"which track was this race at" = "venue"
+"where is this race held" = "venue"
+
+"FP2 times" = "practice"
+"who topped practice" = "practice"
+
+"what's the weather like" = "none"
+"tell me a joke" = "none"

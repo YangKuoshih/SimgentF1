@@ -9,6 +9,10 @@ WORKDIR /app
 COPY requirements.txt .
 RUN python -m pip install --no-cache-dir --require-hashes -r requirements.txt
 
+# Router embedding model (pinned revision, SHA-256 checked); own layer so code changes reuse it
+COPY scripts/fetch_models.py scripts/fetch_models.py
+RUN python scripts/fetch_models.py
+
 RUN groupadd --gid 10001 simgent && useradd --uid 10001 --gid 10001 --no-create-home simgent
 COPY --chown=10001:10001 . .
 USER 10001:10001
