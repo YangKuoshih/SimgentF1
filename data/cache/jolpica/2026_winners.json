@@ -5,7 +5,7 @@
     "url": "https://api.jolpi.ca/ergast/f1/2026/results/1.json",
     "limit": "100",
     "offset": "0",
-    "total": "15",
+    "total": "17",
     "RaceTable": {
       "position": "1",
       "season": "2026",
@@ -869,37 +869,41 @@
           "season": "2026",
           "round": "16",
           "url": "https://en.wikipedia.org/wiki/2026_Bahrain_Grand_Prix",
-          "raceName": "2026 Bahrain Grand Prix",
+          "raceName": "Bahrain Grand Prix in Malaysia",
           "Circuit": {
-            "circuitId": "bahrain",
-            "url": "https://en.wikipedia.org/wiki/Bahrain_International_Circuit",
-            "circuitName": "Bahrain International Circuit",
+            "circuitId": "sepang",
+            "url": "https://en.wikipedia.org/wiki/Sepang_International_Circuit",
+            "circuitName": "Sepang International Circuit",
             "Location": {
-              "lat": "26.0325",
-              "long": "50.5106",
-              "locality": "Sakhir",
-              "country": "Bahrain"
+              "lat": "2.76083",
+              "long": "101.738",
+              "locality": "Kuala Lumpur",
+              "country": "Malaysia"
             }
           },
           "date": "2026-10-04",
+          "time": "07:00:00Z",
           "Results": [
             {
               "number": "3",
               "position": "1",
               "positionText": "1",
-              "points": "26",
+              "points": "25",
               "Driver": {
                 "driverId": "max_verstappen",
                 "permanentNumber": "3",
                 "code": "VER",
+                "url": "http://en.wikipedia.org/wiki/Max_Verstappen",
                 "givenName": "Max",
                 "familyName": "Verstappen",
-                "nationality": "International"
+                "dateOfBirth": "1997-09-30",
+                "nationality": "Dutch"
               },
               "Constructor": {
                 "constructorId": "red_bull",
+                "url": "https://en.wikipedia.org/wiki/Red_Bull_Racing",
                 "name": "Red Bull",
-                "nationality": "International"
+                "nationality": "Austrian"
               },
               "grid": "1",
               "laps": "55",
@@ -913,6 +917,63 @@
                 "lap": "55",
                 "Time": {
                   "time": "1:38.220"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "season": "2026",
+          "round": "17",
+          "url": "https://en.wikipedia.org/wiki/2026_Singapore_Grand_Prix",
+          "raceName": "Singapore Grand Prix",
+          "Circuit": {
+            "circuitId": "marina_bay",
+            "url": "https://en.wikipedia.org/wiki/Marina_Bay_Street_Circuit",
+            "circuitName": "Marina Bay Street Circuit",
+            "Location": {
+              "lat": "1.2914",
+              "long": "103.864",
+              "locality": "Marina Bay",
+              "country": "Singapore"
+            }
+          },
+          "date": "2026-10-11",
+          "time": "12:00:00Z",
+          "Results": [
+            {
+              "number": "3",
+              "position": "1",
+              "positionText": "1",
+              "points": "25",
+              "Driver": {
+                "driverId": "max_verstappen",
+                "permanentNumber": "3",
+                "code": "VER",
+                "url": "http://en.wikipedia.org/wiki/Max_Verstappen",
+                "givenName": "Max",
+                "familyName": "Verstappen",
+                "dateOfBirth": "1997-09-30",
+                "nationality": "Dutch"
+              },
+              "Constructor": {
+                "constructorId": "red_bull",
+                "url": "https://en.wikipedia.org/wiki/Red_Bull_Racing",
+                "name": "Red Bull",
+                "nationality": "Austrian"
+              },
+              "grid": "1",
+              "laps": "62",
+              "status": "Finished",
+              "Time": {
+                "millis": "6120785",
+                "time": "1:42:00.785"
+              },
+              "FastestLap": {
+                "rank": "5",
+                "lap": "44",
+                "Time": {
+                  "time": "1:36.201"
                 }
               }
             }
