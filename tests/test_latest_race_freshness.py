@@ -117,5 +117,28 @@ class WeekendInProgressTests(LatestRaceFreshnessTests):
         self.assertEqual((latest["year"], latest["round"], latest["session"]), (YEAR, 3, "qualifying"))
 
 
+class NotPublishedYetTests(unittest.TestCase):
+    """Race day: Jolpica has no result yet. It is asked again at most every 10 minutes,
+    not on every page load and chat message."""
+
+    def test_unpublished_result_is_not_refetched_on_every_call(self):
+        calls = []
+
+        def fake_http(url, retries=4):
+            calls.append(url)
+            return _doc([])
+
+        with tempfile.TemporaryDirectory() as cache, patch.object(J, "CACHE", cache), \
+                patch.object(J, "_http", side_effect=fake_http), patch.object(J, "_manifest_record"), \
+                patch.object(J, "_manifest_forget"), patch.dict(J._NOT_PUBLISHED, clear=True):
+            for _ in range(5):
+                self.assertIsNone(J.results(YEAR, 99))
+            self.assertEqual(len(calls), 1)
+            # after the retry interval it asks again
+            J._NOT_PUBLISHED[f"{YEAR}_99_results"] -= J.NOT_PUBLISHED_RETRY_S + 1
+            J.results(YEAR, 99)
+            self.assertEqual(len(calls), 2)
+
+
 if __name__ == "__main__":
     unittest.main()
