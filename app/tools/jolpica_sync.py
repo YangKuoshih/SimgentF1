@@ -230,12 +230,26 @@ def _heal_race_circuit(name: str, doc: Optional[Dict[str, Any]], year: int, rnd:
             pass
 
 
+# Sessions Jolpica had no result for when last asked: name -> time of that request. A race
+# that has just run (or is about to) would otherwise be re-requested on every page load and
+# chat message until Jolpica publishes it.
+_NOT_PUBLISHED: Dict[str, float] = {}
+NOT_PUBLISHED_RETRY_S = 600
+
+
+def _may_fetch(name: str, net: bool) -> bool:
+    return net and time.time() - _NOT_PUBLISHED.get(name, 0.0) > NOT_PUBLISHED_RETRY_S
+
+
 def results(year: int, rnd: int, net: bool = True) -> Optional[Dict[str, Any]]:
     name = f"{year}_{rnd}_results"
-    d = cached(name, f"{BASE}/{year}/{rnd}/results.json?limit=40", net, max_age_s=_recent_max_age(year, rnd))
+    fetch = _may_fetch(name, net)
+    d = cached(name, f"{BASE}/{year}/{rnd}/results.json?limit=40", fetch, max_age_s=_recent_max_age(year, rnd))
     _heal_race_circuit(name, d, year, rnd)
     races = d["MRData"]["RaceTable"]["Races"] if d else []
     if not races:
+        if fetch:
+            _NOT_PUBLISHED[name] = time.time()
         # Do not cache "not yet raced" forever
         p = _path(name)
         if os.path.exists(p):
@@ -248,10 +262,13 @@ def results(year: int, rnd: int, net: bool = True) -> Optional[Dict[str, Any]]:
 def sprint_results(year: int, rnd: int, net: bool = True) -> Optional[Dict[str, Any]]:
     """Fetches official FIA Sprint Race results if the weekend had a Sprint."""
     name = f"{year}_{rnd}_sprint"
-    d = cached(name, f"{BASE}/{year}/{rnd}/sprint.json?limit=40", net, max_age_s=_recent_max_age(year, rnd))
+    fetch = _may_fetch(name, net)
+    d = cached(name, f"{BASE}/{year}/{rnd}/sprint.json?limit=40", fetch, max_age_s=_recent_max_age(year, rnd))
     _heal_race_circuit(name, d, year, rnd)
     races = d["MRData"]["RaceTable"]["Races"] if d else []
     if not races or "SprintResults" not in races[0]:
+        if fetch:
+            _NOT_PUBLISHED[name] = time.time()
         p = _path(name)
         if os.path.exists(p):
             try:
@@ -431,10 +448,13 @@ def sprint_qualifying(year: int, rnd: int, net: bool = True) -> Optional[Dict[st
 def qualifying_results(year: int, rnd: int, net: bool = True) -> Optional[Dict[str, Any]]:
     """Fetches official FIA Qualifying results (Q1, Q2, Q3 lap times and grid)."""
     name = f"{year}_{rnd}_qualifying"
-    d = cached(name, f"{BASE}/{year}/{rnd}/qualifying.json?limit=40", net, max_age_s=_recent_max_age(year, rnd))
+    fetch = _may_fetch(name, net)
+    d = cached(name, f"{BASE}/{year}/{rnd}/qualifying.json?limit=40", fetch, max_age_s=_recent_max_age(year, rnd))
     _heal_race_circuit(name, d, year, rnd)
     races = d["MRData"]["RaceTable"]["Races"] if d else []
     if not races or "QualifyingResults" not in races[0]:
+        if fetch:
+            _NOT_PUBLISHED[name] = time.time()
         p = _path(name)
         if os.path.exists(p):
             try:
