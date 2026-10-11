@@ -176,6 +176,9 @@ class NoAnswerFromAnotherRace(unittest.TestCase):
     def test_a_qualifying_question_is_not_blocked_by_the_missing_race(self):
         if J.results(2026, 17, net=False) or not J.qualifying_results(2026, 17, net=False):
             self.skipTest("needs Singapore qualifying cached and its race not yet")
+        from app.agent.router import get_router
+        if get_router().method != "embedding":
+            self.skipTest("the router only re-asks with the embedding model (scripts/fetch_models.py)")
         r = ask("who got bounced in the first session?", view(2026, 17, "Singapore Grand Prix"), [])
         self.assertEqual(r.get("tool"), "qualifying_segment_lookup")
         self.assertIn("Knocked out in **Q1**", r["text"])
