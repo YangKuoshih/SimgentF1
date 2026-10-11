@@ -277,14 +277,20 @@ class NoSprintWeekend(unittest.TestCase):
 
 class LiveRunFindings(unittest.TestCase):
     """Found by the 373-question Playwright run against the live site (October 2026)."""
-    def test_who_won_the_race_on_a_qualifying_screen_means_the_grand_prix(self):
-        if J.results(2026, 17, net=False):
-            self.skipTest("the 2026 Singapore Grand Prix result is cached now")
-        r = ask("Who won the race?", view(2026, 17, "Singapore Grand Prix", "qualifying"), [])
-        self.assertEqual(r.get("tool"), "race_not_run")
-        r = ask("Who won the race?", view(2026, 16, "Bahrain Grand Prix in Malaysia", "qualifying"), [])
+    def test_who_won_this_race_follows_the_session_on_the_replay(self):
+        # "this race" is whatever is on the replay: qualifying -> P1, sprint -> sprint winner
+        quali = ask("Who won this race?", view(2026, 16, "Bahrain Grand Prix in Malaysia", "qualifying"), [])
+        self.assertEqual(quali.get("tool"), "qualifying_classification_lookup")
+        self.assertIn("was **P1** in Qualifying", quali["text"])
+        sq = ask("Who won the race?", view(2026, 17, "Singapore Grand Prix", "sprint_qualifying"), [])
+        self.assertIn("**Max Verstappen** was **P1** in Sprint Qualifying", sq["text"])
+        sprint = ask("Who won this race?", view(2026, 17, "Singapore Grand Prix", "sprint"), [])
+        self.assertEqual(sprint.get("tool"), "sprint_classification_lookup")
+
+    def test_naming_the_grand_prix_still_means_the_grand_prix(self):
+        r = ask("Who won the grand prix?", view(2026, 16, "Bahrain Grand Prix in Malaysia", "qualifying"), [])
         self.assertIn("Max Verstappen", r["text"])
-        self.assertNotIn("pole", r["text"].lower().split("fastest lap")[0])
+        self.assertIn("Grand Prix", r["text"].strip().splitlines()[-1])
 
     def test_another_season_named_ignores_the_round_on_screen(self):
         r = ask("Who won the sprint in 2024?", view(2026, 16, "Bahrain Grand Prix in Malaysia"), [])
