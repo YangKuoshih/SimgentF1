@@ -2688,16 +2688,16 @@
    "note": "verified against Jolpica 2026-10-08"
   },
   "jolpica/2026_constructorStandings.json": {
-   "source": "https://api.jolpi.ca/ergast/f1/2026/constructorstandings.json",
-   "sha256": "e576c21a8e2defec06e01f6e594ecb90e0347dbb5c82216436782ab9f3e98f03",
-   "fetched_at": "2026-10-08T18:37:48Z",
-   "note": "verified against Jolpica 2026-10-08"
+   "source": "https://api.jolpi.ca/ergast/f1/2026/constructorStandings.json?limit=40",
+   "sha256": "1ced7fbc1a7471ac1c31184acf865a2c09337b52f17d575141de36f60bf2d245",
+   "fetched_at": "2026-10-11T05:44:57Z",
+   "note": "corrected by revalidate"
   },
   "jolpica/2026_driverStandings.json": {
-   "source": "https://api.jolpi.ca/ergast/f1/2026/driverstandings.json",
-   "sha256": "a36de025d9863a322bb9cd37fd7cc5dc4fbbf875b178d0432576c48af3a97a9b",
-   "fetched_at": "2026-10-08T18:28:50Z",
-   "note": "corrected from Jolpica 2026-10-08 (audit)"
+   "source": "https://api.jolpi.ca/ergast/f1/2026/driverStandings.json?limit=40",
+   "sha256": "ea7d884e1d5498916208d1b3873e684beb61f8bebb85d710f091c72c7637d8f4",
+   "fetched_at": "2026-10-11T05:44:58Z",
+   "note": "corrected by revalidate"
   },
   "jolpica/2026_schedule.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026.json",

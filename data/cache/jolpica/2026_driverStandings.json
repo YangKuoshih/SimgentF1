@@ -8,16 +8,16 @@
     "total": "23",
     "StandingsTable": {
       "season": "2026",
-      "round": "16",
+      "round": "17",
       "StandingsLists": [
         {
           "season": "2026",
-          "round": "16",
+          "round": "17",
           "DriverStandings": [
             {
               "position": "1",
               "positionText": "1",
-              "points": "320",
+              "points": "325",
               "wins": "8",
               "Driver": {
                 "driverId": "antonelli",
@@ -65,7 +65,7 @@
             {
               "position": "3",
               "positionText": "3",
-              "points": "214",
+              "points": "221",
               "wins": "1",
               "Driver": {
                 "driverId": "hamilton",
@@ -89,7 +89,7 @@
             {
               "position": "4",
               "positionText": "4",
-              "points": "191",
+              "points": "197",
               "wins": "1",
               "Driver": {
                 "driverId": "leclerc",
@@ -113,31 +113,7 @@
             {
               "position": "5",
               "positionText": "5",
-              "points": "188",
-              "wins": "2",
-              "Driver": {
-                "driverId": "norris",
-                "permanentNumber": "1",
-                "code": "NOR",
-                "url": "http://en.wikipedia.org/wiki/Lando_Norris",
-                "givenName": "Lando",
-                "familyName": "Norris",
-                "dateOfBirth": "1999-11-13",
-                "nationality": "British"
-              },
-              "Constructors": [
-                {
-                  "constructorId": "mclaren",
-                  "url": "https://en.wikipedia.org/wiki/McLaren",
-                  "name": "McLaren",
-                  "nationality": "British"
-                }
-              ]
-            },
-            {
-              "position": "6",
-              "positionText": "6",
-              "points": "188",
+              "points": "196",
               "wins": "1",
               "Driver": {
                 "driverId": "max_verstappen",
@@ -155,6 +131,30 @@
                   "url": "https://en.wikipedia.org/wiki/Red_Bull_Racing",
                   "name": "Red Bull",
                   "nationality": "Austrian"
+                }
+              ]
+            },
+            {
+              "position": "6",
+              "positionText": "6",
+              "points": "189",
+              "wins": "2",
+              "Driver": {
+                "driverId": "norris",
+                "permanentNumber": "1",
+                "code": "NOR",
+                "url": "http://en.wikipedia.org/wiki/Lando_Norris",
+                "givenName": "Lando",
+                "familyName": "Norris",
+                "dateOfBirth": "1999-11-13",
+                "nationality": "British"
+              },
+              "Constructors": [
+                {
+                  "constructorId": "mclaren",
+                  "url": "https://en.wikipedia.org/wiki/McLaren",
+                  "name": "McLaren",
+                  "nationality": "British"
                 }
               ]
             },
@@ -209,7 +209,7 @@
             {
               "position": "9",
               "positionText": "9",
-              "points": "65",
+              "points": "69",
               "wins": "0",
               "Driver": {
                 "driverId": "lawson",
@@ -311,7 +311,7 @@
             {
               "position": "13",
               "positionText": "13",
-              "points": "20",
+              "points": "23",
               "wins": "0",
               "Driver": {
                 "driverId": "bearman",
@@ -359,7 +359,7 @@
             {
               "position": "15",
               "positionText": "15",
-              "points": "7",
+              "points": "9",
               "wins": "0",
               "Driver": {
                 "driverId": "hulkenberg",
