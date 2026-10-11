@@ -625,7 +625,10 @@ def _routed(query: str, context: Optional[Dict[str, Any]], history: Optional[Lis
     tool = resp.get("tool") or ""
     if tool in intent.tools or tool in R.DEFINITIVE_TOOLS:
         return resp
-    if tool not in R.FALLBACK_TOOLS and (route.score < R.OVERRIDE_MIN_SCORE or route.margin < R.OVERRIDE_MARGIN):
+    if tool == "race_not_run" and route.intent in R.RACE_INTENTS:
+        return resp
+    generic = tool in R.FALLBACK_TOOLS or tool == "race_not_run"
+    if not generic and (route.score < R.OVERRIDE_MIN_SCORE or route.margin < R.OVERRIDE_MARGIN):
         return resp
     rewritten = R.canonical(question, intent)
     if not rewritten or rewritten.lower().strip(" ?") == question.lower().strip(" ?"):

@@ -32,10 +32,13 @@ INTENTS_FILE = os.path.join(ROOT, "agent", "intents.toml")
 OVERRIDE_MIN_SCORE = 0.60
 OVERRIDE_MARGIN = 0.10
 FALLBACK_TOOLS = {"session_telemetry_briefing", ""}  # curated memory answers are specific, not fallbacks
-# Correct statements, never overridden: the race hasn't run, the weekend had no sprint, the
-# session isn't in the data.
-DEFINITIVE_TOOLS = {"race_not_run", "no_sprint_weekend", "qualifying_not_in_data", "sprint_not_in_data",
+# Correct statements, never overridden: the weekend had no sprint, the session isn't in the data.
+DEFINITIVE_TOOLS = {"no_sprint_weekend", "qualifying_not_in_data", "sprint_not_in_data",
                     "sprint_qualifying_not_in_data"}
+# "No race result yet" is definitive for questions about the Grand Prix itself, not for
+# qualifying, standings, careers or rules ("who got bounced in the first session?").
+RACE_INTENTS = {"session_result", "finishing_position", "driver_result", "podium_check", "starting_grid",
+                "retirements", "driver_retirement", "fastest_lap", "pit_strategy", "safety_car", "race_story"}
 _SESSION_WORDS = re.compile(r"\b(sprint qualifying|sprint shootout|sprint|qualifying|quali|shootout|grand prix|gp|race)\b")
 
 # Tuned on tests/eval_router.py and its held-out paraphrases (docs/AGENT_ARCHITECTURE.md)
