@@ -63,6 +63,8 @@ marketing_private/
 *.mp4
 *.log
 scripts/
+# ...except the router model fetcher, which the Docker build runs
+!scripts/fetch_models.py
 
 # Private runtime state, local agent configuration, and generated builds
 .aws/
