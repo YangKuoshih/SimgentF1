@@ -32,6 +32,9 @@ jobs:
         run: |
           pip install --require-hashes -r requirements.txt
 
+      - name: Fetch router embedding model (pinned, SHA-256 checked)
+        run: python scripts/fetch_models.py
+
       - name: Run Test Suite
         run: python -m unittest discover tests
 
