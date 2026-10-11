@@ -82,8 +82,8 @@ def cases():
 
         if quali:
             q1 = by_pos(quali["QualifyingResults"], 1)
-            out.append(("qualifying: who won (pole)", view("qualifying"), "Who won?",
-                        [q1["Driver"]["familyName"], "pole", "doesn't have a winner"]))
+            out.append(("qualifying: who won (P1, pole)", view("qualifying"), "Who won?",
+                        [q1["Driver"]["familyName"], "P1", "pole"]))
 
         if race:
             out.append(("race: who won", view("race"), "Who won?", [by_pos(race["Results"], 1)["Driver"]["familyName"]]))

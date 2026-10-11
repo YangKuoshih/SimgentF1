@@ -72,10 +72,6 @@ def resolve_scope(query: str, context: Optional[Dict[str, Any]],
     if (named == "qualifying" and from_screen and screen_session == "sprint_qualifying"
             and not re.search(r"\b(grand prix|gp|main|sunday)\b", q)):
         named = "sprint_qualifying"
-    # Qualifying has no race: "who won the race?" on a qualifying screen means the Grand Prix.
-    if (named is None and from_screen and screen_session in ("qualifying", "sprint_qualifying")
-            and re.search(r"\b(?:the|this|that) race\b", q)):
-        named = "race"
     session = named or (screen_session if from_screen else "race")
     return {"year": year, "round": rnd, "session": session, "from_screen": from_screen,
             "session_from_screen": from_screen and named is None, "race": ctx.get("race") or ""}
@@ -385,13 +381,16 @@ def answer_in_session(query: str, scope: Dict[str, Any], context: Optional[Dict[
         text = f"**{session_name} — top {n}:** {rows}."
     elif is_quali:
         pole_kind = "sprint pole" if session == "sprint_qualifying" else "pole position"
-        no_winner = (f"{session_name} doesn't have a winner; the fastest driver takes {pole_kind}. "
-                     if re.search(r"\b(won|winner|win)\b", q) else "")
+        asked_winner = bool(re.search(r"\b(won|winner|win|first|number one|no\.? ?1|p1)\b", q))
         p2 = top[1] if len(top) > 1 else None
         gap = f", {p2.get('pole_delta')} ahead of **{p2['name']}**" if p2 and str(p2.get("pole_delta", "")).startswith("+") else ""
         lap = f" with **{p1.get('best_lap')}**" if p1.get("best_lap") else ""
         rest = ", ".join(f"P{d.get('finish')} {d['name']}" for d in top[1:])
-        text = f"{no_winner}**{p1['name']}** took **{pole_kind}** for {p1['team']}{lap}{gap}. Top three: P1 {p1['name']}, {rest}."
+        if asked_winner:  # "who won this race?" on a qualifying replay: who was P1
+            text = (f"**{p1['name']}** was **P1** in {session_name} for {p1['team']}, taking {pole_kind}{lap}{gap}. "
+                    f"Top three: P1 {p1['name']}, {rest}.")
+        else:
+            text = f"**{p1['name']}** took **{pole_kind}** for {p1['team']}{lap}{gap}. Top three: P1 {p1['name']}, {rest}."
     else:
         rest = " and ".join(f"**{d['name']}** (P{d.get('finish')})" for d in top[1:])
         grid = f" from P{p1['grid']} on the grid" if isinstance(p1.get("grid"), int) and p1["grid"] > 0 else ""
