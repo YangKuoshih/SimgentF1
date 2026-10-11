@@ -1,0 +1,319 @@
+# Pit Wall Agent intents: what people ask, mapped to the tools that answer it.
+#
+# Each table is one intent. `tools` lists the answer types (the `tool` field of a reply) that
+# serve it; `examples` are ways people ask; `not` lists near misses that belong elsewhere.
+# The router embeds every example and sends a question to the closest intent
+# (docs/AGENT_ARCHITECTURE.md). To teach the agent a new phrasing, add an example here and run
+#   python tests/eval_router.py
+#
+# `requires` names what a question must mention for the intent to apply, `excludes` what it must
+# not ("driver": a driver name or he/his/they, "position": P3/third/runner-up, "year",
+# "segment": Q1-Q3 or SQ1-SQ3); names and years are masked
+# before matching, so the router learns the shape of a question, not who it is about.
+#
+# Write examples the way a person would type them. Use real names and races where it helps;
+# the router learns the shape of the question, the slots (race, driver, session) are parsed
+# separately from the data.
+
+[session_result]
+description = "Who won a race, sprint or session, the podium, top N or full classification"
+excludes = ["segment"]
+tools = ["race_classification_lookup", "sprint_classification_lookup",
+         "qualifying_classification_lookup", "sprint_qualifying_classification_lookup"]
+examples = [
+  "who won",
+  "who won the race",
+  "who won the grand prix",
+  "who took the win today",
+  "who won the sprint",
+  "what was the podium",
+  "who finished on the podium",
+  "show me the top 10",
+  "final classification please",
+  "what were the results",
+  "who came out on top in Monaco",
+  "race result for the British Grand Prix",
+]
+not = ["who won the championship", "how many races has he won"]
+
+[pole_position]
+description = "Pole position or the fastest qualifier, for Grand Prix or Sprint Qualifying"
+excludes = ["segment"]
+tools = ["qualifying_pole_lookup", "sprint_qualifying_lookup", "qualifying_classification_lookup",
+         "sprint_qualifying_classification_lookup"]
+examples = [
+  "who was on pole for the Australian Grand Prix",
+  "who started on pole in that race",
+  "who was fastest",
+  "who was quickest",
+  "who was on pole",
+  "who got pole position",
+  "who took sprint pole",
+  "who was fastest in qualifying",
+  "who qualified first",
+  "who topped qualifying",
+  "pole time at Monza",
+  "who starts from pole tomorrow",
+  "who was quickest in the shootout",
+]
+
+[finishing_position]
+description = "Who finished in a given position"
+requires = ["position"]
+tools = ["driver_finish_position_lookup", "sprint_position_lookup",
+         "qualifying_position_lookup", "sprint_qualifying_position_lookup"]
+examples = [
+  "who finished second in the British Grand Prix",
+  "who came third in that race",
+  "who finished fifth at Monza",
+  "who came second",
+  "who was second in the 2019 race",
+  "who finished second",
+  "who was P3",
+  "who came fourth",
+  "who finished in tenth place",
+  "who was the runner up",
+  "who qualified P2",
+  "who was fifth in the sprint",
+  "who finished just off the podium",
+]
+
+[driver_result]
+description = "How a named driver did in a race or session: position, grid, laps, points"
+requires = ["driver"]
+tools = ["driver_performance_lookup", "driver_classification_lookup", "sprint_driver_lookup",
+         "qualifying_driver_lookup", "sprint_qualifying_driver_lookup", "weekend_driver_summary"]
+examples = [
+  "how did Hamilton do",
+  "where did Leclerc finish",
+  "how did he get on",
+  "what position did Norris finish",
+  "where did Piastri qualify",
+  "how was Alonso's race",
+  "what happened to Russell in the sprint",
+  "how many points did Verstappen score today",
+  "what was Leclerc's best lap",
+  "how did Lindblad do in his first race",
+]
+not = ["how did the race go", "how many podiums does Hamilton have in his career"]
+
+[podium_check]
+description = "Whether a named driver got a podium"
+requires = ["driver"]
+tools = ["driver_podium_verification"]
+examples = [
+  "did Norris get a podium",
+  "was Hamilton on the podium",
+  "did Sainz finish in the top three",
+  "did Russell make the podium today",
+]
+
+[starting_grid]
+description = "Grid positions for a race or sprint, or where a driver started"
+tools = ["starting_grid_lookup", "driver_starting_grid_lookup", "sprint_grid_lookup"]
+examples = [
+  "what was the sprint grid",
+  "what was the grid for the sprint",
+  "what was the starting grid",
+  "where did Verstappen start",
+  "who started second",
+  "show me the grid",
+  "who was on the front row",
+  "what grid slot did Alonso have",
+  "who started from the pit lane",
+  "where did he line up for the sprint",
+]
+
+[qualifying_segments]
+description = "Knockout segments: eliminated in Q1/Q2 (SQ1/SQ2), made Q3, fastest or a driver's time in a segment"
+tools = ["qualifying_segment_lookup", "sprint_qualifying_segment_lookup",
+         "qualifying_segment_driver_lookup", "sprint_qualifying_segment_driver_lookup"]
+examples = [
+  "who was knocked out in Q1",
+  "who got eliminated in Q2",
+  "who didn't make it to Q3",
+  "which drivers made SQ3",
+  "how many cars got through to Q2",
+  "who was fastest in Q2",
+  "who topped SQ1",
+  "did Colapinto set a time in Q2",
+  "what was Hamilton's Q1 time",
+  "who dropped out in the first segment",
+]
+
+[retirements]
+description = "Who retired or did not finish a race or sprint"
+tools = ["dnf_summary_lookup", "sprint_dnf_lookup"]
+examples = [
+  "who retired",
+  "who didn't finish",
+  "were there any DNFs",
+  "how many cars retired",
+  "which drivers dropped out of the race",
+  "list the retirements",
+  "did anyone crash out",
+]
+not = ["who was knocked out in Q1", "when did Hamilton retire from F1"]
+
+[driver_retirement]
+description = "When and why a named driver retired from a race (an incident)"
+requires = ["driver"]
+tools = ["incident_investigation"]
+examples = [
+  "when did Albon retire",
+  "why did Verstappen DNF",
+  "what happened to Leclerc's car",
+  "what lap did Stroll go out on",
+  "why did Senna stop in Monaco 1988",
+  "what caused Hulkenberg's retirement",
+]
+not = ["when did Hamilton retire from Formula 1"]
+
+[fastest_lap]
+description = "Fastest lap of a race"
+excludes = ["segment"]
+tools = ["fastest_lap_lookup"]
+examples = [
+  "who set the fastest lap",
+  "fastest lap of the race",
+  "who had the quickest lap",
+  "what was the fastest race lap",
+  "who got the bonus point for fastest lap",
+]
+
+[pit_strategy]
+description = "Pit stops, tyres and strategy, or how an undercut works"
+tools = ["pit_strategy_profile", "pit_strategy_explanation"]
+examples = [
+  "explain Verstappen's pit strategy",
+  "when did Hamilton pit",
+  "how many stops did Norris make",
+  "what tyres did Leclerc use",
+  "was it a one stop race",
+  "how does an undercut work",
+  "how can I simulate an undercut strategy",
+  "what compound did he start on",
+  "when did VER box",
+]
+
+[safety_car]
+description = "Safety cars, virtual safety cars, red flags and race control"
+tools = ["safety_car_analysis", "race_control_lookup"]
+examples = [
+  "was there a safety car",
+  "when was the safety car deployed",
+  "were there any red flags",
+  "what did race control do",
+  "how many safety car periods were there",
+  "was there a VSC",
+]
+
+[championship_standings]
+description = "Current championship standings, points and the title fight"
+tools = ["championship_standings_lookup"]
+examples = [
+  "who leads the championship",
+  "what are the standings",
+  "how many points does Norris have",
+  "who is leading the constructors championship",
+  "how close is the title fight",
+  "show me the drivers standings",
+]
+
+[season_champion]
+description = "Who won a past world championship"
+tools = ["historical_championship_lookup"]
+examples = [
+  "who won the 2008 championship",
+  "who was world champion in 1994",
+  "who won the title in 2016",
+  "which team won the constructors title in 2010",
+  "who was runner up in the 2021 championship",
+]
+
+[driver_career]
+description = "A driver's career: titles, wins, podiums, poles, seasons"
+requires = ["driver"]
+tools = ["driver_career_history_lookup", "driver_career_milestone_lookup"]
+examples = [
+  "tell me about Ayrton Senna",
+  "how many wins does Hamilton have",
+  "how many podiums does Alonso have",
+  "how many championships did Schumacher win",
+  "when did Hamilton retire from F1",
+  "what is Fangio's career record",
+  "how many poles has Verstappen got",
+]
+
+[head_to_head]
+description = "Comparing two drivers"
+tools = ["driver_head_to_head_comparison"]
+examples = [
+  "Senna vs Prost",
+  "compare Hamilton and Verstappen",
+  "who was better, Schumacher or Hamilton",
+  "Leclerc versus Sainz head to head",
+]
+
+[all_time_records]
+description = "All-time records and leaderboards"
+tools = ["f1_all_time_records_lookup"]
+examples = [
+  "who has the most wins of all time",
+  "most pole positions ever",
+  "who has the most championships",
+  "all time podium leaders",
+  "youngest race winner",
+]
+
+[era_regulations]
+description = "Historic eras and how the rules or cars changed"
+tools = ["f1_era_regulations_lookup"]
+examples = [
+  "tell me about the V10 era",
+  "what was the turbo era",
+  "when did ground effect come back",
+  "how were the cars different in the 1970s",
+]
+
+[regulations_2026]
+description = "The 2026 rules: power units, active aero, hybrid split"
+tools = ["fia_regulations_lookup"]
+examples = [
+  "how does the 2026 power unit work",
+  "explain active aero",
+  "what is X mode and Z mode",
+  "what is the 50/50 hybrid split",
+  "what changed in the 2026 regulations",
+]
+
+[race_story]
+description = "The story of an iconic race, controversy or turning point"
+tools = ["historic_race_moment_lookup"]
+examples = [
+  "what happened in Abu Dhabi 2021",
+  "tell me the story of this race",
+  "why was Senna disqualified in 1989",
+  "what was the controversy at the end",
+  "what was the turning point of the race",
+]
+
+[venue]
+description = "Where a race was held"
+tools = ["race_venue_lookup"]
+examples = [
+  "where was the race held",
+  "which circuit hosted the 2026 Bahrain Grand Prix",
+  "what track is this",
+  "where is the Singapore Grand Prix",
+]
+
+[practice]
+description = "Free practice sessions (not in the data)"
+tools = ["free_practice_telemetry_lookup"]
+examples = [
+  "FP1 lap times",
+  "who was fastest in second practice",
+  "show me the FP3 results",
+  "long run pace in practice",
+]

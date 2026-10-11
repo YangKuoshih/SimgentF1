@@ -420,6 +420,23 @@ class ChatMessage(BaseModel):
             raise ValueError("context too large")
         return v
 
+def _router_shadow(question: str, engine_tool: Optional[str]) -> None:
+    """Step 1 of docs/AGENT_ARCHITECTURE.md: route the question with the semantic router and log
+    whether it agrees with the engine. Logs tool and intent names and scores only, never the
+    question. Never affects the answer."""
+    try:
+        from app.agent.router import get_router
+        router = get_router()
+        route = router.route(question)
+        expected = router.tool_intents().get(engine_tool or "", [])
+        logger.info(json.dumps({"router_shadow": {
+            "engine_tool": engine_tool, "intent": route.intent, "best": route.best,
+            "score": route.score, "margin": route.margin, "method": route.method,
+            "agree": (route.intent in expected) if route.intent and expected else None}}))
+    except Exception as e:  # shadow mode must never break a reply
+        logger.warning(f"router shadow failed: {type(e).__name__}")
+
+
 @app.post("/api/chat")
 async def api_chat(msg: ChatMessage, request: Request):
     client_ip = _client_ip(request)
@@ -502,6 +519,7 @@ async def api_chat(msg: ChatMessage, request: Request):
 
     # Fallback to the deterministic telemetry engine (no external model call)
     resp = race_agent.answer_race_engineer_query(resolved_query, msg.context, history=safe_history)
+    _router_shadow(resolved_query, resp.get("tool"))
     latency = round((time.perf_counter() - start_t) * 1000, 2)
     resp["latency_ms"] = latency
     resp["provider"] = "Pit Wall Telemetry Engine"

@@ -32,6 +32,9 @@ jobs:
           python -m pip check
           python scripts/check_dependency_metadata.py
 
+      - name: Fetch router embedding model (pinned, SHA-256 checked)
+        run: python scripts/fetch_models.py
+
       - name: Run Python Automated Test Suite
         run: |
           python -m unittest discover tests
@@ -54,6 +57,11 @@ jobs:
           python tests/eval_cross_era.py
           python tests/eval_multi_turn.py
           python tests/eval_session_scope.py
+
+      - name: Router shadow eval (agreement with the engine, held-out paraphrases)
+        run: |
+          python tests/eval_router.py --gate
+          python tests/eval_router.py --paraphrases --gate
 
       - name: Set up Node.js 26.11.1
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0

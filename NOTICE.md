@@ -6,6 +6,7 @@ SimgentF1 combines code and data under different licenses.
 |---|---|
 | Source code (everything outside `data/cache/`) | [MIT](LICENSE) |
 | Race data in `data/cache/jolpica/` | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/), from [Jolpica-F1](https://github.com/jolpica/jolpica-f1) ([terms](https://github.com/jolpica/jolpica-f1/blob/main/TERMS.md)) |
+| Router embedding model (downloaded to `models/`, not in the repository) | [MIT](https://huggingface.co/minishlab/potion-base-8M), [minishlab/potion-base-8M](https://huggingface.co/minishlab/potion-base-8M) |
 | Sprint qualifying data in `data/cache/openf1/` | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/), from [OpenF1](https://openf1.org) |
 
 The MIT License does not apply to the data. If you reuse the data, credit the source,

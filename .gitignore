@@ -103,3 +103,6 @@ tests/screenshots/
 # Synthetic fuzz output
 fuzz-artifacts/
 release-artifacts/
+
+# Router embedding model: fetched by scripts/fetch_models.py (pinned, hash-checked)
+models/

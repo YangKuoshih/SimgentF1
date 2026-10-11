@@ -1,6 +1,6 @@
 # Pit Wall Agent architecture: tools, intents, content and an optional model
 
-Status: **proposed**, implemented in four steps (see [Migration](#migration)).
+Status: **step 1 done**; steps 2–4 in progress (see [Migration](#migration)).
 Audience: contributors and maintainers.
 
 ## Goals
@@ -76,23 +76,33 @@ not = ["who retired from the race"]   # near misses that belong elsewhere
 
 TOML is read with Python's standard library (`tomllib`), so this adds no dependency.
 
-**Router.** Each example is embedded once (at startup, cached by content hash). A question is
-embedded and compared with every example by cosine similarity. The top tool wins when:
+**Router** (`app/agent/router.py`).
 
-- its best score is at least `ROUTER_MIN_SCORE` (tuned on the evals), and
-- it beats the best example of a different tool by `ROUTER_MARGIN`, and
-- its required slots can be filled (e.g. a segment tool needs a qualifying session).
+1. **Masking.** Driver, race, circuit and country names and years are removed from examples and
+   questions before matching (the name lists come from the cached data, not from code), so the
+   router learns the *shape* of a question ("who finished second in the grand prix"), not who
+   or where it is about. Without masking, "How did Verstappen do?" matched an example that
+   happened to mention Verstappen.
+2. **Scoring.** Each example scores 0.7 × cosine similarity of the static embeddings plus
+   0.3 × BM25 keyword overlap (exact terms like "Q1", "pole", "DNF" matter). An intent scores
+   the mean of its two best examples.
+3. **Slots.** An intent can `require` or `exclude` what the question mentions: `driver` (a
+   driver name, or he/his/they), `position` (P3, third, runner-up), `year`, `segment`
+   (Q1–Q3, SQ1–SQ3). `finishing_position` requires a position; `fastest_lap` excludes a
+   segment, so "fastest lap of Q1" can't go there.
+4. **Near misses.** `not` examples rule an intent out when the question is closer to them.
+5. **Abstain** when the best score is below `MIN_SCORE` (0.40) or within `MARGIN` (0.02) of the
+   runner-up. An abstention falls back to the current engine; a wrong route is worse than none.
 
-Otherwise the router abstains and the current behaviour applies (step 1–3) or the general
-briefing answers (end state). `not` examples push a near-miss question away from a tool.
-
-**Embedding model.** `minishlab/potion-base-8M` static embeddings (MIT licence, about 30 MB,
-under a millisecond per question on CPU). It is run with only `tokenizers` and `numpy`: a
-static model is a token-embedding table, so a question's vector is the normalised mean of its
-token vectors. The files are downloaded at build time from a pinned revision and checked against
-SHA-256 hashes (`scripts/fetch_models.py`), never committed. Without the files (e.g. a quick
-clone without running the script), the router falls back to a lexical scorer (BM25 over the same
-examples) so the app still works.
+**Embedding model.** `minishlab/potion-base-8M` static embeddings (MIT licence, 30 MB,
+about 0.1 ms per question on CPU). A static model is a token-embedding table, so a question's
+vector is the normalised mean of its token vectors. It runs with **numpy only**: the BERT
+WordPiece tokenizer is implemented in Python (`app/agent/embedding.py`) and matches the
+reference `tokenizers` library id for id on 4,792 test strings. The files are downloaded at
+build time from a pinned revision and checked against SHA-256 hashes
+(`scripts/fetch_models.py`), never committed. Without them, the router falls back to BM25 alone
+so a fresh clone still works. The 4× larger `potion-base-32M` was tried: one more paraphrase
+right out of 81, not worth 130 MB.
 
 Why not a hosted embedding API: a key, a cost and a network call for every question. Why not
 `fastembed`/ONNX: no build for Python 3.14 yet, and a much larger dependency tree.
@@ -181,7 +191,7 @@ The hosted demo stays on `none` until a model is deliberately enabled and evalua
 
 | You want to | Edit | Check |
 |---|---|---|
-| Teach the agent a new way to ask something | add examples to `agent/intents.toml` | `python tests/eval_router.py` |
+| Teach the agent a new way to ask something | add examples to `agent/intents.toml` (never copy from `tests/router_paraphrases.toml`) | `python tests/eval_router.py` and `--paraphrases` |
 | Add or fix a race story, rule or definition | add/edit a file in `content/` | `python -m unittest tests.test_content` |
 | Answer a new kind of question | add a tool in `app/agent/tools/` and its intents | unit test + evals |
 
@@ -189,18 +199,25 @@ The hosted demo stays on `none` until a model is deliberately enabled and evalua
 
 Each step is its own pull request; all evals must keep their scores.
 
-1. **Tool registry and intents, router in shadow mode.** Add `agent/intents.toml`, the embedding
-   model and the router. Production answers are unchanged; the router runs alongside the current
-   code in the evals and in `tests/eval_router.py`, which reports how often it picks the same
-   tool. Exit: the router agrees on ≥ 95% of eval questions, and every disagreement is reviewed
-   (either the intents gain examples or the current code is shown to be wrong).
+1. **Intents and router in shadow mode** (done). `agent/intents.toml` (22 intents), the
+   embedding model and the router. Production answers are unchanged; the API logs, for every
+   engine answer, which intent the router would have chosen (names and scores only, never the
+   question). `tests/eval_router.py` gates CI:
+   - agreement with the engine on the 419 unique eval questions: **99.8%** (418/419), no
+     abstentions. The eval questions are template-heavy, so this mostly shows the router covers
+     what the engine answers today;
+   - **held-out paraphrases** (`tests/router_paraphrases.toml`, 81 questions written separately,
+     never copied into the intents): **74% right, 2 wrong, 19 abstained**. This is the honest
+     measure of new phrasings; the abstentions are the work list for step 3.
+   Exit met: ≥ 95% agreement; paraphrases ≤ 3 wrong and ≥ 70% right.
 2. **Content out of code.** Move race stories, retirement write-ups and regulations into
    `content/` with sources; tools read them; semantic search over them for explain/why
    questions; answers cite sources. Exit: identical eval scores, content facts checked
    against data.
 3. **Router in charge.** Tools become registered functions; the router chooses the tool and the
    regex dispatch in `_answer_core` is removed tool by tool, each removal guarded by the evals.
-   Questions the router can't place get the general briefing. Exit: evals unchanged, plus a
+   While the router abstains on a question, the current dispatch answers it; the general
+   briefing only once paraphrase coverage is high. Exit: evals unchanged, plus a
    paraphrase eval (new phrasings of every eval question) that the regex version fails.
 4. **Optional model via ADK.** `SIMGENT_LLM`, the ADK agent over the same registry, the fact
    checker and timeouts. Exit: with `SIMGENT_LLM=ollama` (Gemma 4 E2B) the evals keep their
@@ -208,7 +225,6 @@ Each step is its own pull request; all evals must keep their scores.
 
 ## Open questions
 
-- Router thresholds (`ROUTER_MIN_SCORE`, `ROUTER_MARGIN`) are set from the step 1 agreement data.
 - Whether to keep thumbs-up feedback as runtime memory, or turn reviewed feedback into intent
   examples and content through pull requests (more durable, reviewable). Proposal: the latter.
 - Whether the hosted demo enables a model at all, decided after measuring step 4 on real traffic.
