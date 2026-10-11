@@ -2,6 +2,31 @@
 
 ## Unreleased
 
+## v1.5.0 — 2026-10-11
+
+### Added
+- **Semantic intent router** (`app/agent/router.py`, `agent/intents.toml`): 22 kinds of question with example phrasings, matched with potion-base-8M static embeddings (numpy only, pinned and SHA-256 checked, about 0.1 ms per question) blended with BM25; names and years are masked so it learns the shape of a question. When it is confident the engine misread a question, the engine is asked again in that intent's canonical phrasing; definitive answers ("no race result yet", "no sprint that weekend") are never replaced. Held-out paraphrases answered correctly end to end: 63% → 75%, none broken (CI gate). See `docs/AGENT_ARCHITECTURE.md`.
+- **Content out of code**: race stories, eras, retirement write-ups and the 2026 regulations live in `content/*.md` with sources; answers from them show "Source: content/…" linked to the file. Facts in content are checked against the race data (the first check corrected Schumacher's Spa 1998 lap count to 25).
+- **Sprint and Qualifying from OpenF1** until Jolpica publishes, in Jolpica's format; the sprint grid comes from OpenF1's position feed (identical to Jolpica's on every 2026 sprint).
+- **Hands-off data pipeline**: verified data is published to `main` by a deploy key limited to the `main` branch and to `data/cache/`, then deployed; deploys also run on every merge to `main`.
+- **Race weekends in progress** open on their newest session; sessions that ended without results show "results pending".
+- Session picker on phones; weekend summaries.
+
+### Changed
+- **Qualifying replays are a knockout**: each segment's cars run one flying lap at their real time, knocked-out drivers leave the track (OUT Q1 / OUT Q2), and the timing tower builds live instead of showing the final order. Seasons before 2006 replay as one session.
+- **"Who won this race?" follows the replay**: P1 on qualifying screens, the sprint winner on the sprint; naming the Grand Prix still means the Grand Prix.
+- The Pit Wall Agent answers qualifying segment questions (knocked out in Q1, made Q3, fastest in Q2, a driver's time in a segment).
+
+### Fixed
+- Questions about a race that has not run no longer get another race's result (the season's first race was used).
+- "Who started P3" returned Jackie Stewart's career profile ("started" fuzzy-matched "Stewart").
+- The whole starting grid had no answer; free practice questions returned race results.
+- Estimated qualifying (grid order when the classification is missing) no longer quotes made-up lap times.
+- The 2026 Singapore sprint grid had two cars on P1.
+- Unpublished results were re-requested from Jolpica on every page load and chat message.
+- Pages are revalidated on every visit, so deploys show without a hard refresh.
+- Driver exit questions in qualifying and sprint, readable over-long question errors, no made-up sprints, and three answers found by a 373-question live browser run.
+
 ## v1.4.0 — 2026-10-09
 
 ### Security
