@@ -61,7 +61,7 @@ class TextPositions(unittest.TestCase):
 
 
 class FallbackUntilJolpicaPublishes(unittest.TestCase):
-    """2026 R17 (Singapore) has no Jolpica sprint or qualifying in the cache."""
+    """2026 R17 (Singapore), with Jolpica's sprint and qualifying hidden."""
 
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
@@ -75,8 +75,22 @@ class FallbackUntilJolpicaPublishes(unittest.TestCase):
         for name, doc in (("2026_17_sprint", rows), ("2026_17_qualifying", quali)):
             with open(os.path.join(self.tmp.name, f"{name}.json"), "w") as f:
                 json.dump(doc, f)
+        # As if Jolpica hadn't published this round's sprint and qualifying yet (it has since).
+        # Their cache paths point nowhere, so nothing real is read or deleted.
+        hidden = ("2026_17_sprint", "2026_17_qualifying")
+        real_cached, real_path = J.cached, J._path
+
+        def unpublished(name, *args, **kwargs):
+            return None if name in hidden else real_cached(name, *args, **kwargs)
+
+        def path(name):
+            return os.path.join(self.tmp.name, "hidden", f"{name}.json") if name in hidden else real_path(name)
+
         self.patches = [patch.object(J, "OPENF1_CACHE", self.tmp.name),
-                        patch.object(J, "_http", lambda url, retries=4: None)]
+                        patch.object(J, "_http", lambda url, retries=4: None),
+                        patch.object(J, "cached", side_effect=unpublished),
+                        patch.object(J, "_path", side_effect=path),
+                        patch.object(J, "_manifest_forget")]
         for p in self.patches:
             p.start()
 
