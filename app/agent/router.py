@@ -31,7 +31,7 @@ INTENTS_FILE = os.path.join(ROOT, "agent", "intents.toml")
 # needs this much more confidence than replacing a generic fallback.
 OVERRIDE_MIN_SCORE = 0.60
 OVERRIDE_MARGIN = 0.10
-FALLBACK_TOOLS = {"session_telemetry_briefing", "telemetry_memory_retrieval", ""}
+FALLBACK_TOOLS = {"session_telemetry_briefing", ""}  # curated memory answers are specific, not fallbacks
 # Correct statements, never overridden: the race hasn't run, the weekend had no sprint, the
 # session isn't in the data.
 DEFINITIVE_TOOLS = {"race_not_run", "no_sprint_weekend", "qualifying_not_in_data", "sprint_not_in_data",

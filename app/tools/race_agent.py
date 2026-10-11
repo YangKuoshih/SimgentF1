@@ -616,6 +616,8 @@ def _routed(query: str, context: Optional[Dict[str, Any]], history: Optional[Lis
     from app.agent import router as R
     question = resolve_follow_up(query, scope_history_to_view(history, context))
     router = R.get_router()
+    if router.method != "embedding":
+        return resp  # keyword-only scores aren't calibrated for overriding answers; shadow only
     route = router.route(question)
     if not route.intent:
         return resp

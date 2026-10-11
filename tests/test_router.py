@@ -129,6 +129,24 @@ class CanonicalPhrasingTests(unittest.TestCase):
                 self.assertIn(tool, intent.tools, f"{intent.name}: {q!r} answered by {tool}")
 
 
+class OverrideSafetyTests(unittest.TestCase):
+    Q = "What tires were used by red bull for max verstappens win during the 2026 Bahrain GP?"
+
+    def test_no_override_without_the_embedding_model(self):
+        # the keyword-only fallback once replaced a curated tyre answer with the race result
+        from unittest.mock import patch
+        from app.agent import router as R
+        from app.tools import jolpica_sync as J
+        from app.tools import race_agent as A
+        lexical = Router(load_intents(), None)
+        with patch.object(J, "_http", lambda url, retries=4: None), patch.object(R, "get_router", lambda: lexical):
+            self.assertEqual(A.answer_race_engineer_query(self.Q).get("tool"), A._answer_once(self.Q).get("tool"))
+
+    def test_curated_memory_answers_are_not_fallbacks(self):
+        from app.agent import router as R
+        self.assertNotIn("telemetry_memory_retrieval", R.FALLBACK_TOOLS)
+
+
 class ShadowLoggingTests(unittest.TestCase):
     def test_logs_names_and_scores_never_the_question(self):
         from frontend import main as M
