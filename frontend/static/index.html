@@ -4497,6 +4497,15 @@
     `;
   }
 
+  // Content-backed answers cite their file (stories, eras, retirements, regulations in content/).
+  const CONTENT_SOURCE = /^content\/[a-z0-9_\/-]+\.md$/;
+  function renderSources(sources) {
+    const ok = (Array.isArray(sources) ? sources : []).filter(p => typeof p === 'string' && CONTENT_SOURCE.test(p));
+    if (!ok.length) return '';
+    const links = ok.map(p => `<a class="underline decoration-dotted hover:text-slate-200" target="_blank" rel="noopener noreferrer" href="https://github.com/YangKuoshih/SimgentF1/blob/main/${esc(p)}">${esc(p)}</a>`).join(', ');
+    return `<div class="text-[10px] font-mono text-slate-500" data-sources>Source: ${links}</div>`;
+  }
+
   function renderAssistantMessageHtml(msg) {
     const msgId = msg.id || ('chat-msg-' + Date.now());
     let providerBadge = 'TELEMETRY';
@@ -4524,6 +4533,7 @@
 
         <div class="text-slate-200 leading-relaxed font-sans">${formattedText}</div>
         ${cardHtml}
+        ${renderSources(msg.sources)}
         ${renderFeedbackBar(msgId)}
       </div>
     `;
@@ -4658,6 +4668,7 @@
         tier: res.tier || 'Deterministic Telemetry',
         tool: res.tool || '',
         a2ui_card: res.a2ui_card || null,
+        sources: Array.isArray(res.sources) ? res.sources : [],
         timestamp: Date.now(),
         context: context,
         view: userMsg.view

@@ -9,6 +9,7 @@ import datetime
 import re
 import contextvars
 from typing import Dict, Any, List, Optional, Tuple
+from app.agent import content as _content
 from app.tools import race_replay, f1_telemetry, f1_history
 from app.tools import jolpica_sync as J
 from app.tools.agent_memory import memory_manager
@@ -388,160 +389,9 @@ def _match_race_round(q: str, races: List[Dict[str, Any]]) -> Optional[int]:
     return None
 
 
-CURATED_RETIREMENTS = {
-    # 2026 Bahrain GP in Malaysia (Sepang). Laps and stops: Jolpica race result and pit
-    # stops. Albon's gearbox problem: grandprix.com race analysis. Russell's
-    # cause has not been published, so none is stated.
-    (2026, "sepang", "ALB"): {
-        "exit_lap": 42,
-        "completed_laps": 41,
-        "cause": "Gearbox problem; stopped on track",
-        "explanation": (
-            "**Alexander Albon (#23 Williams)** retired from the 2026 Bahrain Grand Prix (held at Sepang) on **Lap 42**.\n\n"
-            "• **Completed Laps**: 41 full laps.\n"
-            "• **Retirement Race Lap**: **Lap 42** (of 55 laps).\n"
-            "• **Cause**: Stopped on track with a gearbox problem.\n"
-            "• **Race Impact**: His stop brought out a Virtual Safety Car, then a full Safety Car; Verstappen made his third pit stop under it on Lap 43."
-        ),
-        "action": "JUMP TO LAP 42 REPLAY"
-    },
-    (2026, "sepang", "BOT"): {
-        "exit_lap": 8,
-        "completed_laps": 7,
-        "cause": "Went off track at the end of Lap 8",
-        "explanation": (
-            "**Valtteri Bottas (#77 Cadillac)** retired from the 2026 Bahrain Grand Prix (held at Sepang) on **Lap 8**.\n\n"
-            "• **Completed Laps**: 7 full laps.\n"
-            "• **Retirement Race Lap**: **Lap 8** (of 55 laps).\n"
-            "• **Cause**: Went off track at the end of Lap 8 in wet conditions.\n"
-            "• **Race Impact**: Triggered the first Safety Car (Laps 9–12); most of the field switched from intermediates to slicks on Lap 9."
-        ),
-        "action": "JUMP TO LAP 8 REPLAY"
-    },
-    (2026, "sepang", "RUS"): {
-        "exit_lap": 50,
-        "completed_laps": 49,
-        "cause": "Stopped on track under the Safety Car (cause not published)",
-        "explanation": (
-            "**George Russell (#63 Mercedes)** retired from the 2026 Bahrain Grand Prix (held at Sepang) on **Lap 50**.\n\n"
-            "• **Completed Laps**: 49 full laps (classified 20th).\n"
-            "• **Retirement Race Lap**: **Lap 50**, during the late Safety Car period.\n"
-            "• **Cause**: Stopped on track; no official cause has been published.\n"
-            "• **Race Impact**: Antonelli and Hamilton completed the podium behind Verstappen."
-        ),
-        "action": "JUMP TO LAP 50 REPLAY"
-    },
-    (2026, "baku", "STR"): {
-        "exit_lap": 9,
-        "completed_laps": 7,
-        "cause": "Loss of water pressure / terminal engine cooling failure",
-        "explanation": (
-            "**Lance Stroll (#18 Aston Martin)** exited the 2026 Azerbaijan Grand Prix on **Lap 9**.\n\n"
-            "• **Completed Laps**: 7 full laps (Fastest Lap: 1:51.723 on Lap 7).\n"
-            "• **Retirement Race Lap**: **Lap 9** (official Race Control timing / media consensus).\n"
-            "• **Primary Cause**: Loss of water pressure / terminal engine cooling failure.\n"
-            "• **Incident Telemetry**: Starting P22, Stroll was running on Lap 8 when alarms triggered on the Aston Martin pit wall. "
-            "The team instructed him over the radio to pull off immediately and shut down the power unit. Stroll parked in the **Turn 15 runoff escape area** on Lap 8. "
-            "Because the leaders were running ~38 seconds ahead, race leader George Russell crossed the line to begin **Lap 9** when Race Control officially neutralized the sector with yellow flags and logged Stroll's retirement.\n"
-            "• **Paddock Exchange**: Following his exit, Stroll had a widely publicized, heated exchange with a track safety marshal after expressing frustration at having to wait behind the perimeter barrier rather than being escorted immediately back to the paddock."
-        ),
-        "action": "JUMP TO LAP 9 REPLAY"
-    },
-    (2024, "albert_park", "HAM"): {
-        "exit_lap": 17,
-        "completed_laps": 15,
-        "cause": "Power Unit (ICE) catastrophic failure",
-        "explanation": (
-            "**Lewis Hamilton (#44 Mercedes)** retired from the 2024 Australian Grand Prix on **Lap 17**.\n\n"
-            "• **Completed Laps**: 15 full laps.\n"
-            "• **Retirement Race Lap**: **Lap 17**.\n"
-            "• **Primary Cause**: Sudden Power Unit (Internal Combustion Engine) catastrophic failure.\n"
-            "• **Incident Telemetry**: Running in P9 on Lap 17, Hamilton suffered a sudden complete loss of engine drive exiting Turn 10. "
-            "He reported 'Engine failure' over the team radio and steered the car onto the grass at Turn 11 before stopping. "
-            "Race Control deployed the Virtual Safety Car (VSC) on Lap 17 to recover his Mercedes W15."
-        ),
-        "action": "JUMP TO LAP 17 REPLAY"
-    },
-    (2024, "albert_park", "VER"): {
-        "exit_lap": 4,
-        "completed_laps": 3,
-        "cause": "Right-rear brake caliper seizure & fire",
-        "explanation": (
-            "**Max Verstappen (#1 Red Bull)** retired from the 2024 Australian Grand Prix on **Lap 4**.\n\n"
-            "• **Completed Laps**: 3 full laps.\n"
-            "• **Retirement Race Lap**: **Lap 4**.\n"
-            "• **Primary Cause**: Right-rear brake caliper stuck locked from lights out, leading to extreme brake overheating and fire.\n"
-            "• **Incident Telemetry**: From the race start, Verstappen reported the car felt like 'driving with the handbrake on'. Carlos Sainz passed him for the lead on Lap 2, and thick smoke poured from the right-rear wheel before the brake assembly exploded as he entered pit lane on Lap 4 to retire, ending his 43-race consecutive finish streak."
-        ),
-        "action": "JUMP TO LAP 4 REPLAY"
-    },
-    (2021, "silverstone", "VER"): {
-        "exit_lap": 1,
-        "completed_laps": 0,
-        "cause": "51G collision with Lewis Hamilton at Copse",
-        "explanation": (
-            "**Max Verstappen (#33 Red Bull)** crashed out of the 2021 British Grand Prix on **Lap 1**.\n\n"
-            "• **Completed Laps**: 0 laps (Lap 1 incident).\n"
-            "• **Retirement Race Lap**: **Lap 1**.\n"
-            "• **Primary Cause**: High-speed wheel-to-wheel contact with Lewis Hamilton at Copse corner (51G barrier impact).\n"
-            "• **Incident Telemetry**: Contesting the race lead down the Wellington and National pit straights, Hamilton attempted an inside move into the 290 km/h Copse corner. Hamilton's front-left touched Verstappen's right-rear, causing an immediate rear tyre failure that pitched Verstappen through the gravel trap into the tyre wall at 51G. The race was red-flagged immediately."
-        ),
-        "action": "JUMP TO LAP 1 REPLAY"
-    },
-    (2021, "yas_marina", "LAT"): {
-        "exit_lap": 53,
-        "completed_laps": 50,
-        "cause": "Single-car barrier crash at Turn 14",
-        "explanation": (
-            "**Nicholas Latifi (#6 Williams)** crashed and retired from the 2021 Abu Dhabi Grand Prix on **Lap 53**.\n\n"
-            "• **Completed Laps**: 50 full laps.\n"
-            "• **Retirement Race Lap**: **Lap 53**.\n"
-            "• **Primary Cause**: Rear-end snap into the barrier under dirty air at Turn 14.\n"
-            "• **Incident Telemetry**: While battling Mick Schumacher for P15, Latifi ran wide off-line, gathered marbles on his tyres, and lost control under braking into Turn 14, slamming the barrier. "
-            "His stranded Williams necessitated the Lap 53 Safety Car that directly set up the famous final-lap title shootout between Verstappen and Hamilton."
-        ),
-        "action": "JUMP TO LAP 53 REPLAY"
-    },
-    (1998, "spa", "MSC"): {
-        "exit_lap": 25,
-        "completed_laps": 24,
-        "cause": "Torrential rain collision with lapped David Coulthard",
-        "explanation": (
-            "**Michael Schumacher (#3 Ferrari)** retired from the torrential 1998 Belgian Grand Prix on **Lap 25**.\n\n"
-            "• **Completed Laps**: 24 full laps.\n"
-            "• **Retirement Race Lap**: **Lap 25**.\n"
-            "• **Primary Cause**: Collision with David Coulthard's McLaren in zero-visibility spray.\n"
-            "• **Incident Telemetry**: Schumacher led the race by over 40 seconds in torrential rain. Approaching Coulthard to lap him on the descent to Pouhon, Coulthard eased off the throttle while remaining directly on the racing line in blinding spray. Schumacher unsighted rear-ended the McLaren, ripping off his Ferrari's right-front suspension. Both cars limped back to the pit lane, leading to the infamous scene of Schumacher storming into the McLaren garage."
-        ),
-        "action": "JUMP TO LAP 25 REPLAY"
-    },
-    (2024, "monaco", "PER"): {
-        "exit_lap": 1,
-        "completed_laps": 0,
-        "cause": "Beau Rivage high-speed collision with Kevin Magnussen",
-        "explanation": (
-            "**Sergio Pérez (#11 Red Bull)** retired from the 2024 Monaco Grand Prix on **Lap 1**.\n\n"
-            "• **Completed Laps**: 0 laps (Lap 1 incident).\n"
-            "• **Retirement Race Lap**: **Lap 1**.\n"
-            "• **Primary Cause**: Heavy collision on the climb up Beau Rivage with Kevin Magnussen's Haas.\n"
-            "• **Incident Telemetry**: Heading up the hill toward Massenet on the opening lap, Magnussen attempted to squeeze up the inside of Pérez into a closing gap. The cars touched, sending Pérez's Red Bull into the barrier and ricocheting back across the track to collect Nico Hülkenberg. The chassis was completely destroyed, triggering a 45-minute red flag."
-        ),
-        "action": "JUMP TO LAP 1 REPLAY"
-    },
-    (1988, "monza", "SEN"): {
-        "exit_lap": 49,
-        "completed_laps": 48,
-        "cause": "Chicane collision with Jean-Louis Schlesser",
-        "explanation": (
-            "**Ayrton Senna (#12 McLaren-Honda)** retired from the 1988 Italian Grand Prix on **Lap 49**.\n\n"
-            "• **Completed Laps**: 48 full laps.\n"
-            "• **Retirement Race Lap**: **Lap 49** (of 51 laps).\n"
-            "• **Primary Cause**: Collision at the Rettifilo Chicane while attempting to lap Jean-Louis Schlesser's Williams.\n"
-            "• **Incident Telemetry**: Senna had led comfortably from pole position and was only 2 laps away from victory, which would have preserved McLaren's clean sweep of all 16 races in 1988. Heading into the Prima Variante chicane, Schlesser locked up and went wide. As Senna cut inside, Schlesser turned back across the kerb, launching Senna's McLaren onto the kerbing with damaged suspension, handing Ferrari's Gerhard Berger an emotional 1-2 victory weeks after Enzo Ferrari's passing."
-        ),
-        "action": "JUMP TO LAP 49 REPLAY"
-    }
-}
+# Curated retirement write-ups live in content/retirements/*.md, with their sources; the
+# laps they state are checked against Jolpica-F1 in tests/test_content.py.
+CURATED_RETIREMENTS = _content.retirements()
 
 
 
@@ -923,7 +773,8 @@ def _answer_core(
             "text": story_data["text"],
             "tool": "historic_race_moment_lookup",
             "intent": "Iconic Formula 1 Historical Turning Point & Drama Analysis",
-            "a2ui_card": story_data["card"]
+            "a2ui_card": story_data["card"],
+            "sources": [_content.source_of("races", id=story_data["story"]["id"])],
         }
 
     # B. Head-to-Head Driver Comparisons (e.g. Senna vs Prost, Hamilton vs Schumacher)
@@ -1213,7 +1064,8 @@ def _answer_core(
                 "text": era_data["text"],
                 "tool": "f1_era_regulations_lookup",
                 "intent": "FIA Technical Regulations & Historical Era Profile",
-                "a2ui_card": era_data["card"]
+                "a2ui_card": era_data["card"],
+                "sources": [_content.source_of("eras", id=era_data["era_id"])],
             }
 
     # 1. DRIVER-SPECIFIC & RETIREMENT / DNF / EXIT QUERIES
@@ -1354,9 +1206,12 @@ def _answer_core(
                 CURATED_RETIREMENTS.get((year, cid, did))
             )
             if curated:
+                source = (_content.source_of("retirements", year=year, circuit_id=cid, driver=code)
+                          or _content.source_of("retirements", year=year, circuit_id=cid, driver=did))
                 return {
                     "role": "assistant",
                     "text": curated["explanation"],
+                    "sources": [source] if source else [],
                     "tool": "incident_investigation",
                     "intent": "Curated Historical Incident Telemetry & Steward Report",
                     "a2ui_card": {
@@ -2043,27 +1898,14 @@ def _answer_core(
     ]) or ("2026" in q and any(w in q for w in ["engine", "rule", "spec", "aero", "power", "change", "new rule", "chassis"]))
 
     if is_reg_query:
+        reg = _content.regulation("2026-technical")  # content/regulations/2026-technical.md
         return {
             "role": "assistant",
-            "text": (
-                "The 2026 technical regulations introduce an exact **50/50 power split** between the 535 hp internal combustion engine and 350 kW (470 hp) MGU-K on 100% sustainable drop-in e-fuel. DRS is replaced by **Active Aerodynamics** (high-downforce Z-Mode and low-drag X-Mode) alongside an electrical **Manual Overtake Mode** boost."
-            ),
+            "text": reg["text"],
             "tool": "fia_regulations_lookup",
-            "intent": "FIA Formula 1 Technical Regulations Architecture",
-            "a2ui_card": {
-                "type": "regulations_card",
-                "title": "2026 Technical Regulations Matrix",
-                "metrics": [
-                    {"label": "MGU-K Output", "value": "350 kW (470 hp)", "color": "#00F5D4"},
-                    {"label": "ICE Output", "value": "400 kW (535 hp)", "color": "#FFFFFF"},
-                    {"label": "Aero Profile", "value": "Active Aero (X/Z-Mode)", "color": "#A855F7"},
-                    {"label": "Fuel Specification", "value": "100% Drop-In E-Fuel", "color": "#10B981"}
-                ],
-                "action": "VIEW REGULATIONS TAB",
-                "target": {
-                    "action_type": "open_regulations"
-                }
-            }
+            "intent": reg["intent"],
+            "a2ui_card": reg["card"],
+            "sources": [_content.source_of("regulations", id="2026-technical")],
         }
 
 

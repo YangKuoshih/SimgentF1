@@ -1,6 +1,6 @@
 # Pit Wall Agent architecture: tools, intents, content and an optional model
 
-Status: **step 1 done**; steps 2–4 in progress (see [Migration](#migration)).
+Status: **steps 1–2 done**; steps 3–4 in progress (see [Migration](#migration)).
 Audience: contributors and maintainers.
 
 ## Goals
@@ -210,10 +210,16 @@ Each step is its own pull request; all evals must keep their scores.
      never copied into the intents): **74% right, 2 wrong, 19 abstained**. This is the honest
      measure of new phrasings; the abstentions are the work list for step 3.
    Exit met: ≥ 95% agreement; paraphrases ≤ 3 wrong and ≥ 70% right.
-2. **Content out of code.** Move race stories, retirement write-ups and regulations into
-   `content/` with sources; tools read them; semantic search over them for explain/why
-   questions; answers cite sources. Exit: identical eval scores, content facts checked
-   against data.
+2. **Content out of code** (done). 9 race stories, 10 eras, 11 retirement write-ups and the
+   2026 regulations moved to `content/` (about 600 lines of prose out of Python). The loader
+   (`app/agent/content.py`) rebuilds exactly the structures the code used (verified equal
+   before the literals were deleted), so every eval kept its score. Answers from content
+   carry `sources` and the chat shows "Source: content/…" linked to the file. Semantic search
+   over content (same hybrid scoring as the router, names not masked) replaces the arbitrary
+   default in the era lookup. `tests/test_content.py` checks content facts against the data;
+   its first run caught a wrong lap count (Schumacher, Spa 1998: 24 → 25). Driver profiles
+   (`f1_history.HISTORICAL_DRIVERS`) stay in code for now: they are mostly statistics that
+   the data refresh keeps current, not prose.
 3. **Router in charge.** Tools become registered functions; the router chooses the tool and the
    regex dispatch in `_answer_core` is removed tool by tool, each removal guarded by the evals.
    While the router abstains on a question, the current dispatch answers it; the general
