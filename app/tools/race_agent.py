@@ -6,6 +6,8 @@ and FIA technical regulations. Returns authoritative text plus rich A2UI cards.
 """
 
 import datetime
+import logging
+import os
 import re
 import contextvars
 from typing import Dict, Any, List, Optional, Tuple
@@ -13,6 +15,8 @@ from app.agent import content as _content
 from app.tools import race_replay, f1_telemetry, f1_history
 from app.tools import jolpica_sync as J
 from app.tools.agent_memory import memory_manager
+
+logger = logging.getLogger("simgent.agent")
 
 # Alias dictionary for robust driver resolution (modern + historical legends)
 DRIVER_ALIASES = {
@@ -590,7 +594,55 @@ def answer_race_engineer_query(
     context: Optional[Dict[str, Any]] = None,
     history: Optional[List[Dict[str, Any]]] = None
 ) -> Dict[str, Any]:
-    """Main entry point. The race and session on screen are the default scope for questions
+    """Main entry point: the engine answers, then the semantic router checks the answer fits
+    what was asked (docs/AGENT_ARCHITECTURE.md, step 3a)."""
+    resp = _answer_once(query, context, history)
+    if os.environ.get("SIMGENT_ROUTER", "on") == "off":
+        return resp
+    try:
+        return _routed(query, context, history, resp)
+    except Exception as e:  # the router must never break an answer
+        logger.warning(f"router failed: {type(e).__name__}")
+        return resp
+
+
+def _routed(query: str, context: Optional[Dict[str, Any]], history: Optional[List[Dict[str, Any]]],
+            resp: Dict[str, Any]) -> Dict[str, Any]:
+    """If the router is confident the question asks for another intent than the engine
+    answered, ask the engine again in that intent's canonical phrasing (with the question's own
+    names, position, segment and race) and keep the retry only if it answers with that intent's
+    tools. A generic fallback is replaced at normal confidence; a specific answer from another
+    intent only at high confidence."""
+    from app.agent import router as R
+    question = resolve_follow_up(query, scope_history_to_view(history, context))
+    router = R.get_router()
+    if router.method != "embedding":
+        return resp  # keyword-only scores aren't calibrated for overriding answers; shadow only
+    route = router.route(question)
+    if not route.intent:
+        return resp
+    intent = router.intents[route.intent]
+    tool = resp.get("tool") or ""
+    if tool in intent.tools or tool in R.DEFINITIVE_TOOLS:
+        return resp
+    if tool not in R.FALLBACK_TOOLS and (route.score < R.OVERRIDE_MIN_SCORE or route.margin < R.OVERRIDE_MARGIN):
+        return resp
+    rewritten = R.canonical(question, intent)
+    if not rewritten or rewritten.lower().strip(" ?") == question.lower().strip(" ?"):
+        return resp
+    retry = _answer_once(rewritten, context, history)
+    if retry.get("tool") not in intent.tools:
+        return resp
+    retry["routed"] = {"intent": route.intent, "score": route.score, "asked_as": rewritten, "engine_tool": tool}
+    return retry
+
+
+def _answer_once(
+    query: str,
+    context: Optional[Dict[str, Any]] = None,
+    history: Optional[List[Dict[str, Any]]] = None
+) -> Dict[str, Any]:
+    """The engine. The race and session on screen are the default scope for questions
     that don't name their own (ADK session-state pattern); every race-data answer says which
     race and session it is based on."""
     from app.tools import session_scope as SS
@@ -1109,7 +1161,7 @@ def _answer_core(
     ])
 
     # Starting grid inquiries (specific driver, grid slot, or full grid)
-    is_grid_query = bool(re.search(r'\b(grid|starting grid|started in|start in|started p\d+|start p\d+|started from|start from|where did .* start|what position did .* start)\b', q)) or (
+    is_grid_query = bool(re.search(r'\b(grid|starting grid|started in|start in|started p\d+|start p\d+|started from|start from|where did .* start|what position did .* start|front row|started at the back|pit lane start)\b', q)) or (
         any(w in q for w in ["start", "started"]) and any(w in q for w in ["grid", "p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9", "p10", "p20", "position", "where", "which"]) and not any(w in q for w in ["restart", "strategy", "undercut"])
     )
 
@@ -1188,6 +1240,31 @@ def _answer_core(
                 }
             }
         }
+
+    # The whole grid ("what was the starting grid", "who was on the front row"): no driver or
+    # slot named. Grid slots come from the race result (0 = pit lane start).
+    if is_grid_query and not target_driver and drivers:
+        on_grid = sorted((d for d in drivers if isinstance(d.get("grid"), int) and d["grid"] > 0), key=lambda d: d["grid"])
+        pit_lane = [d for d in drivers if d.get("grid") == 0]
+        if on_grid:
+            race_label = meta.get("race_name", "Grand Prix")
+            front = " and ".join(f"**{d['name']}**" for d in on_grid[:2])
+            top = ", ".join(f"P{d['grid']} {d['code']}" for d in on_grid[:10])
+            back = on_grid[-1]
+            pit_txt = f" Pit lane start: {', '.join(d['name'] for d in pit_lane)}." if pit_lane else ""
+            return {
+                "role": "assistant",
+                "text": (f"Front row for the **{race_label} ({year})**: {front}. Top ten on the grid: {top}. "
+                         f"Last on the grid: {back['name']} (P{back['grid']}).{pit_txt}"),
+                "tool": "starting_grid_lookup",
+                "intent": f"{year} FIA Starting Grid",
+                "a2ui_card": {
+                    "type": "starting_grid_card",
+                    "title": f"Starting Grid — {race_label}",
+                    "metrics": [{"label": f"P{d['grid']}", "value": f"{d['name']} ({d['code']})", "color": d.get("color", "#FFFFFF")}
+                                for d in on_grid[:4]],
+                },
+            }
 
     if target_driver:
         d = target_driver
@@ -1333,6 +1410,54 @@ def _answer_core(
                     "session": ctx.get("session_type", "race") or "race",
                     "lap": dnfs[0].get("retire_lap", 1) if dnfs else 1,
                     "race_name": meta.get("race_name", "Grand Prix")
+                }
+            }
+        }
+
+    # 3.5 FREE PRACTICE (FP1, FP2, FP3) & FRIDAY LONG-RUN TELEMETRY
+    # (before the results handlers: "FP1 lap times" is not a race-result question)
+    is_practice_query = any(w in q for w in [
+        "practice", "fp1", "fp2", "fp3", "free practice", "long run", "race simulation",
+        "race sim", "friday pace", "friday long", "setup run", "aero test", "flow vis"
+    ])
+    if is_practice_query:
+        d = target_driver or winner or (drivers[0] if drivers else None)
+        d_name = d['name'] if d else "The frontrunners"
+        d_team = d['team'] if d else "top teams"
+        d_code = d['code'] if d else "P1"
+        race_title = meta.get('race_name', f'{year} Grand Prix')
+
+        text = (
+            f"**Free Practice Telemetry Debrief — {race_title} ({year})**:\n\n"
+            f"• **FP1 (Aerodynamic Baseline)**: Teams focused on flow-vis paint sweeps and ride-height sweeps. "
+            f"{d_name} (#{d.get('number', '1') if d else '1'} {d_team}) dialed in mechanical balance with low degradation on Hard tyres.\n"
+            f"• **FP2 (Twilight Race Simulations)**: Representative high-fuel long runs revealed an estimated degradation rate of **0.08s/lap** "
+            f"on the Medium (C3) compound, with {d_code} establishing the benchmark long-run average pace (1:34.1).\n"
+            f"• **FP3 (Qualifying Prep)**: Final low-fuel qualifying trim simulations confirmed strong high-speed apex stability.\n\n"
+            f"> *Note: Free Practice data is indexed directly within the Pit Wall Agent's telemetry knowledge base. "
+            f"Interactive 2D replays are dedicated to competitive sessions (Grand Prix, Qualifying, and Sprint).* "
+        )
+        return {
+            "role": "assistant",
+            "text": text,
+            "tool": "free_practice_telemetry_lookup",
+            "intent": "Free Practice Stint Analysis & Friday Long-Run Degradation",
+            "a2ui_card": {
+                "type": "practice_telemetry_card",
+                "title": f"Practice & Long-Run Intel — {race_title}",
+                "metrics": [
+                    {"label": "FP2 Long-Run Pace", "value": f"{d_code} (1:34.1)", "color": "#00F5D4"},
+                    {"label": "Degradation Rate", "value": "0.08s/lap (Med)", "color": "#FFD166"},
+                    {"label": "Top Speed Trap", "value": "334.8 km/h", "color": "#FFFFFF"},
+                    {"label": "Telemetry Status", "value": "FP1–FP3 Complete", "color": "#10B981"}
+                ],
+                "action": "VIEW QUALIFYING REPLAY",
+                "target": {
+                    "action_type": "switch_session",
+                    "year": year,
+                    "round": round_no,
+                    "session": "qualifying",
+                    "race_name": race_title
                 }
             }
         }
@@ -1516,53 +1641,6 @@ def _answer_core(
                     }
                 }
             }
-
-    # 3.5 FREE PRACTICE (FP1, FP2, FP3) & FRIDAY LONG-RUN TELEMETRY
-    is_practice_query = any(w in q for w in [
-        "practice", "fp1", "fp2", "fp3", "free practice", "long run", "race simulation",
-        "race sim", "friday pace", "friday long", "setup run", "aero test", "flow vis"
-    ])
-    if is_practice_query:
-        d = target_driver or winner or (drivers[0] if drivers else None)
-        d_name = d['name'] if d else "The frontrunners"
-        d_team = d['team'] if d else "top teams"
-        d_code = d['code'] if d else "P1"
-        race_title = meta.get('race_name', f'{year} Grand Prix')
-
-        text = (
-            f"**Free Practice Telemetry Debrief — {race_title} ({year})**:\n\n"
-            f"• **FP1 (Aerodynamic Baseline)**: Teams focused on flow-vis paint sweeps and ride-height sweeps. "
-            f"{d_name} (#{d.get('number', '1') if d else '1'} {d_team}) dialed in mechanical balance with low degradation on Hard tyres.\n"
-            f"• **FP2 (Twilight Race Simulations)**: Representative high-fuel long runs revealed an estimated degradation rate of **0.08s/lap** "
-            f"on the Medium (C3) compound, with {d_code} establishing the benchmark long-run average pace (1:34.1).\n"
-            f"• **FP3 (Qualifying Prep)**: Final low-fuel qualifying trim simulations confirmed strong high-speed apex stability.\n\n"
-            f"> *Note: Free Practice data is indexed directly within the Pit Wall Agent's telemetry knowledge base. "
-            f"Interactive 2D replays are dedicated to competitive sessions (Grand Prix, Qualifying, and Sprint).* "
-        )
-        return {
-            "role": "assistant",
-            "text": text,
-            "tool": "free_practice_telemetry_lookup",
-            "intent": "Free Practice Stint Analysis & Friday Long-Run Degradation",
-            "a2ui_card": {
-                "type": "practice_telemetry_card",
-                "title": f"Practice & Long-Run Intel — {race_title}",
-                "metrics": [
-                    {"label": "FP2 Long-Run Pace", "value": f"{d_code} (1:34.1)", "color": "#00F5D4"},
-                    {"label": "Degradation Rate", "value": "0.08s/lap (Med)", "color": "#FFD166"},
-                    {"label": "Top Speed Trap", "value": "334.8 km/h", "color": "#FFFFFF"},
-                    {"label": "Telemetry Status", "value": "FP1–FP3 Complete", "color": "#10B981"}
-                ],
-                "action": "VIEW QUALIFYING REPLAY",
-                "target": {
-                    "action_type": "switch_session",
-                    "year": year,
-                    "round": round_no,
-                    "session": "qualifying",
-                    "race_name": race_title
-                }
-            }
-        }
 
     # 4. PIT STOPS, TYRES & STRATEGY
     is_pit_or_tyre = any(w in q for w in [

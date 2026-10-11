@@ -11,12 +11,21 @@
 # "segment": Q1-Q3 or SQ1-SQ3); names and years are masked
 # before matching, so the router learns the shape of a question, not who it is about.
 #
+# `canonical` is how the engine is asked when the router is confident about the intent but the
+# engine's first answer doesn't fit it (step 3a). Placeholders come from the question:
+# {driver} {driver2} (driver names; {driver_poss} = Hamilton's / his), {position} (P3, third...), {segment} (Q1..SQ3),
+# {year}, {race} (year and race/circuit/country words, e.g. "in the 2021 abu dhabi grand prix"),
+# {race_name} ("the 2021 abu dhabi grand prix", or "this race").
+# A placeholder that the question doesn't fill drops out (with its "in the" if any); an intent
+# without `canonical` is never rewritten.
+#
 # Write examples the way a person would type them. Use real names and races where it helps;
 # the router learns the shape of the question, the slots (race, driver, session) are parsed
 # separately from the data.
 
 [session_result]
 description = "Who won a race, sprint or session, the podium, top N or full classification"
+canonical = "who won {race}"
 excludes = ["segment"]
 tools = ["race_classification_lookup", "sprint_classification_lookup",
          "qualifying_classification_lookup", "sprint_qualifying_classification_lookup"]
@@ -38,6 +47,7 @@ not = ["who won the championship", "how many races has he won"]
 
 [pole_position]
 description = "Pole position or the fastest qualifier, for Grand Prix or Sprint Qualifying"
+canonical = "who was on pole {race}"
 excludes = ["segment"]
 tools = ["qualifying_pole_lookup", "sprint_qualifying_lookup", "qualifying_classification_lookup",
          "sprint_qualifying_classification_lookup"]
@@ -59,6 +69,7 @@ examples = [
 
 [finishing_position]
 description = "Who finished in a given position"
+canonical = "who finished {position} {race}"
 requires = ["position"]
 tools = ["driver_finish_position_lookup", "sprint_position_lookup",
          "qualifying_position_lookup", "sprint_qualifying_position_lookup"]
@@ -80,6 +91,7 @@ examples = [
 
 [driver_result]
 description = "How a named driver did in a race or session: position, grid, laps, points"
+canonical = "how did {driver} do {race}"
 requires = ["driver"]
 tools = ["driver_performance_lookup", "driver_classification_lookup", "sprint_driver_lookup",
          "qualifying_driver_lookup", "sprint_qualifying_driver_lookup", "weekend_driver_summary"]
@@ -99,6 +111,7 @@ not = ["how did the race go", "how many podiums does Hamilton have in his career
 
 [podium_check]
 description = "Whether a named driver got a podium"
+canonical = "did {driver} get a podium {race}"
 requires = ["driver"]
 tools = ["driver_podium_verification"]
 examples = [
@@ -110,6 +123,7 @@ examples = [
 
 [starting_grid]
 description = "Grid positions for a race or sprint, or where a driver started"
+canonical = "what was the starting grid {race}"
 tools = ["starting_grid_lookup", "driver_starting_grid_lookup", "sprint_grid_lookup"]
 examples = [
   "what was the sprint grid",
@@ -126,6 +140,7 @@ examples = [
 
 [qualifying_segments]
 description = "Knockout segments: eliminated in Q1/Q2 (SQ1/SQ2), made Q3, fastest or a driver's time in a segment"
+canonical = "who was knocked out in {segment} {race}"
 tools = ["qualifying_segment_lookup", "sprint_qualifying_segment_lookup",
          "qualifying_segment_driver_lookup", "sprint_qualifying_segment_driver_lookup"]
 examples = [
@@ -143,6 +158,7 @@ examples = [
 
 [retirements]
 description = "Who retired or did not finish a race or sprint"
+canonical = "who retired {race}"
 tools = ["dnf_summary_lookup", "sprint_dnf_lookup"]
 examples = [
   "who retired",
@@ -157,6 +173,7 @@ not = ["who was knocked out in Q1", "when did Hamilton retire from F1"]
 
 [driver_retirement]
 description = "When and why a named driver retired from a race (an incident)"
+canonical = "when did {driver} retire {race}"
 requires = ["driver"]
 tools = ["incident_investigation"]
 examples = [
@@ -171,6 +188,7 @@ not = ["when did Hamilton retire from Formula 1"]
 
 [fastest_lap]
 description = "Fastest lap of a race"
+canonical = "who set the fastest lap {race}"
 excludes = ["segment"]
 tools = ["fastest_lap_lookup"]
 examples = [
@@ -183,6 +201,7 @@ examples = [
 
 [pit_strategy]
 description = "Pit stops, tyres and strategy, or how an undercut works"
+canonical = "explain {driver_poss} pit strategy {race}"
 tools = ["pit_strategy_profile", "pit_strategy_explanation"]
 examples = [
   "explain Verstappen's pit strategy",
@@ -198,6 +217,7 @@ examples = [
 
 [safety_car]
 description = "Safety cars, virtual safety cars, red flags and race control"
+canonical = "was there a safety car {race}"
 tools = ["safety_car_analysis", "race_control_lookup"]
 examples = [
   "was there a safety car",
@@ -210,6 +230,7 @@ examples = [
 
 [championship_standings]
 description = "Current championship standings, points and the title fight"
+canonical = "who leads the championship {race}"
 tools = ["championship_standings_lookup"]
 examples = [
   "who leads the championship",
@@ -222,6 +243,7 @@ examples = [
 
 [season_champion]
 description = "Who won a past world championship"
+canonical = "who won the {year} championship"
 tools = ["historical_championship_lookup"]
 examples = [
   "who won the 2008 championship",
@@ -233,6 +255,7 @@ examples = [
 
 [driver_career]
 description = "A driver's career: titles, wins, podiums, poles, seasons"
+canonical = "tell me about {driver}"
 requires = ["driver"]
 tools = ["driver_career_history_lookup", "driver_career_milestone_lookup"]
 examples = [
@@ -247,6 +270,7 @@ examples = [
 
 [head_to_head]
 description = "Comparing two drivers"
+canonical = "{driver} vs {driver2}"
 tools = ["driver_head_to_head_comparison"]
 examples = [
   "Senna vs Prost",
@@ -278,6 +302,7 @@ examples = [
 
 [regulations_2026]
 description = "The 2026 rules: power units, active aero, hybrid split"
+canonical = "what are the 2026 regulations"
 tools = ["fia_regulations_lookup"]
 examples = [
   "how does the 2026 power unit work",
@@ -289,6 +314,7 @@ examples = [
 
 [race_story]
 description = "The story of an iconic race, controversy or turning point"
+canonical = "what happened {race}"
 tools = ["historic_race_moment_lookup"]
 examples = [
   "what happened in Abu Dhabi 2021",
@@ -300,6 +326,7 @@ examples = [
 
 [venue]
 description = "Where a race was held"
+canonical = "where was {race_name} held"
 tools = ["race_venue_lookup"]
 examples = [
   "where was the race held",
@@ -310,6 +337,7 @@ examples = [
 
 [practice]
 description = "Free practice sessions (not in the data)"
+canonical = "FP1 lap times {race}"
 tools = ["free_practice_telemetry_lookup"]
 examples = [
   "FP1 lap times",

@@ -5,6 +5,8 @@ championship rosters, all-time records, and legendary rivalries for motorsport r
 """
 
 import difflib
+import functools
+import os
 import re
 from typing import Any, Dict, List, Optional, Tuple
 from app.agent import content as _content
@@ -1075,6 +1077,19 @@ WORLD_CHAMPIONS_BY_YEAR: Dict[int, Dict[str, Any]] = {
 # 5. FUZZY DRIVER RESOLUTION & RESEARCH ENGINE
 # =============================================================================
 
+@functools.lru_cache(maxsize=1)
+def _english_words() -> frozenset:
+    """Whole words in the router model's WordPiece vocabulary (about 20,000 common English
+    words), or a short list of question verbs when the model isn't downloaded."""
+    try:
+        from app.agent.embedding import MODEL_DIR, WordPiece
+        vocab = WordPiece.from_tokenizer_json(os.path.join(MODEL_DIR, "tokenizer.json")).vocab
+        return frozenset(w for w in vocab if w.isalpha() and not w.startswith("##"))
+    except (OSError, ValueError):
+        return frozenset({"started", "starting", "finished", "finishing", "stopped", "retired", "crashed",
+                          "pitted", "qualified", "overtook", "passed", "leading", "behind", "ahead"})
+
+
 def resolve_historical_driver(query: str) -> Optional[Dict[str, Any]]:
     """
     Resolves driver queries even with heavy typos (e.g. 'schmacur', 'shumacher', 'sena', 'versappen').
@@ -1108,10 +1123,13 @@ def resolve_historical_driver(query: str) -> Optional[Dict[str, Any]]:
             if alias in words:
                 return HISTORICAL_DRIVERS.get(did)
 
-    # 2. Token-level close match with difflib across all driver aliases
+    # 2. Token-level close match with difflib across all driver aliases, for misspellings only:
+    # a real English word ("started", "finished") is never a misspelled name ("started" scored
+    # 0.71 against "stewart"). Real names were matched exactly in step 1.
     candidates = [k for k in DRIVER_NAME_LOOKUP.keys() if len(k) >= 4 and k not in STOP_WORDS]
+    english = _english_words()
     for word in words:
-        if len(word) < 5 or word in STOP_WORDS:
+        if len(word) < 5 or word in STOP_WORDS or word in english:
             continue
         matches = difflib.get_close_matches(word, candidates, n=1, cutoff=0.70)
         if matches:

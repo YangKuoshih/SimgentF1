@@ -9,12 +9,15 @@ router never answers on its own, so an abstention just means "keep the current b
   python tests/eval_router.py                  # summary + disagreements
   python tests/eval_router.py --all            # also list every abstention
   python tests/eval_router.py --paraphrases    # held-out phrasings (tests/router_paraphrases.toml)
-  add --gate to exit non-zero below the step 1 bar (CI): agreement >= 95%; paraphrases at
-  most 3 wrong and at least 70% correct; the embedding model must be present.
+  python tests/eval_router.py --end-to-end     # paraphrases through the whole agent, router off vs on
+  add --gate to exit non-zero below the bar (CI): agreement >= 95%; paraphrases at most 3 wrong
+  and at least 70% correct; end to end, the router breaks nothing the engine got right; the
+  embedding model must be present.
 """
 import contextlib
 import io
 import os
+import re
 import runpy
 import sys
 from collections import Counter, defaultdict
@@ -82,8 +85,54 @@ def paraphrases():
     return wrong <= 3 and right / n >= 0.70
 
 
+# Context the end-to-end paraphrases are asked in: the race on screen, or its qualifying for
+# qualifying questions (2026 R16 has a full classification, segments and lap data).
+E2E_RACE = {"year": 2026, "round": 16, "session": "race", "race": "Bahrain Grand Prix in Malaysia"}
+E2E_SESSION = {"qualifying_segments": "qualifying", "pole_position": "qualifying"}
+
+
+def end_to_end():
+    """The held-out paraphrases through the whole agent, without and with the router: is the
+    answer given by one of the expected intent's tools?"""
+    import tomllib
+    with open(os.path.join(ROOT, "tests", "router_paraphrases.toml"), "rb") as f:
+        cases = {q: e for q, e in tomllib.load(f)["cases"].items() if e != "none"}
+    router = get_router()
+    scores = {}
+    for mode in ("off", "on"):
+        os.environ["SIMGENT_ROUTER"] = mode
+        right, misses = 0, []
+        for question, expected in cases.items():
+            ctx = dict(E2E_RACE, session=E2E_SESSION.get(expected, "race"))
+            if re.search(r"\bsprint\b|\bsq[123]\b", question.lower()):
+                ctx = {"year": 2026, "round": 17, "race": "Singapore Grand Prix",  # a sprint weekend
+                       "session": "sprint_qualifying" if expected in E2E_SESSION else "sprint"}
+            resp = A.answer_race_engineer_query(question, ctx, [])
+            if resp.get("tool") in router.intents[expected].tools:
+                right += 1
+            else:
+                misses.append((question, expected, resp.get("tool"), resp.get("routed")))
+        scores[mode] = (right, misses)
+    os.environ.pop("SIMGENT_ROUTER", None)
+    n = len(cases)
+    for mode in ("off", "on"):
+        print(f"router {mode:3}: {scores[mode][0]}/{n} answered by the right tool = {100 * scores[mode][0] / n:.1f}%")
+    fixed = {q for q, *_ in scores["off"][1]} - {q for q, *_ in scores["on"][1]}
+    broke = {q for q, *_ in scores["on"][1]} - {q for q, *_ in scores["off"][1]}
+    print(f"router fixed {len(fixed)}, broke {len(broke)}")
+    for q in sorted(broke):
+        print(f"BROKE    {q!r}")
+    if "--all" in sys.argv:
+        for q, e, tool, routed in scores["on"][1]:
+            print(f"MISS     {q!r} expected={e} got={tool} routed={routed}")
+    return len(broke) == 0
+
+
 def main():
     gate = "--gate" in sys.argv
+    if "--end-to-end" in sys.argv:
+        ok = end_to_end()
+        sys.exit(0 if ok or not gate else 1)
     if gate and get_router().method != "embedding":
         print("FAIL: embedding model missing (run scripts/fetch_models.py)")
         sys.exit(1)

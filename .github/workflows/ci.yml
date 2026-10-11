@@ -62,6 +62,7 @@ jobs:
         run: |
           python tests/eval_router.py --gate
           python tests/eval_router.py --paraphrases --gate
+          python tests/eval_router.py --end-to-end --gate
 
       - name: Set up Node.js 26.11.1
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
