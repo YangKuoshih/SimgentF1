@@ -113,14 +113,15 @@ async function runTestSuite() {
     const selDriverText = await page.locator('#fc-name').textContent();
     assert(selDriverText.length > 0 && selDriverText !== '—', `Driver focus card rendered for: ${selDriverText.trim()}`);
 
-    // Verify Corner Telemetry Modal
+    // Verify the modelled speed profile modal (labelled as a model, not car telemetry)
     const openTraceBtn = page.locator('#btn-open-telemetry');
     await openTraceBtn.click();
     await page.waitForSelector('#telemetry-modal:not(.hidden)', { timeout: 3000 });
-    assert(true, `Corner-by-corner throttle, brake and speed telemetry modal opened`);
+    const telSub = await page.locator('#tel-sub').textContent();
+    assert(/not car telemetry/.test(telSub), `Speed profile modal opened and labelled as a model: ${telSub.trim()}`);
     await page.locator('#btn-close-telemetry').click();
     await page.locator('#telemetry-modal').waitFor({ state: 'hidden', timeout: 3000 });
-    assert(true, `Corner telemetry modal closed cleanly`);
+    assert(true, `Speed profile modal closed cleanly`);
 
     // -------------------------------------------------------------
     // SUITE 2: Multi-Turn Conversation & Pronoun Resolution

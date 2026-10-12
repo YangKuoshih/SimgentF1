@@ -262,8 +262,9 @@ class OfflineDataEval:
 
         # 3. Turns valid
         report["checks"] += 1
+        # Turns are only listed where their positions are known (none is valid)
         turns = geo.get("turns", [])
-        if turns and all(0.0 <= t.get("pct", 0) <= 1.0 for t in turns):
+        if all(0.0 <= t.get("pct", 0) <= 1.0 for t in turns):
             report["matches"] += 1
         else:
             report["passed"] = False

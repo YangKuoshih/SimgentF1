@@ -650,7 +650,19 @@ def _answer_once(
     race and session it is based on."""
     from app.tools import session_scope as SS
     history = scope_history_to_view(history, context)
+    # Nothing on screen (API, MCP, first visit): the latest completed race is the default,
+    # and the answer's footer says so
+    if not (context or {}).get("round"):
+        context = {**(context or {}), "year": _CURRENT_SEASON, "round": _latest_round(_CURRENT_SEASON)}
     scope = SS.resolve_scope(query, context, history)
+    if scope and not scope["from_screen"] and scope["session"] != "race":
+        # "who was knocked out in Q1 in Singapore?": a named race and a named session
+        named = _named_race(query.lower(), scope["year"])
+        if named:
+            target = dict(scope, year=named[0], round=named[1], race="", session_from_screen=False)
+            resp = SS.answer_in_session(query, target, None, history)
+            if resp:
+                return SS.with_scope(resp, target, resp.pop("label"))
     if scope and scope["from_screen"]:
         resp = SS.answer_weekend(query, scope)
         if resp:
@@ -680,6 +692,32 @@ def _answer_once(
     return resp
 
 
+_CURRENT_SEASON = 2026
+
+
+def _named_race(q: str, default_year: int) -> Optional[Tuple[int, int]]:
+    """(year, round) of the race a question names, or None when it names none."""
+    ym = re.search(r"\b(19[5-9]\d|20\d\d)\b", q)
+    year = int(ym.group(1)) if ym else default_year
+    if not 1950 <= year <= _CURRENT_SEASON:
+        return None
+    races = race_replay.season_races(year)
+    rm = re.search(r"\b(?:round|r)\s*(\d+)\b", q)
+    if rm and any(r["round"] == int(rm.group(1)) for r in races):
+        return year, int(rm.group(1))
+    if re.search(r"\b(latest|last|recent|current) race\b|\btoday\b", q):
+        return year, _latest_round(year)
+    rnd = _match_race_round(q, races)
+    return (year, rnd) if rnd is not None else None
+
+
+def _latest_round(year: int) -> int:
+    """The last completed round of a season (the last round for a past season)."""
+    races = race_replay.season_races(year)
+    done = [r["round"] for r in races if r.get("completed")]
+    return done[-1] if done else (races[-1]["round"] if races else 1)
+
+
 def _answer_core(
     query: str,
     context: Optional[Dict[str, Any]] = None,
@@ -696,14 +734,16 @@ def _answer_core(
     q = query.lower().strip()
     q_words = set(re.findall(r'\b[a-z0-9_-]+\b', q))
     ctx = context or {}
+    # No race on screen: default to the latest completed race (it used to be a fixed
+    # round 15, so "who was knocked out in Q1?" answered about Baku)
     try:
-        year = int(ctx.get("year", 2026))
+        year = int(ctx.get("year") or _CURRENT_SEASON)
     except (ValueError, TypeError):
-        year = 2026
+        year = _CURRENT_SEASON
     try:
-        round_no = int(ctx.get("round", 15))
+        round_no = int(ctx["round"]) if ctx.get("round") else _latest_round(year)
     except (ValueError, TypeError):
-        round_no = 15
+        round_no = _latest_round(year)
 
     # 0. Check Grounded RAG Memory Subsystem (Ground Truth & Verified Feedback)
     mem_hit = memory_manager.retrieve(query, context=ctx, history=history, defer_to_data=True)
@@ -901,7 +941,7 @@ def _answer_core(
             if champ_data is None:
                 champ_data = f1_history.lookup_season_champion(hist_yr)
             if champ_data:
-                return {
+                resp = {
                     "role": "assistant",
                     "text": champ_data["text"],
                     "tool": "historical_championship_lookup",
@@ -909,6 +949,18 @@ def _answer_core(
                     "driver_id": champ_data.get("driver_id"),
                     "a2ui_card": champ_data["card"]
                 }
+                # "Why did Hamilton lose the 2021 title?": the standings alone don't answer
+                # why, so add the story of the race that decided it when content has one
+                decider = next((st for st in _content.race_stories()
+                                if st["year"] == hist_yr and st.get("decided_title")), None)
+                if decider and re.search(r"\b(why|how)\b", q):
+                    resp["text"] = (f"{champ_data['text'].rstrip()}\n\n**How it was decided — {decider['title']}**\n\n"
+                                    f"{decider['summary']}")
+                    resp["sources"] = [_content.source_of("races", id=decider["id"])]
+                elif re.search(r"\b(why|how)\b", q):
+                    resp["text"] = (f"{champ_data['text'].rstrip()}\n\nI have the final standings for {hist_yr} "
+                                    "but no write-up of how the title was decided.")
+                return resp
 
     # Sprint questions about a weekend without a Sprint (or no race named at all) never get
     # another session's result: say so and ask which Sprint is meant.

@@ -5,7 +5,6 @@ schema enforcement, and output safety for the Pit Wall AI Agent.
 """
 
 import re
-import html
 import time
 from collections import defaultdict, deque
 from typing import Dict, Any, Optional, Tuple
@@ -96,12 +95,13 @@ UNSUPPORTED_DATA_PATTERNS = [
 ]
 
 SAFE_UNSUPPORTED_DATA_REFUSAL = (
-    "📡 **Pit Wall Telemetry: Data Scope Notice**\n\n"
-    "The requested data is outside the official open Formula 1 telemetry feed:\n"
-    "• **Free Practice (FP1/FP2/FP3)**: Non-competitive practice telemetry is excluded from our 2D replay engine to limit the indexed data scope (only competitive sessions — Grand Prix, Qualifying, and Sprints — are indexed across 76 seasons).\n"
-    "• **Private Radio Channels**: Only official FIA Race Control incident logs and TV-broadcast team radio messages are logged; private internal team radio frequencies are encrypted and confidential.\n"
-    "• **Historical Horizon**: Official FIA Formula 1 World Championship telemetry covers 1950 through 2026.\n"
-    "• **Proprietary Engineering**: Team CAD/CFD files and wind tunnel sensor data are confidential intellectual property of the constructors."
+    "📡 **Data Scope Notice**\n\n"
+    "That isn't in SimGent's data, which comes from the open Jolpica-F1 and OpenF1 sources:\n"
+    "• **Free Practice (FP1/FP2/FP3)**: practice sessions are not replayed; only the Grand Prix, qualifying and sprint sessions are.\n"
+    "• **Team radio**: not in the data.\n"
+    "• **Car telemetry** (speed, throttle and brake traces): not in the data; replays use lap times (from 1996) and results.\n"
+    "• **Seasons**: the World Championship began in 1950; there is nothing earlier.\n"
+    "• **Team engineering data** (CAD, CFD, wind tunnel): confidential to the teams."
 )
 
 
@@ -258,17 +258,28 @@ def evaluate_all_guardrails(query: str, context: Optional[Dict[str, Any]] = None
     return False, None
 
 
+# Control characters and angle brackets never occur in card text (race and driver names,
+# figures), so they are dropped: no markup can reach a client that forgets to escape.
+_CONTROL = re.compile(r"[\x00-\x1f\x7f<>]")
+
+
+def _plain(value: Any, limit: int) -> str:
+    return _CONTROL.sub("", str(value))[:limit]
+
+
 def sanitize_a2ui_card(card: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
     """
     Validates and hardens A2UI card schemas before transmitting to client.
-    Validates allowed actions and payload fields and escapes displayed text.
+    Validates allowed actions and payload fields, caps lengths and drops control characters
+    and angle brackets. Text is not HTML-escaped here: the client escapes every field when it
+    renders (escaping here too showed "&amp;" in card titles). Colours are restricted to hex.
     """
     if not card or not isinstance(card, dict):
         return None
 
     card_type = str(card.get("type", "generic_card"))[:32]
-    title = html.escape(str(card.get("title", "Telemetry Card"))[:80])
-    action = html.escape(str(card.get("action", ""))[:50]) if card.get("action") else None
+    title = _plain(card.get("title", "Card"), 80)
+    action = _plain(card.get("action"), 50) if card.get("action") else None
 
     # Sanitize metrics list
     raw_metrics = card.get("metrics") or []
@@ -276,8 +287,8 @@ def sanitize_a2ui_card(card: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any
     if isinstance(raw_metrics, list):
         for m in raw_metrics[:6]:  # Maximum 6 metrics per card
             if isinstance(m, dict):
-                lbl = html.escape(str(m.get("label", ""))[:30])
-                val = html.escape(str(m.get("value", ""))[:40])
+                lbl = _plain(m.get("label", ""), 30)
+                val = _plain(m.get("value", ""), 40)
                 color = str(m.get("color", "#FFFFFF"))[:16]
                 if not re.match(r"^#[0-9a-fA-F]{3,8}$", color):
                     color = "#FFFFFF"
@@ -309,7 +320,7 @@ def sanitize_a2ui_card(card: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any
         if "driver" in raw_target:
             safe_target["driver"] = str(raw_target["driver"])[:16]
         if "race_name" in raw_target:
-            safe_target["race_name"] = html.escape(str(raw_target["race_name"])[:60])
+            safe_target["race_name"] = _plain(raw_target["race_name"], 60)
 
     return {
         "type": card_type,

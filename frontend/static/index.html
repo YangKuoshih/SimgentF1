@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SimGent · Simulator Agent: Autonomous Pit Wall & Telemetry Cockpit</title>
-  <meta name="description" content="SimGent (Simulator Agent) — Independent Open-Source Autonomous AI Race Engineer & Telemetry Replay Cockpit (1950–2026). Interactive 2D track map, multi-car telemetry delta, live AI pit wall radio, and historic Grand Prix archives. Built by Tony Yang.">
+  <meta name="description" content="SimGent (Simulator Agent) — open-source race replay and AI pit wall for every Formula 1 race since 1950. Lap-timing replays from 1996, results-based replays before that, and a race engineer agent grounded in the data. Built by Tony Yang.">
   <meta name="author" content="Tony Yang">
   <link rel="canonical" href="https://simgent.tonyyang.work">
 
@@ -19,7 +19,7 @@
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://simgent.tonyyang.work">
   <meta property="og:title" content="SimGent (Simulator Agent) — Autonomous AI Pit Wall & Telemetry Cockpit">
-  <meta property="og:description" content="Interactive 2D track replay, live multi-car delta graphs, 1950–2026 telemetry archives, and an autonomous AI pit wall race engineer. Free & open-source fan project.">
+  <meta property="og:description" content="Interactive 2D race replay, lap-time charts, results for every Grand Prix since 1950, and an AI pit wall race engineer grounded in the data. Free & open-source fan project.">
   <meta property="og:image" content="https://simgent.tonyyang.work/static/simgent_preview.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
@@ -29,7 +29,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:url" content="https://simgent.tonyyang.work">
   <meta name="twitter:title" content="SimGent · Simulator Agent: AI Pit Wall & Telemetry Cockpit">
-  <meta name="twitter:description" content="Explore 76+ years of Grand Prix telemetry, interactive lap replay with collision/DNF debriefs, and an autonomous AI race engineer. Built by Tony Yang.">
+  <meta name="twitter:description" content="Every Grand Prix since 1950: interactive replays (lap timing from 1996), retirement debriefs, and an AI race engineer grounded in the data. Built by Tony Yang.">
   <meta name="twitter:image" content="https://simgent.tonyyang.work/static/simgent_preview.png">
   <meta name="theme-color" content="#E10600">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -303,9 +303,9 @@
         </select>
       </div>
 
-      <span id="data-source-pill" class="hidden xl:flex text-[10px] font-mono uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded px-2.5 py-1 items-center gap-1.5" title="Telemetry & Session Stream">
-        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>LIVE TIMING FEED</span>
+      <span id="data-source-pill" class="hidden xl:flex text-[10px] font-mono uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded px-2.5 py-1 items-center gap-1.5" title="Data source for this replay">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+        <span>LAP TIMING DATA</span>
       </span>
 
       <button id="btn-about" class="px-2 sm:px-2.5 py-1 text-[11px] font-mono rounded border border-white/15 bg-white/5 hover:bg-white/15 text-slate-300 hover:text-white transition cursor-pointer flex items-center gap-1.5" title="About SimGent — Simulator Agent & Legal Disclaimer">
@@ -562,7 +562,7 @@
             <div class="space-y-1 pt-1 border-t border-white/5">
               <div class="text-[9px] text-slate-400 font-bold uppercase tracking-wider flex items-center justify-between">
                 <span>Track Sectors</span>
-                <span id="tic-drs-badge" class="text-f1red font-normal">DRS Active</span>
+                <span id="tic-drs-badge" class="text-f1red font-normal"></span>
               </div>
               <div class="grid grid-cols-3 gap-1 text-[9px] text-center font-mono">
                 <div class="p-1 rounded bg-[#FF7A00]/15 text-[#FF7A00] border border-[#FF7A00]/30 font-bold">S1 SPEED</div>
@@ -699,9 +699,9 @@
               <button id="btn-tel-mode-delta" class="px-2 py-0.5 rounded text-slate-400 hover:text-white font-bold transition cursor-pointer" title="Cumulative delta gap to race leader">DELTA</button>
             </div>
 
-            <button id="btn-open-telemetry" class="px-2 py-0.5 rounded bg-f1red/20 hover:bg-f1red/30 text-white font-display text-[9px] sm:text-[10px] font-black uppercase tracking-wider border border-f1red/40 flex items-center gap-1.5 transition shadow-sm cursor-pointer" title="Open corner-by-corner throttle, brake and speed telemetry">
+            <button id="btn-open-telemetry" class="px-2 py-0.5 rounded bg-f1red/20 hover:bg-f1red/30 text-white font-display text-[9px] sm:text-[10px] font-black uppercase tracking-wider border border-f1red/40 flex items-center gap-1.5 transition shadow-sm cursor-pointer" title="Modelled speed profile of this circuit (estimated from corner geometry, not car telemetry)">
               <svg class="w-3 h-3 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-              <span>CORNER TRACE</span>
+              <span>SPEED MODEL</span>
             </button>
           </div>
         </div>
@@ -1197,23 +1197,18 @@
     </div>
   </section>
 
-  <!-- ===================== CORNER-BY-CORNER TELEMETRY MODAL ===================== -->
+  <!-- ===================== MODELLED SPEED PROFILE MODAL ===================== -->
   <div id="telemetry-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
     <div class="f1-glass-up rounded border border-white/20 w-full max-w-4xl p-6 shadow-2xl space-y-4 max-h-[92vh] flex flex-col f1-chamfer">
       <div class="flex items-center justify-between pb-3 border-b border-white/10">
         <div>
           <div class="flex items-center gap-2">
             <span class="w-2 h-4 bg-f1red"></span>
-            <h3 class="font-display font-black text-xl text-white uppercase tracking-wider">Corner-by-Corner Telemetry Analysis</h3>
+            <h3 class="font-display font-black text-xl text-white uppercase tracking-wider">Modelled Speed Profile</h3>
           </div>
-          <p id="tel-sub" class="text-xs font-mono text-slate-400 mt-0.5">Speed (km/h), Throttle %, Brake Pressure & Gear Distribution across circuit distance</p>
+          <p id="tel-sub" class="text-xs font-mono text-slate-400 mt-0.5">Estimated from the circuit's corner geometry. Not car telemetry.</p>
         </div>
         <div class="flex items-center gap-3">
-          <div class="flex items-center gap-2 font-mono text-xs">
-            <span id="tel-driver-a" class="font-bold px-2 py-1 rounded bg-white/10 text-white">VER</span>
-            <span class="text-slate-500">vs</span>
-            <span id="tel-driver-b" class="font-bold px-2 py-1 rounded bg-white/10 text-white">LEC</span>
-          </div>
           <button id="btn-close-telemetry" class="w-8 h-8 rounded bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer" title="Close">
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
@@ -1225,23 +1220,23 @@
         <canvas id="telCanvas" class="w-full h-full"></canvas>
       </div>
 
-      <!-- Corner Telemetry Metrics Grid -->
+      <!-- Modelled speed figures (from the track model, not from any car) -->
       <div class="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono text-xs">
         <div class="bg-black/50 p-2.5 rounded border border-white/10">
-          <div class="text-[10px] text-slate-400 uppercase font-bold">Top Straight Speed</div>
-          <div id="tel-top-speed" class="text-base font-bold text-white mt-0.5">328 km/h vs 322 km/h</div>
+          <div class="text-[10px] text-slate-400 uppercase font-bold">Modelled top speed</div>
+          <div id="tel-top-speed" class="text-base font-bold text-white mt-0.5">—</div>
         </div>
         <div class="bg-black/50 p-2.5 rounded border border-white/10">
-          <div class="text-[10px] text-slate-400 uppercase font-bold">Min Apex Speed (T1)</div>
-          <div id="tel-apex-speed" class="text-base font-bold text-emerald-400 mt-0.5">74 km/h vs 69 km/h</div>
+          <div class="text-[10px] text-slate-400 uppercase font-bold">Modelled slowest corner</div>
+          <div id="tel-apex-speed" class="text-base font-bold text-emerald-400 mt-0.5">—</div>
         </div>
         <div class="bg-black/50 p-2.5 rounded border border-white/10">
-          <div class="text-[10px] text-slate-400 uppercase font-bold">Braking Delta T1</div>
-          <div id="tel-brake-delta" class="text-base font-bold text-f1amber mt-0.5">+6m Deeper Entry</div>
+          <div class="text-[10px] text-slate-400 uppercase font-bold">Braking zones (model)</div>
+          <div id="tel-brake-delta" class="text-base font-bold text-f1amber mt-0.5">—</div>
         </div>
         <div class="bg-black/50 p-2.5 rounded border border-white/10">
-          <div class="text-[10px] text-slate-400 uppercase font-bold">Throttle Pickup</div>
-          <div id="tel-throttle-delta" class="text-base font-bold text-white mt-0.5">0.12s Earlier Full Throttle</div>
+          <div class="text-[10px] text-slate-400 uppercase font-bold">Source</div>
+          <div id="tel-throttle-delta" class="text-[11px] font-bold text-white mt-0.5">Track model, not car data</div>
         </div>
       </div>
     </div>
@@ -1573,7 +1568,7 @@
                 <span class="text-[9px] font-mono text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/30 font-bold">TELEMETRY ENGINE ONLINE</span>
               </div>
               <div class="text-slate-200 leading-relaxed font-sans">
-                Pit Wall Telemetry Transponders active. Grounded in 75 seasons of verified Grand Prix lap timings, sector telemetry, pit stops, and steward logs.
+                Answers come from the cached race data: results since 1950, lap times from 1996 and pit stops from 2011, and curated write-ups of notable races and retirements.
                 <br/><br/>
                 Click any of the <strong>Quick Prompt cards above</strong> or ask any question in the terminal below for telemetry debriefs, pit strategy projections, and interactive replay analysis in real time.
               </div>
@@ -2035,8 +2030,8 @@
     $('race-sub').title = `${m.meta.race_name} (${m.meta.locality}, ${m.meta.country}) - ${sessionTag}`;
     const synthetic = m.drivers.some(d => d.synthetic && d.laps > 0);
     $('data-source-pill').innerHTML = `
-      <span class="w-1.5 h-1.5 rounded-full ${m.meta.has_lap_data && !synthetic ? 'bg-emerald-400' : 'bg-f1amber'} animate-pulse"></span>
-      <span>${m.meta.has_lap_data && !synthetic ? 'LIVE TIMING FEED' : 'HISTORIC ARCHIVE'}</span>
+      <span class="w-1.5 h-1.5 rounded-full ${m.meta.has_lap_data && !synthetic ? 'bg-emerald-400' : 'bg-f1amber'}"></span>
+      <span>${m.meta.has_lap_data && !synthetic ? 'LAP TIMING DATA' : 'RECONSTRUCTED FROM RESULTS'}</span>
     `;
     $('data-source-pill').title = m.meta.source;
     $('data-source-pill').className = 'hidden xl:flex text-[10px] font-mono rounded px-2.5 py-1 border items-center gap-1.5 ' + (m.meta.has_lap_data ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' : 'text-f1amber bg-f1amber/10 border-f1amber/30');
@@ -3334,7 +3329,9 @@
     if (throtEl) throtEl.textContent = throtStr;
     if (recordEl) recordEl.textContent = tr.lap_record || '—';
     const drsCount = Array.isArray(tr.drs_zones) ? tr.drs_zones.length : (typeof tr.drs_zones === 'number' ? tr.drs_zones : null);
-    if (drsEl) drsEl.textContent = drsCount ? `${drsCount} DRS Zone${drsCount > 1 ? 's' : ''}` : 'DRS Active';
+    // DRS only exists from 2011; from 2026 the zones are straight-line (active aero) mode
+    const zoneLabel = tr.aero_zone_label || 'DRS';
+    if (drsEl) drsEl.textContent = drsCount ? `${drsCount} ${zoneLabel} zone${drsCount > 1 ? 's' : ''}` : '';
 
     if (miniSpecs) {
       miniSpecs.textContent = `${tr.length_km ? tr.length_km.toFixed(2) + 'km' : ''} ${turnsCount ? '· ' + turnsCount + 'T' : ''}`;
@@ -3355,7 +3352,10 @@
           `;
         }).join('');
       } else {
-        cornersList.innerHTML = `<div class="text-slate-500 italic p-1 text-center">Calibrated track telemetry layout.</div>`;
+        cornersList.innerHTML = '';
+      }
+      if (tr.layout_note) {
+        cornersList.insertAdjacentHTML('beforeend', `<div class="text-slate-400 italic p-1 text-center text-[9px]">${esc(tr.layout_note)}</div>`);
       }
     }
 
@@ -3747,9 +3747,9 @@
         return `
           <div class="flex items-center gap-1.5 px-2 py-0.5 rounded ${isSel ? 'bg-white/20 border-white/40 shadow-sm' : 'bg-white/5 border-white/10'} border text-[10px] font-mono shrink-0 transition" title="${esc(d.name)} (${esc(d.team)})">
             <span class="w-2 h-2 rounded-full shrink-0 shadow-[0_0_8px_${neon}]" style="background:${neon}"></span>
-            <span class="font-bold text-white cursor-pointer hover:underline" onclick="selectDriver('${d.id}')">${d.code}</span>
+            <span class="font-bold text-white cursor-pointer hover:underline" data-select-driver="${esc(d.id)}">${esc(d.code)}</span>
             <span class="text-[8px] px-1 rounded bg-black/50 font-bold" style="color:${neon}">#${idx + 1}</span>
-            ${drivers.length > 1 ? `<button onclick="removeCompDriver('${d.id}')" class="text-slate-400 hover:text-rose-400 ml-0.5 cursor-pointer leading-none text-xs" title="Remove from comparison">&times;</button>` : ''}
+            ${drivers.length > 1 ? `<button data-remove-driver="${esc(d.id)}" class="text-slate-400 hover:text-rose-400 ml-0.5 cursor-pointer leading-none text-xs" title="Remove from comparison">&times;</button>` : ''}
           </div>
         `;
       }).join('');
@@ -3759,9 +3759,17 @@
       const activeIds = new Set(drivers.map(d => d.id));
       const available = S.model.drivers.filter(d => !activeIds.has(d.id));
       addSelect.innerHTML = `<option value="" disabled selected>+ COMPARE (${drivers.length}/3)</option>` +
-        available.map(d => `<option value="${d.id}">${d.code} (${d.name.split(' ').pop()} · ${d.team})</option>`).join('');
+        available.map(d => `<option value="${esc(d.id)}">${esc(d.code)} (${esc(d.name.split(' ').pop())} · ${esc(d.team)})</option>`).join('');
     }
   }
+
+  // Chip clicks are delegated (driver ids come from third-party data, so no inline handlers)
+  $('telemetry-chips')?.addEventListener('click', e => {
+    const sel = e.target.closest('[data-select-driver]');
+    if (sel) return selectDriver(sel.dataset.selectDriver);
+    const rm = e.target.closest('[data-remove-driver]');
+    if (rm) removeCompDriver(rm.dataset.removeDriver);
+  });
 
   function removeCompDriver(id) {
     if (!S.compList) return;
@@ -3890,7 +3898,7 @@
         <div class="flex items-center justify-between gap-3 text-[10px]">
           <span class="flex items-center gap-1 font-bold" style="color:${neon}">
             <span class="w-1.5 h-1.5 rounded-full" style="background:${neon}"></span>
-            ${d.code} <span class="text-[8px] opacity-75 font-normal">#${idx + 1}</span> ${isPit ? '<span class="text-amber-400 font-normal">●PIT</span>' : ''}
+            ${esc(d.code)} <span class="text-[8px] opacity-75 font-normal">#${idx + 1}</span> ${isPit ? '<span class="text-amber-400 font-normal">●PIT</span>' : ''}
           </span>
           <span class="text-white font-mono font-medium">${isDelta ? gap : s}</span>
         </div>
@@ -6284,39 +6292,21 @@
   });
 
   // =====================================================================
-  // CORNER-BY-CORNER TELEMETRY MODAL
+  // MODELLED SPEED PROFILE MODAL
   // =====================================================================
   const telModal = $('telemetry-modal');
   const telCanvas = $('telCanvas');
   const tctx_tel = telCanvas ? telCanvas.getContext('2d') : null;
 
-  function compareTarget(base) {
-    if (!S.model || !S.model.drivers) return null;
-    const baseId = base ? base.id : S.selected;
-    const otherId = (S.compList || []).find(id => id !== baseId);
-    if (otherId) {
-      const found = S.model.drivers.find(d => d.id === otherId);
-      if (found) return found;
-    }
-    return S.model.drivers.find(d => d.id !== baseId) || S.model.drivers[1] || S.model.drivers[0];
-  }
-
   function openTelemetryModal() {
     if (!S.model || !telModal) return;
-    const a = S.model.drivers.find(d => d.id === S.selected) || S.model.drivers[0];
-    const b = compareTarget() || S.model.drivers[1] || a;
-    
-    $('tel-driver-a').textContent = a.code;
-    $('tel-driver-a').style.color = a.color;
-    $('tel-driver-b').textContent = b.code;
-    $('tel-driver-b').style.color = b.color;
-    
     const cName = S.model.meta.circuit_name || S.model.meta.locality || 'Grand Prix Circuit';
-    $('tel-sub').textContent = `${cName} · Speed (km/h), Throttle %, Brake Pressure & Apex Speeds`;
+    const layoutNote = S.model.track && S.model.track.layout_note ? ` · ${S.model.track.layout_note}` : '';
+    $('tel-sub').textContent = `${cName} · estimated from corner geometry, not car telemetry${layoutNote}`;
 
     telModal.classList.remove('hidden');
     requestAnimationFrame(() => {
-      drawTelemetryCanvas(a, b);
+      drawTelemetryCanvas();
     });
     SoundEngine.playClick();
   }
@@ -6359,13 +6349,13 @@
 
   window.addEventListener('resize', () => {
     if (telModal && !telModal.classList.contains('hidden') && S.model) {
-      const a = S.model.drivers.find(d => d.id === S.selected) || S.model.drivers[0];
-      const b = compareTarget() || S.model.drivers[1] || a;
-      drawTelemetryCanvas(a, b);
+      drawTelemetryCanvas();
     }
   });
 
-  function drawTelemetryCanvas(d1, d2) {
+  // One modelled line for the circuit. There is no per-car telemetry in the data, so no driver
+  // comparison is drawn (an earlier version scaled this line by finishing position).
+  function drawTelemetryCanvas() {
     if (!telCanvas || !tctx_tel) return;
     const dpr = window.devicePixelRatio || 1;
     const r = telCanvas.getBoundingClientRect();
@@ -6378,21 +6368,22 @@
 
     const isLight = document.body.classList.contains('theme-light');
     const tr = S.model.track;
-    const n = tr ? tr.speed_kmh.length : 200;
-    const baseSpeed = tr ? tr.speed_kmh : Array.from({length: n}, (_, i) => 180 + 100 * Math.sin(i / 10));
+    const baseSpeed = tr && !tr.schematic && Array.isArray(tr.speed_kmh) ? tr.speed_kmh : [];
+    const n = baseSpeed.length;
+    if (!n) {
+      ['tel-top-speed', 'tel-apex-speed', 'tel-brake-delta'].forEach(id => { $(id).textContent = '—'; });
+      tctx_tel.fillStyle = isLight ? '#0F172A' : '#F1F5F9';
+      tctx_tel.font = '600 12px JetBrains Mono, ui-monospace, monospace';
+      tctx_tel.textAlign = 'center';
+      tctx_tel.fillText('No layout data for this circuit, so there is no speed model.', W / 2, H / 2);
+      return;
+    }
 
-    const p1Modifier = d1.finishedStatus ? (1 - (d1.finish - 1) * 0.003) : 0.98;
-    const p2Modifier = d2.finishedStatus ? (1 - (d2.finish - 1) * 0.003) : 0.96;
-
-    const top1 = Math.round(Math.max(...baseSpeed) * p1Modifier * 1.04);
-    const top2 = Math.round(Math.max(...baseSpeed) * p2Modifier * 1.02);
-    const min1 = Math.round(Math.min(...baseSpeed) * p1Modifier * 0.98);
-    const min2 = Math.round(Math.min(...baseSpeed) * p2Modifier * 0.95);
-
-    $('tel-top-speed').textContent = `${top1} km/h vs ${top2} km/h`;
-    $('tel-apex-speed').textContent = `${min1} km/h vs ${min2} km/h`;
-    $('tel-brake-delta').textContent = `+${Math.max(2, Math.abs(top1 - top2))}m Deeper Entry`;
-    $('tel-throttle-delta').textContent = `0.${Math.max(1, (top1 > top2 ? 14 : 8))}s Earlier Full Throttle`;
+    let brakingZones = 0;
+    baseSpeed.forEach((v, i) => { if (v < 150 && (i === 0 || baseSpeed[i - 1] >= 150)) brakingZones++; });
+    $('tel-top-speed').textContent = `${Math.round(Math.max(...baseSpeed))} km/h`;
+    $('tel-apex-speed').textContent = `${Math.round(Math.min(...baseSpeed))} km/h`;
+    $('tel-brake-delta').textContent = `${brakingZones}`;
 
     const padL = 68, padR = 20, padT = 20, padB = 40;
     const chartW = W - padL - padR, chartH = H - padT - padB;
@@ -6454,31 +6445,18 @@
 
     const speedY = s => padT + (1 - (s - 80) / 280) * (chartH * 0.65);
 
-    // Driver 2 speed trace
+    // Modelled speed trace
     tctx_tel.beginPath();
-    tctx_tel.strokeStyle = d2.color;
-    tctx_tel.lineWidth = 1.8;
-    tctx_tel.globalAlpha = 0.75;
+    tctx_tel.strokeStyle = '#22D3EE';
+    tctx_tel.lineWidth = 2.2;
     baseSpeed.forEach((s, i) => {
       const x = padL + (i / n) * chartW;
-      const y = speedY(s * p2Modifier);
+      const y = speedY(s);
       i === 0 ? tctx_tel.moveTo(x, y) : tctx_tel.lineTo(x, y);
     });
     tctx_tel.stroke();
 
-    // Driver 1 speed trace
-    tctx_tel.beginPath();
-    tctx_tel.strokeStyle = d1.color;
-    tctx_tel.lineWidth = 2.4;
-    tctx_tel.globalAlpha = 1.0;
-    baseSpeed.forEach((s, i) => {
-      const x = padL + (i / n) * chartW;
-      const y = speedY(s * p1Modifier);
-      i === 0 ? tctx_tel.moveTo(x, y) : tctx_tel.lineTo(x, y);
-    });
-    tctx_tel.stroke();
-
-    // Throttle & Brake bars
+    // Throttle & brake bands inferred from the modelled speed (above 220 / below 150 km/h)
     baseSpeed.forEach((s, i) => {
       const x = padL + (i / n) * chartW;
       const segW = Math.max(2, chartW / n);
@@ -6491,14 +6469,13 @@
       }
     });
 
-    // Label corner apexes at local speed minima
-    let cCount = 1;
+    // Mark slow corners at local speed minima (unnumbered: not the official turn numbering)
     for (let i = 4; i < n - 4; i++) {
       if (baseSpeed[i] <= baseSpeed[i-1] && baseSpeed[i] <= baseSpeed[i+1] && baseSpeed[i] < 190) {
         const x = padL + (i / n) * chartW;
         tctx_tel.fillStyle = '#E10600';
         tctx_tel.font = 'bold 9px JetBrains Mono';
-        tctx_tel.fillText(`T${cCount++}`, x - 6, H - 8);
+        tctx_tel.fillText('▲', x - 4, H - 8);
         tctx_tel.strokeStyle = 'rgba(225,6,0,0.3)';
         tctx_tel.setLineDash([2, 2]);
         tctx_tel.beginPath();

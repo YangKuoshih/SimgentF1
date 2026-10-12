@@ -19,6 +19,10 @@ on:
     # Every 6 hours: picks up results, sprint/sprint-qualifying, grids and late corrections
     # for races in the last 21 days (jolpica_sync.RECENT_DAYS).
     - cron: '17 */6 * * *'
+    # Race weekends (Friday to Monday, UTC): the same light sync every hour in between, so
+    # results appear within about an hour of being published. Usually well under 50 Jolpica requests a
+    # run, well under its ~500/hour limit. (GitHub can delay scheduled runs.)
+    - cron: '47 1-5,7-11,13-17,19-23 * * 5,6,0,1'
     # Wednesdays: full re-check of every cached season against Jolpica (older data can
     # still be corrected upstream).
     - cron: '43 3 * * 3'
