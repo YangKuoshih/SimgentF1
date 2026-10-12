@@ -1653,8 +1653,11 @@ def _build_race_replay(year: int, rnd: int, net: bool = True, circuit_override: 
         if isinstance(fl_data, dict):
             rank = str(fl_data.get("rank", ""))
             time_val = fl_data.get("Time", {}).get("time") if isinstance(fl_data.get("Time"), dict) else None
-            if (rank == "1" or not fl) and time_val:
+            # Only the race's fastest lap (rank 1). When just the winner's row is known, its own best
+            # lap is not the race's fastest lap: F1DB's (below) is used instead.
+            if rank == "1" and time_val:
                 fl = {
+                    "name": f'{r["Driver"]["givenName"]} {r["Driver"]["familyName"]}',
                     "code": r["Driver"].get("code", r["Driver"].get("familyName", "FL")[:3].upper()),
                     "lap": _safe_int(fl_data.get("lap"), fallback=1),
                     "time": time_val
@@ -1664,7 +1667,7 @@ def _build_race_replay(year: int, rnd: int, net: bool = True, circuit_override: 
         f1 = geo["race_fastest_lap"]
         who = next((d for d in drivers if d["name"] == f1["driver"]), None)
         fl = {"code": who["code"] if who else f1["driver"].split()[-1][:3].upper(),
-              "lap": f1.get("lap") or 1, "time": f1["time"]}
+              "name": who["name"] if who else f1["driver"], "lap": f1.get("lap") or 1, "time": f1["time"]}
 
     cname = geo["name"] if geo else res.get("Circuit", {}).get("circuitName", cid.replace("_", " ").title())
     loc = res.get("Circuit", {}).get("Location", {}).get("locality", "")

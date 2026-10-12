@@ -58,6 +58,10 @@ jobs:
           python tests/eval_multi_turn.py
           python tests/eval_session_scope.py
 
+      - name: Golden eval (every Grand Prix since 1950, answers from F1DB)
+        run: |
+          python tests/eval_golden.py --gate --markdown "$GITHUB_STEP_SUMMARY"
+
       - name: Router shadow eval (agreement with the engine, held-out paraphrases)
         run: |
           python tests/eval_router.py --gate
@@ -75,6 +79,15 @@ jobs:
           npm install --global npm@12.2.0
           npm ci
           npx playwright install --with-deps chromium
+
+      - name: Behaviour eval (promptfoo - injections, unavailable data, phrasing)
+        env:
+          PROMPTFOO_PYTHON: python
+          PROMPTFOO_DISABLE_TELEMETRY: '1'
+          PROMPTFOO_DISABLE_UPDATE: '1'
+        run: |
+          python -m pip install --require-hashes -r requirements-eval.txt
+          npx --yes promptfoo@0.124.1 eval -c tests/promptfoo/promptfooconfig.yaml --no-cache
 
       - name: Run Browser Suites with Managed Test Server
         env:
