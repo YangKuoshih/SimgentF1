@@ -1340,7 +1340,7 @@ def lookup_season_champion(year: int) -> Optional[Dict[str, Any]]:
         f"• **World Drivers' Champion**: **{info['driver']}** driving for **{info['team']}**\n"
         f"• **Championship Record**: **{info['wins']} Grand Prix victories**, scoring **{info['points']:.1f} points**\n"
         f"• **Runner-Up**: {info['runner_up']}\n\n"
-        f"> *Interactive replays and timing classifications are archived for competitive sessions across all 76 seasons.*"
+        f"> *Source: SimGent's season records.*"
     )
 
     card = {

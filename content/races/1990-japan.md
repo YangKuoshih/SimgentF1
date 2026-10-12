@@ -1,5 +1,6 @@
 +++
 order = 2
+decided_title = true
 id = "1990_japan"
 year = 1990
 round = 15

@@ -42,14 +42,22 @@ Every race weekend, my kids and I sit together watching the Grand Prix. Between 
 
 Commercial timing screens are locked behind paywalls or designed like 1990s spreadsheets that kids can't explore. I wanted to build something intuitive and inspiring for them: a 60 FPS interactive 2D replay cockpit paired with an autonomous AI Race Engineer they could talk to in plain English.
 
-What started as a family race-day side project became **SimGent** (short for **Simulator Agent**) — an open-source pit wall telemetry cockpit covering 76+ years of Grand Prix racing history (1950–2026).
+What started as a family race-day side project became **SimGent** (short for **Simulator Agent**) — an open-source race replay and pit wall agent covering every World Championship race since 1950.
+
+> **What is real data and what is modelled.** Results, grids, pit stops and championship
+> standings come from [Jolpica-F1](https://github.com/jolpica/jolpica-f1) (OpenF1 fills in
+> sprint and qualifying sessions before Jolpica publishes them). Lap-by-lap replays use real lap
+> times from **1996 onwards**; earlier races are reconstructed from the results (finishing order,
+> laps completed, retirements). Car positions *within* a lap, the speed profile and the circuit
+> figures are modelled from today's circuit outlines. There is no car telemetry (speed, throttle,
+> brake) in the data. Circuits without layout data replay on a labelled schematic.
 
 ---
 
 ## 📸 Application Showcase
 
 ### 1. High-Performance 2D Vector Replay Cockpit (Dark Mode)
-*Unobstructed racing line view across 40+ Grand Prix circuits, 20+ synchronized car models in team-inspired colors, live timing tower, multi-driver telemetry curves, and real-time session debriefs.*
+*Unobstructed racing line view across 40+ Grand Prix circuits, 20+ synchronized car models in team-inspired colors, timing tower, lap-time and gap charts, and session debriefs.*
 
 ![SimGent - 2D Vector Race Replay (Dark Mode)](docs/assets/01_race_replay_dark.png)
 
@@ -85,22 +93,22 @@ What started as a family race-day side project became **SimGent** (short for **S
 - Full normalized vector track maps rendered from real geospatial circuit coordinates (`f1-circuits.geojson`).
 - Dynamic heading rotation \(\theta = \arctan2(\Delta y, \Delta x)\) synchronizing micro-car models with team-inspired colors (Ferrari `#E80020`, Red Bull `#3671C6`, McLaren `#FF8000`, Mercedes `#27F4D2`, Aston Martin `#229971`, etc.).
 - Real-time **Race Control event transponders**: Safety Car (SC), Virtual Safety Car (VSC), Red Flags, Yellow Flags, and non-finisher (DNF) markers.
-- Fully collapsible, movable HUDs: minimizes the Driver Telemetry Card and Circuit Intel HUD for an unobstructed view of the racing line.
+- Fully collapsible, movable HUDs: minimizes the Driver Card and Circuit Intel HUD for an unobstructed view of the racing line.
 
 ### 2. Autonomous AI Pit Wall Radio
 - Ask any natural language question about pit stop tactics, tire degradation, regulations, or historical retirements.
-- Dynamic multi-LLM orchestrator (Groq Llama-3.3-70B, Google Gemini 2.5 Flash, Ollama, and local deterministic transponder fallback).
-- **Tactical Action Cards**: The agent doesn't just return text; it synthesizes interactive action cards (e.g. `[JUMP TO LAP 17 REPLAY]`) that scrub the entire cockpit camera and telemetry timeline directly to the incident.
+- Answers come from the cached data by a deterministic agent with a small local embedding router (no API key or LLM needed; this is how the live site runs). An optional LLM layer (Groq, Gemini or Ollama) can be enabled with your own keys.
+- **Tactical Action Cards**: The agent doesn't just return text; it synthesizes interactive action cards (e.g. `[JUMP TO LAP 17 REPLAY]`) that scrub the replay directly to the incident.
 
-### 3. Multi-Driver Telemetry Delta Cockpit
-- High-fidelity telemetry comparisons across any drivers on the grid.
-- Synchronized overlays for **Speed (km/h)**, **Throttle (%)**, **Braking Pressure (%)**, **Gear Selection**, and **DRS Activation Zones**.
-- Dynamic cornering apex detection highlighting apex minimum speeds and braking zone markers.
+### 3. Lap-Time and Gap Charts
+- Lap-time comparison for up to three drivers, from real lap timing (1996 onwards).
+- A **modelled** speed profile per circuit, estimated from corner geometry (labelled as a model; not car telemetry).
+- DRS zones shown from 2011, straight-line (active aero) mode from 2026.
 
-### 4. 76+ Years of Grand Prix Archives (1950–2026)
-- Complete historical coverage spanning 76+ seasons of World Championship racing.
-- Pre-cached transponder records for instant sub-10ms query execution.
-- Real-time auto-updating pipeline via Jolpica-F1 REST sync for modern Grand Prix sessions.
+### 4. Every Grand Prix Since 1950
+- Results for every World Championship race, 1950–2026; full lap-timing replays from 1996, earlier races reconstructed from results.
+- Cached data in the repo, so answers need no network calls.
+- Automatic sync from Jolpica-F1 (and OpenF1 for sprint and qualifying) every 6 hours, hourly on race weekends.
 
 ### 5. Strategy Lab & Interactive "What-If" Battle Simulator
 - Full-distance tactical race battle simulations between any two driver strategies.
@@ -112,7 +120,7 @@ What started as a family race-day side project became **SimGent** (short for **S
   - *2024 British GP*: What if McLaren fitted Norris with fresh Mediums instead of used Softs?
   - *2026 Bahrain GP*: Verstappen aggressive 2-stop pursuit vs Russell 1-stop conservation.
   - *1998 Belgian GP*: What if Schumacher avoided the spray collision with Coulthard?
-- Interactive SVG delta telemetry chart plotting real-time lead margins across the full Grand Prix distance.
+- Interactive SVG chart of the simulated gap across the race distance.
 
 ### 6. 2026 FIA Technical Regulations Primer
 - Deep interactive technical guide contrasting the upcoming **2026 Engine & Aero era**:

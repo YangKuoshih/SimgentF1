@@ -1,0 +1,166 @@
+"""What the app shows must match what the data supports (fixes from a pre-launch review).
+
+Historic circuits are never shown as another circuit or with today's figures, cards are not
+double-escaped, questions without a race on screen use the latest race, "why" championship
+questions explain, and the UI does not claim live timing or car telemetry. Offline."""
+import os
+import re
+import sys
+import unittest
+from unittest.mock import patch
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from app.tools import jolpica_sync as J  # noqa: E402
+from app.tools import race_replay as R  # noqa: E402
+from app.tools.guardrails import sanitize_a2ui_card  # noqa: E402
+from app.tools.race_agent import answer_race_engineer_query as ask  # noqa: E402
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_offline = patch.object(J, "_http", lambda url, retries=4: None)
+
+
+def setUpModule():
+    _offline.start()
+
+
+def tearDownModule():
+    _offline.stop()
+
+
+def track(year, rnd):
+    m = R.build_replay(year, rnd)
+    return m["meta"], m["track"]
+
+
+class HistoricCircuits(unittest.TestCase):
+    def test_circuit_without_layout_keeps_its_own_name_on_a_labelled_schematic(self):
+        for rnd, name in ((4, "Bremgarten"), (6, "Reims")):
+            meta, tr = track(1950, rnd)
+            self.assertIn(name, meta["circuit_name"])
+            self.assertNotIn("Silverstone", meta["circuit_name"])
+            self.assertTrue(tr["schematic"])
+            self.assertIn("schematic", tr["layout_note"])
+            self.assertIsNone(tr["length_km"])
+            self.assertEqual(tr["drs_zones"], [])
+            self.assertEqual(tr["turns"], [])
+
+    def test_resolver_never_substitutes_another_circuit(self):
+        for year in (1950, 1955, 1961):
+            for race in R.season_races(year, net=False):
+                res = J.results(year, race["round"], net=False) or {}
+                raw = res.get("Circuit", {}).get("circuitId", "")
+                if raw and raw != "silverstone":
+                    self.assertNotEqual(R.resolve_canonical_circuit(year, race["round"], raw_circuit_id=raw),
+                                        "silverstone", (year, race["round"], raw))
+
+    def test_pre_1996_races_show_none_of_todays_figures(self):
+        meta, tr = track(1950, 1)
+        self.assertEqual(meta["circuit_name"], "Silverstone Circuit")
+        for key in ("length_km", "turns_count", "pit_loss_s", "full_throttle_pct", "lap_record"):
+            self.assertIsNone(tr[key], key)
+        self.assertEqual(tr["drs_zones"], [])
+        self.assertIn("1950", tr["layout_note"])
+
+    def test_drs_only_from_2011_and_straight_line_mode_from_2026(self):
+        self.assertEqual(track(2005, 9)[1]["drs_zones"], [])
+        tr = track(2019, 10)[1]
+        self.assertTrue(tr["drs_zones"])
+        self.assertEqual(tr["aero_zone_label"], "DRS")
+        self.assertEqual(track(2026, 17)[1]["aero_zone_label"], "Straight-line mode")
+
+    def test_no_lap_record_set_after_the_race(self):
+        for year, rnd in ((2019, 10), (2005, 9), (2026, 17)):
+            record = track(year, rnd)[1].get("lap_record") or ""
+            for y in re.findall(r"\b(?:19|20)\d{2}\b", record):
+                self.assertLessEqual(int(y), year, (year, rnd, record))
+
+    def test_no_invented_default_figures(self):
+        geo = R.circuit_geometry("some_circuit_without_data")
+        self.assertTrue(geo["schematic"])
+        self.assertIsNone(geo["length_km"])
+        self.assertEqual(geo["drs_zones"], [])
+        with open(os.path.join(ROOT, "app", "tools", "race_replay.py"), encoding="utf-8") as f:
+            src = f.read()
+        for default in ('"1:30.000"', '"Level 3/5"', '"length_km": 5.2'):
+            self.assertNotIn(default, src)
+
+
+class ReconstructedSessionsAreLabelled(unittest.TestCase):
+    def test_sprint_points_come_from_the_classification(self):
+        m = R.build_replay(2021, 10, session_type="sprint")  # 2021 sprints paid 3-2-1
+        self.assertFalse(m["meta"]["has_lap_data"])
+        finish = m["events"][-1]["consequence"]
+        self.assertIn("(3 pts)", finish)
+        self.assertNotIn("8 pts", finish)
+
+
+class CardsAreNotDoubleEscaped(unittest.TestCase):
+    def test_text_stays_plain_for_the_client_to_escape(self):
+        card = sanitize_a2ui_card({"title": "Results & Classification", "action": "VIEW",
+                                   "metrics": [{"label": "P1 & P2", "value": "<b>x</b>", "color": "red;x"}]})
+        self.assertEqual(card["title"], "Results & Classification")
+        self.assertEqual(card["metrics"][0]["label"], "P1 & P2")
+        self.assertNotIn("&amp;", str(card))
+        self.assertTrue(re.fullmatch(r"#[0-9A-Fa-f]{3,8}", card["metrics"][0]["color"]))
+
+    def test_control_characters_and_length_are_capped(self):
+        card = sanitize_a2ui_card({"title": "a\x00b\x1b" + "x" * 200})
+        self.assertTrue(card["title"].startswith("ab"))
+        self.assertLessEqual(len(card["title"]), 80)
+
+
+class NoRaceOnScreen(unittest.TestCase):
+    def test_q1_without_context_uses_the_latest_race(self):
+        for q in ("Who got knocked out in Q1?", "which drivers were eliminated in Q1"):
+            r = ask(q, {}, [])
+            self.assertEqual(r["tool"], "qualifying_segment_lookup", q)
+            self.assertIn("Qualifying", r["text"])
+            self.assertNotIn("retirement", r["text"].lower())
+
+    def test_named_race_and_session(self):
+        r = ask("who was knocked out in Q1 at monza 2024", {"year": 2026, "round": 17}, [])
+        self.assertEqual(r["tool"], "qualifying_segment_lookup")
+        self.assertIn("2024 Italian Grand Prix", r["text"])
+
+
+class ChampionshipWhy(unittest.TestCase):
+    def test_why_includes_the_deciding_race_whatever_is_on_screen(self):
+        for ctx in ({}, {"year": 2026, "round": 17}):
+            r = ask("Why did Hamilton lose the 2021 championship?", ctx, [])
+            self.assertIn("Max Verstappen", r["text"])
+            self.assertIn("Latifi", r["text"], ctx)
+
+    def test_why_without_a_write_up_says_so(self):
+        r = ask("why did button win the 2009 title", {}, [])
+        self.assertIn("no write-up", r["text"])
+
+    def test_who_won_stays_short(self):
+        r = ask("who won the 2009 title", {}, [])
+        self.assertNotIn("How it was decided", r["text"])
+
+
+class UiClaims(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        with open(os.path.join(ROOT, "frontend", "static", "index.html"), encoding="utf-8") as f:
+            cls.html = f.read()
+
+    def test_no_live_timing_or_telemetry_overclaims(self):
+        for claim in ("LIVE TIMING FEED", "Corner-by-Corner Telemetry", "telemetry archives",
+                      "76+ years of Grand Prix telemetry", "Calibrated track telemetry layout",
+                      "Deeper Entry", "Earlier Full Throttle"):
+            self.assertNotIn(claim, self.html)
+
+    def test_driver_fields_are_not_put_into_inline_handlers(self):
+        self.assertNotRegex(self.html, r"onclick=\"\w+\('\$\{")
+
+    def test_readme_states_what_is_modelled(self):
+        with open(os.path.join(ROOT, "README.md"), encoding="utf-8") as f:
+            readme = f.read()
+        self.assertIn("1996", readme)
+        self.assertIn("no car telemetry", readme.lower().replace("there is ", ""))
+
+
+if __name__ == "__main__":
+    unittest.main()

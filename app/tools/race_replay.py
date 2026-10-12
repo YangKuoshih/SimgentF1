@@ -188,7 +188,64 @@ def resolve_canonical_circuit(
             if re.search(r'\b' + re.escape(keyword) + r'\b', rn_lower):
                 return cid
 
-    return "silverstone"
+    # A circuit without layout data (Bremgarten, Reims...) keeps its own id and replays on a
+    # schematic; it is never shown as another circuit (this used to return "silverstone").
+    for candidate in (raw_circuit_id, _main_circuit_id(year, rnd), _schedule_circuit_id(year, rnd)):
+        if candidate and candidate.strip():
+            return candidate.strip().lower()
+    return "unknown"
+
+
+def _main_circuit_id(year: int, rnd: int) -> str:
+    try:
+        res = J.results(year, rnd, net=False)
+        return (res or {}).get("Circuit", {}).get("circuitId", "")
+    except Exception:
+        return ""
+
+
+def _schedule_circuit_id(year: int, rnd: int) -> str:
+    try:
+        race = next((r for r in J.schedule(year, net=False) if _safe_int(r.get("round")) == rnd), None)
+        return (race or {}).get("Circuit", {}).get("circuitId", "")
+    except Exception:
+        return ""
+
+
+DRS_FROM, ACTIVE_AERO_FROM, LAP_TIMING_FROM = 2011, 2026, 1996
+
+
+def track_for_year(cid: str, year: int, circuit_info: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
+    """The circuit as it can honestly be shown for a given season.
+
+    Layouts come from today's circuit outlines, so: DRS zones only from 2011 (straight-line
+    mode replaces DRS from 2026), a lap record only if it was set by that season, and for
+    races before 1996 (results-only replays) none of today's length, turn or pit figures.
+    Circuits without layout data get a labelled schematic with their real name."""
+    geo = circuit_geometry(cid) if cid else None
+    if not geo:
+        return None
+    geo = dict(geo)
+    ci = circuit_info or {}
+    if geo.get("schematic"):
+        geo["name"] = ci.get("circuitName") or geo.get("name")
+        geo["country"] = ci.get("Location", {}).get("country", "")
+        geo["layout_note"] = "No layout data for this circuit: the track shown is a schematic, not the real shape."
+        return geo
+    if year < DRS_FROM:
+        geo["drs_zones"], geo["drs_detections"] = [], []
+    geo["aero_zone_label"] = "Straight-line mode" if year >= ACTIVE_AERO_FROM else "DRS"
+    record_year = re.search(r"\b(19|20)\d{2}\b", geo.get("lap_record") or "")
+    if record_year and int(record_year.group(0)) > year:
+        geo["lap_record"] = None
+    if year < LAP_TIMING_FROM:
+        for key in ("length_km", "turns_count", "pit_loss_s", "full_throttle_pct", "tyre_stress"):
+            geo[key] = None
+        geo["turns"], geo["key_turns"] = [], []
+        geo["layout_note"] = f"Today's layout shown for reference; the {year} circuit was different."
+    else:
+        geo["layout_note"] = "Track figures are for today's layout."
+    return geo
 
 
 # Official-ish team colours keyed by Jolpica constructorId (modern + historic)
@@ -470,7 +527,10 @@ def circuit_geometry(circuit_id: str, n_points: int = 720) -> Optional[Dict[str,
             "aspect": round((maxx - minx) / (maxy - miny), 4) if (maxy - miny) else 1.0,
             "speed_kmh": v_kmh,
             "tfrac": tfrac,
-            "length_km": 5.2,
+            # No layout data for this circuit: a schematic loop so the replay can animate.
+            # Nothing about it is real, so no length, turns or DRS zones are claimed.
+            "schematic": True,
+            "length_km": None,
             "name": circuit_id.replace("_", " ").title(),
             "rotation_deg": rot_deg,
             "sectors": [
@@ -478,9 +538,9 @@ def circuit_geometry(circuit_id: str, n_points: int = 720) -> Optional[Dict[str,
                 {"sector": 2, "start_pct": 0.33, "end_pct": 0.67, "color": "#FF1867", "label": "SECTOR 2"},
                 {"sector": 3, "start_pct": 0.67, "end_pct": 1.0, "color": "#E10600", "label": "SECTOR 3"},
             ],
-            "turns": turns,
-            "drs_zones": [{"name": "ACTIVATION ZONE 1", "start_idx": int(n_points * 0.92), "end_idx": int(n_points * 0.05), "label": "ACTIVATION ZONE 1"}],
-            "drs_detections": [{"name": "DETECTION POINT 1", "idx": int(n_points * 0.88)}],
+            "turns": [],
+            "drs_zones": [],
+            "drs_detections": [],
         }
 
     coords = feat["geometry"]["coordinates"]
@@ -576,10 +636,11 @@ def circuit_geometry(circuit_id: str, n_points: int = 720) -> Optional[Dict[str,
         "turns": turns,
         "drs_zones": drs_zones,
         "drs_detections": drs_detections,
-        "lap_record": bp.get("lap_record", "1:30.000"),
-        "full_throttle_pct": bp.get("full_throttle_pct", 65),
-        "tyre_stress": bp.get("tyre_stress", "Level 3/5"),
-        "pit_loss_s": bp.get("pit_loss_s", 21.0),
+        # Missing figures stay missing (shown as "—"), never filled with defaults
+        "lap_record": bp.get("lap_record"),
+        "full_throttle_pct": bp.get("full_throttle_pct"),
+        "tyre_stress": bp.get("tyre_stress"),
+        "pit_loss_s": bp.get("pit_loss_s"),
         "turns_count": bp.get("turns_count", len(turns)),
         "key_turns": bp.get("turns", [])
     }
@@ -876,7 +937,7 @@ def _build_qualifying_replay(year: int, rnd: int, net: bool = True, circuit_over
 
     raw_cid = circuit_info.get("circuitId", "") if circuit_info else ""
     cid = resolve_canonical_circuit(year, rnd, raw_circuit_id=raw_cid, race_name=race_name, circuit_override=circuit_override)
-    geo = circuit_geometry(cid) if cid else None
+    geo = track_for_year(cid, year, circuit_info)
     cname = geo.get("name") if geo else (circuit_info.get("circuitName") if circuit_info else cid.replace("_", " ").title())
     loc = circuit_info.get("Location", {}).get("locality", "") if circuit_info else ""
     country = geo.get("country", "") if geo else (circuit_info.get("Location", {}).get("country", "") if circuit_info else "")
@@ -885,10 +946,10 @@ def _build_qualifying_replay(year: int, rnd: int, net: bool = True, circuit_over
         cname, loc, country = _reloc["circuit_name"], _reloc["locality"], _reloc["country"]
 
     p1 = drivers_raw[0] if drivers_raw else None
-    pole_time_str = _valid_time_str(p1.get("Q3"), p1.get("Q2"), p1.get("Q1")) if p1 else "1:30.000"
-    if not pole_time_str:
-        pole_time_str = (p1.get("Q3") or p1.get("Q2") or p1.get("Q1")) if p1 else "1:30.000"
-    pole_secs = _secs(pole_time_str) or 90.0
+    pole_time_str = _valid_time_str(p1.get("Q3"), p1.get("Q2"), p1.get("Q1")) if p1 else None
+    if not pole_time_str and p1:
+        pole_time_str = p1.get("Q3") or p1.get("Q2") or p1.get("Q1") or None
+    pole_secs = _secs(pole_time_str) or 90.0  # animation pace only; never displayed
 
     drivers = []
     for idx, r in enumerate(drivers_raw):
@@ -972,7 +1033,7 @@ def _build_qualifying_replay(year: int, rnd: int, net: bool = True, circuit_over
             d["best_lap"] = None
             d["pole_delta"] = None
             d["status"] = d["qualifying_stage"]
-    pole_time_txt = "" if times_estimated else f" ({pole_time_str})"
+    pole_time_txt = "" if times_estimated or not pole_time_str else f" ({pole_time_str})"
     p2_delta_txt = "" if times_estimated else (f" ({drivers[1]['pole_delta']})" if n_cars > 1 else "")
     # Cut-offs from the data (20 cars: 15/10, 22 cars from 2026: 16/10) instead of assuming 20
     n_q2 = sum(1 for d in drivers if d["qualifying_stage"] in ("Q2", "Q3")) or min(15, n_cars)
@@ -1004,7 +1065,8 @@ def _build_qualifying_replay(year: int, rnd: int, net: bool = True, circuit_over
                         "notes": qres.get("notes", []), "source_url": qres.get("source_url", "")}
     else:
         session_meta = {"race_name": f"{clean_qname} - Qualifying", "session_type": "qualifying",
-                        "session_name": "Qualifying",
+                        # The race grid is not the qualifying order (penalties), so say so
+                        "session_name": "Qualifying (order from race grid)" if times_estimated else "Qualifying",
                         "source": ("Estimated from race grid (no qualifying data cached)" if times_estimated
                                    else "Jolpica-F1 (Qualifying)")}
     return {
@@ -1012,7 +1074,7 @@ def _build_qualifying_replay(year: int, rnd: int, net: bool = True, circuit_over
             "year": year, "round": rnd,
             "date": date_str, "circuit_id": cid, "circuit_name": cname,
             "locality": loc, "country": country,
-            "total_laps": n_seg, "has_lap_data": True, "segments": segments,
+            "total_laps": n_seg, "has_lap_data": not times_estimated, "segments": segments,
             "pole_time": None if times_estimated else pole_time_str,
             "times_estimated": times_estimated,
             "pole_driver": drivers[0]["code"] if drivers else "",
@@ -1047,7 +1109,7 @@ def _build_sprint_replay(year: int, rnd: int, net: bool = True, circuit_override
 
     raw_cid = circuit_info.get("circuitId", "") if circuit_info else ""
     cid = resolve_canonical_circuit(year, rnd, raw_circuit_id=raw_cid, race_name=race_name, circuit_override=circuit_override)
-    geo = circuit_geometry(cid) if cid else None
+    geo = track_for_year(cid, year, circuit_info)
     cname = geo.get("name") if geo else (circuit_info.get("circuitName") if circuit_info else cid.replace("_", " ").title())
     loc = circuit_info.get("Location", {}).get("locality", "") if circuit_info else ""
     country = geo.get("country", "") if geo else (circuit_info.get("Location", {}).get("country", "") if circuit_info else "")
@@ -1105,11 +1167,14 @@ def _build_sprint_replay(year: int, rnd: int, net: bool = True, circuit_override
             "synthetic": True,
         })
 
+    # Points from the classification itself: the scale changed (3-2-1 in 2021, top 8 since 2022)
+    scorers = [d for d in drivers if d["points"] > 0]
+    fmt = lambda p: f"{p:g} pt{'s' if p != 1 else ''}"
     events = [
-        {"lap": 1, "type": "FLAG", "message": "SPRINT RACE START — 100km flat-out sprint underway",
-         "consequence": "No mandatory pit stops; points awarded to top 8 finishers (8-7-6-5-4-3-2-1)."},
-        {"lap": max(1, winner_laps), "type": "CHEQUERED", "message": f"SPRINT FINISH — {drivers[0]['code'] if drivers else 'Leader'} wins the Sprint Race",
-         "consequence": f"Secures 8 championship points; {drivers[1]['code']} P2 (7 pts), {drivers[2]['code']} P3 (6 pts)." if len(drivers) > 2 else "Sprint finished."}
+        {"lap": 1, "type": "FLAG", "message": "SPRINT START — 100km sprint underway",
+         "consequence": f"No mandatory pit stops; points to the top {len(scorers)} ({'-'.join(f'{d['points']:g}' for d in scorers)})." if scorers else "No mandatory pit stops."},
+        {"lap": max(1, winner_laps), "type": "CHEQUERED", "message": f"SPRINT FINISH — {drivers[0]['code'] if drivers else 'Leader'} wins the Sprint",
+         "consequence": ("; ".join(f"{d['code']} P{d['finish']} ({fmt(d['points'])})" for d in drivers[:3])) if len(drivers) > 2 else "Sprint finished."}
     ]
 
     clean_sname = re.sub(r'^(?:\d{4}\s+|Flag of [^—\-]+?\s+)', '', race_name)
@@ -1120,7 +1185,8 @@ def _build_sprint_replay(year: int, rnd: int, net: bool = True, circuit_override
             "year": year, "round": rnd, "race_name": f"{clean_sname} - Sprint",
             "date": date_str, "circuit_id": cid, "circuit_name": cname,
             "locality": loc, "country": country,
-            "total_laps": max(1, winner_laps), "has_lap_data": True,
+            # Sprint laps are spread evenly from each driver's total time: no lap timing
+            "total_laps": max(1, winner_laps), "has_lap_data": False,
             "session_type": "sprint",
             "session_name": "F1 Sprint Race (100km)",
             "source": "Jolpica-F1 (Sprint Classification)",
@@ -1157,7 +1223,7 @@ def _build_race_replay(year: int, rnd: int, net: bool = True, circuit_override: 
     raw_cid = res.get("Circuit", {}).get("circuitId", "")
     race_name = res.get("raceName", "")
     cid = resolve_canonical_circuit(year, rnd, raw_circuit_id=raw_cid, race_name=race_name, circuit_override=circuit_override)
-    geo = circuit_geometry(cid)
+    geo = track_for_year(cid, year, res.get("Circuit"))
 
     # Per-driver lap times from real lap data
     lap_times: Dict[str, List[float]] = {}
