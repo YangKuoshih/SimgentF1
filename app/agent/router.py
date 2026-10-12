@@ -32,9 +32,10 @@ INTENTS_FILE = os.path.join(ROOT, "agent", "intents.toml")
 OVERRIDE_MIN_SCORE = 0.60
 OVERRIDE_MARGIN = 0.10
 FALLBACK_TOOLS = {"session_telemetry_briefing", ""}  # curated memory answers are specific, not fallbacks
-# Correct statements, never overridden: the weekend had no sprint, the session isn't in the data.
+# Correct statements, never overridden: the weekend had no sprint, the session isn't in the data,
+# the season is before 1950 or not run yet (the router's canonical phrasing drops the year).
 DEFINITIVE_TOOLS = {"no_sprint_weekend", "qualifying_not_in_data", "sprint_not_in_data",
-                    "sprint_qualifying_not_in_data"}
+                    "sprint_qualifying_not_in_data", "season_out_of_range"}
 # "No race result yet" is definitive for questions about the Grand Prix itself, not for
 # qualifying, standings, careers or rules ("who got bounced in the first session?").
 RACE_INTENTS = {"session_result", "finishing_position", "driver_result", "podium_check", "starting_grid",

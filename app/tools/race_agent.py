@@ -356,7 +356,13 @@ def _season_title_from_data(year: int, constructor: bool = False) -> Optional[Di
 
 def _match_race_round(q: str, races: List[Dict[str, Any]]) -> Optional[int]:
     """Matches a user query against a list of season races."""
-    # First: direct check of race tokens in query
+    # Full race names first, longest first: "the 1976 United States Grand Prix" is Watkins Glen,
+    # not the "United States Grand Prix West" that the word "united" also matches
+    for r in sorted(races, key=lambda x: -len(x.get("race_name", ""))):
+        rn = r.get("race_name", "").lower()
+        if len(rn) >= 6 and re.search(r'\b' + re.escape(rn) + r'\b', q):
+            return r["round"]
+    # Then: direct check of race tokens in query
     for r in races:
         name_words = re.findall(r'[a-zA-Z]{3,}', r.get("race_name", "").lower())
         tokens = [
@@ -583,7 +589,7 @@ _RACE_DATA_TOOLS = {
     "driver_starting_grid_lookup": "race", "starting_grid_lookup": "race",
     "driver_podium_verification": "race", "pit_strategy_profile": "race",
     "pit_strategy_explanation": "race", "safety_car_analysis": "race", "race_control_lookup": "race",
-    "incident_investigation": "race", "dnf_summary_lookup": "race", "fastest_lap_lookup": "race",
+    "incident_investigation": "race", "dnf_summary_lookup": "race", "fastest_lap_lookup": "race", "race_length_lookup": "race",
     "sprint_classification_lookup": "sprint", "sprint_grid_lookup": "sprint",
     "sprint_qualifying_lookup": "sprint_qualifying", "qualifying_pole_lookup": "qualifying",
 }
@@ -649,6 +655,9 @@ def _answer_once(
     that don't name their own (ADK session-state pattern); every race-data answer says which
     race and session it is based on."""
     from app.tools import session_scope as SS
+    out_of_range = _out_of_range_season(query.lower())
+    if out_of_range:
+        return out_of_range
     history = scope_history_to_view(history, context)
     # Nothing on screen (API, MCP, first visit): the latest completed race is the default,
     # and the answer's footer says so
@@ -693,6 +702,21 @@ def _answer_once(
 
 
 _CURRENT_SEASON = 2026
+
+
+def _out_of_range_season(q: str) -> Optional[Dict[str, Any]]:
+    """A season before the championship or not yet run. Checked before anything else: otherwise
+    the year is ignored and the race on screen answers (a 1949 question got a 2026 result)."""
+    m = re.search(r"\b(18\d\d|19\d\d|20\d\d)\b", q)
+    if not m or 1950 <= int(m.group(1)) <= _CURRENT_SEASON:
+        return None
+    asked = int(m.group(1))
+    text = (f"The Formula 1 World Championship began in 1950, so there are no championship races from "
+            f"**{asked}** in the data." if asked < 1950 else
+            f"The **{asked}** season hasn't happened yet. I answer from race results, so I can't predict it; "
+            f"ask me about {_CURRENT_SEASON} or any earlier season.")
+    return {"role": "assistant", "text": text, "tool": "season_out_of_range", "intent": "Season Out of Range",
+            "a2ui_card": None}
 
 
 def _named_race(q: str, default_year: int) -> Optional[Tuple[int, int]]:
@@ -859,7 +883,8 @@ def _answer_core(
     # about a named driver ("why was Senna disqualified in 1989?") are still stories.
     is_story_ask = bool(re.search(r"\b(why|disqualif\w*|controvers\w*|story|what happened|collision|crashgate|scandal)\b", q))
     is_driver_detail_q = not is_story_ask and (_find_driver(q, drivers) is not None or bool(re.search(
-        r"\b(pit|strateg\w*|stint|tyres?|tires?|retire\w*|dnf|grid|start\w*|qualif\w*|lap \d+|pace|gap)\b", q)))
+        r"\b(pit|strateg\w*|stint|tyres?|tires?|retire\w*|dnf|grid|start\w*|qualif\w*|lap \d+|pace|gap"
+        r"|fastest lap|how many laps|number of laps|race distance|pole)\b", q)))
     if (is_narrative_q or (names_race_itself and not is_result_q)) and not is_driver_detail_q:
         story_data = f1_history.lookup_historic_race_event(q, year, meta.get("circuit_id"))
     if story_data:
@@ -1074,6 +1099,21 @@ def _answer_core(
     is_pole_or_quali = any(w in q for w in ["pole", "pole position", "qualifying", "who took pole", "who was on pole", "who started p1", "pole lap", "pole time"])
     if is_pole_or_quali and not any(w in q for w in ["career", "all-time", "most poles", "how many poles"]):
         q_model = race_replay.build_replay(year, round_no, session_type="qualifying")
+        if not (q_model and q_model.get("drivers") and q_model["meta"].get("session_type") == "qualifying"):
+            # No qualifying data: build_replay fell back to the race. Never present the race
+            # leader (or the winner of a results-less race) as the pole sitter.
+            race_m = q_model if (q_model and q_model["meta"].get("session_type") in (None, "race")) else None
+            field = (race_m or {}).get("drivers") or []
+            starter = next((d for d in field if d.get("grid") == 1), None) if len(field) > 1 else None
+            title = (race_m or {}).get("meta", {}).get("race_name") or f"Round {round_no}"
+            if starter:
+                text = (f"**{starter['name']}** started from **pole position** (grid P1) for {starter['team']} at the "
+                        f"**{title} ({year})**. Qualifying times for this race aren't in the data.")
+            else:
+                text = (f"I don't have the qualifying results or starting grid for the **{title} ({year})**, "
+                        "so I can't say who was on pole.")
+            return {"role": "assistant", "text": text, "tool": "qualifying_pole_lookup",
+                    "intent": f"{year} Pole Position", "a2ui_card": None}
         if q_model and q_model.get("drivers"):
             pole_drv = q_model["drivers"][0]
             p2_drv = q_model["drivers"][1] if len(q_model["drivers"]) > 1 else None
@@ -1088,6 +1128,16 @@ def _answer_core(
                 f"**{pole_drv['name']}** took **Pole Position** for {pole_drv['team']} at the **{q_model['meta'].get('race_name', 'Qualifying')} ({year})**"
                 f"{time_txt}{gap_txt}.{caveat}"
             )
+            if year == 2021:
+                # 2021 sprint weekends: qualifying set the Sprint grid, the Sprint set the GP grid,
+                # and the Sprint winner is credited with pole position
+                sp_m = race_replay.build_replay(year, round_no, session_type="sprint")
+                if sp_m and sp_m["meta"].get("session_type") == "sprint" and sp_m.get("drivers"):
+                    sw = sp_m["drivers"][0]
+                    if sw["name"] != pole_drv["name"]:
+                        text = (f"**{sw['name']}** started the **{q_model['meta'].get('race_name', 'Grand Prix').split(' - ')[0]} ({year})** "
+                                f"from **pole position**: in 2021 the Sprint set the grid and its winner is credited with pole. "
+                                f"{pole_drv['name']} was fastest in qualifying{time_txt}.")
             pole_t = pole_t or "Not available"
             return {
                 "role": "assistant",
@@ -1476,45 +1526,21 @@ def _answer_core(
         "race sim", "friday pace", "friday long", "setup run", "aero test", "flow vis"
     ])
     if is_practice_query:
-        d = target_driver or winner or (drivers[0] if drivers else None)
-        d_name = d['name'] if d else "The frontrunners"
-        d_team = d['team'] if d else "top teams"
-        d_code = d['code'] if d else "P1"
         race_title = meta.get('race_name', f'{year} Grand Prix')
 
+        # No practice data exists in any source SimGent uses (Jolpica-F1 and OpenF1 results). This
+        # used to return a template with invented paces, degradation and speed traps.
         text = (
-            f"**Free Practice Debrief — {race_title} ({year})**:\n\n"
-            f"• **FP1 (Aerodynamic Baseline)**: Teams focused on flow-vis paint sweeps and ride-height sweeps. "
-            f"{d_name} (#{d.get('number', '1') if d else '1'} {d_team}) dialed in mechanical balance with low degradation on Hard tyres.\n"
-            f"• **FP2 (Twilight Race Simulations)**: Representative high-fuel long runs revealed an estimated degradation rate of **0.08s/lap** "
-            f"on the Medium (C3) compound, with {d_code} establishing the benchmark long-run average pace (1:34.1).\n"
-            f"• **FP3 (Qualifying Prep)**: Final low-fuel qualifying trim simulations confirmed strong high-speed apex stability.\n\n"
-            f"> *Note: Free Practice data is indexed directly within the Pit Wall Agent's practice data. "
-            f"Interactive 2D replays are dedicated to competitive sessions (Grand Prix, Qualifying, and Sprint).* "
+            f"Free Practice sessions aren't in SimGent's data: the results it uses (Jolpica-F1 and OpenF1) "
+            f"cover qualifying, sprints and the race, not practice. For the **{race_title} ({year})** I can tell "
+            "you about qualifying, the race result, pit stops or retirements."
         )
         return {
             "role": "assistant",
             "text": text,
             "tool": "free_practice_telemetry_lookup",
-            "intent": "Free Practice Stint Analysis & Friday Long-Run Degradation",
-            "a2ui_card": {
-                "type": "practice_telemetry_card",
-                "title": f"Practice & Long-Run Intel — {race_title}",
-                "metrics": [
-                    {"label": "FP2 Long-Run Pace", "value": f"{d_code} (1:34.1)", "color": "#00F5D4"},
-                    {"label": "Degradation Rate", "value": "0.08s/lap (Med)", "color": "#FFD166"},
-                    {"label": "Top Speed Trap", "value": "334.8 km/h", "color": "#FFFFFF"},
-                    {"label": "Telemetry Status", "value": "FP1–FP3 Complete", "color": "#10B981"}
-                ],
-                "action": "VIEW QUALIFYING REPLAY",
-                "target": {
-                    "action_type": "switch_session",
-                    "year": year,
-                    "round": round_no,
-                    "session": "qualifying",
-                    "race_name": race_title
-                }
-            }
+            "intent": "Free Practice (not in the data)",
+            "a2ui_card": None,
         }
 
     # 3. SPECIFIC FINISHING POSITION & PODIUM INQUIRIES
@@ -1595,6 +1621,18 @@ def _answer_core(
             }
         }
 
+    # 3.1b RACE LENGTH: "how many laps was it?"
+    if re.search(r"\bhow many laps\b|\bnumber of laps\b|\bhow (?:long|far) was (?:the|this|that) race\b|\brace distance\b", q) \
+            and not re.search(r"\b(led|lead|leading|completed|did (?:he|she|they)|retire)", q):
+        facts = race_replay.race_layout(year, round_no) or {}
+        laps = facts.get("laps") or meta.get("total_laps")
+        if laps:
+            km = facts.get("length_km")
+            dist = f" of the {km:g} km circuit, {laps * km:.1f} km" if km else ""
+            return {"role": "assistant", "tool": "race_length_lookup", "a2ui_card": None,
+                    "intent": f"{year} Race Length",
+                    "text": f"The **{meta.get('race_name', 'Grand Prix')} ({year})** ran **{laps} laps**{dist}."}
+
     # 3.2 FASTEST LAP TELEMETRY LOOKUP
     is_fl_query = any(w in q for w in ["fastest lap", "fastest lap time", "who set the fastest lap", "purple lap", "who had fastest lap"])
     if is_fl_query:
@@ -1602,11 +1640,11 @@ def _answer_core(
         if fl and fl.get("time"):
             fl_code = fl.get("code")
             fl_driver = next((d for d in drivers if d.get("code") == fl_code), None)
-            fl_name = fl_driver["name"] if fl_driver else fl_code
+            fl_name = fl_driver["name"] if fl_driver else (fl.get("name") or fl_code)
             fl_team = fl_driver["team"] if fl_driver else "Race Entry"
             text = (
-                f"The **Fastest Lap** of the **{meta.get('race_name', 'Grand Prix')} ({year})** was set by **{fl_name}** ({fl_code}) "
-                f"with a lap time of **{fl.get('time')}** on **Lap {fl.get('lap', 'N/A')}**."
+                f"**{fl_name}** set the **fastest lap** of the **{meta.get('race_name', 'Grand Prix')} ({year})**: "
+                f"**{fl.get('time')}** on lap {fl.get('lap', 'N/A')}."
             )
             return {
                 "role": "assistant",
@@ -1657,7 +1695,9 @@ def _answer_core(
         if p1:
             p2_str = f", ahead of {p2['name']} in P2" if p2 else ""
             p3_str = f" and {p3['name']} in P3" if p3 else ""
-            fl_str = f" Fastest lap went to {fl.get('code')} ({fl.get('time')})." if (fl and isinstance(fl, dict) and fl.get("time")) else ""
+            fl_who = (fl.get("name") or next((d["name"] for d in drivers if d.get("code") == fl.get("code")), None)
+                      or fl.get("code")) if isinstance(fl, dict) else None
+            fl_str = f" Fastest lap went to {fl_who} ({fl.get('time')})." if (fl and isinstance(fl, dict) and fl.get("time")) else ""
             pits_str = f" with {len(p1['pits'])} pit stop{'s' if len(p1['pits']) != 1 else ''}" if p1.get('pits') else ""
             race_label = f"{year} {meta.get('race_name', 'Grand Prix')}"  # always name the season
             if len(winners) > 1:

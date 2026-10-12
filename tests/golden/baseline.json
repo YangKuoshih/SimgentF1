@@ -1,0 +1,6 @@
+{
+  "_comment": "CI gate for tests/eval_golden.py. Wrong answers and invented lap times must stay at zero; 'correct' minimums leave a small margin. Pole is low offline only because most races have no qualifying data in the cache, where the agent says it doesn't know.",
+  "min_pct": {"winner": 99.5, "circuit": 99.5, "laps": 99.5, "fastest_lap": 99.0, "champion": 99.0, "decline": 100.0, "pole": 5.0},
+  "max_wrong": {"winner": 0, "circuit": 0, "laps": 0, "fastest_lap": 0, "champion": 0, "decline": 0, "pole": 0},
+  "max_invented_lap_times": 0
+}

@@ -362,3 +362,39 @@ class UiClaims(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class AnswersFoundByTheGoldenEval(unittest.TestCase):
+    """Wrong answers the golden eval (tests/eval_golden.py) found; offline, as in CI."""
+
+    def test_no_pole_sitter_without_qualifying_or_grid(self):
+        text = ask("Who was on pole for the 1950 Indianapolis 500?", {}, [])["text"]
+        self.assertNotIn("took **Pole Position**", text)  # used to name the winner, Johnnie Parsons
+
+    def test_exact_race_name_beats_a_similar_one(self):
+        self.assertIn("James Hunt", ask("Who won the 1976 United States Grand Prix?", {}, [])["text"])
+        self.assertIn("Clay Regazzoni", ask("Who won the 1976 United States Grand Prix West?", {}, [])["text"])
+
+    def test_fastest_lap_is_the_races_not_the_winners_best(self):
+        text = ask("Who set the fastest lap at the 2004 Malaysian Grand Prix?", {}, [])["text"]
+        self.assertTrue(text.startswith("**Juan Pablo Montoya**"))
+        self.assertIn("1:34.223", text)
+
+    def test_practice_is_not_made_up(self):
+        r = ask("How did practice go at the 1982 South African Grand Prix?", {}, [])
+        self.assertIn("aren't in SimGent's data", r["text"])
+        self.assertNotRegex(r["text"], r"\d:\d\d\.\d|km/h|s/lap")
+        self.assertIsNone(r.get("a2ui_card"))
+
+    def test_seasons_out_of_range_are_declined(self):
+        self.assertIn("began in 1950", ask("Who won the 1949 British Grand Prix?", {}, [])["text"])
+        self.assertIn("hasn't happened yet", ask("Who will win the 2027 championship?", {}, [])["text"])
+
+    def test_race_length_and_facts_before_stories(self):
+        self.assertIn("77 laps", ask("How many laps was the 1957 French Grand Prix?", {}, [])["text"])
+        r = ask("Who set the fastest lap at the 1989 Japanese Grand Prix?", {}, [])
+        self.assertEqual(r["tool"], "fastest_lap_lookup")
+
+    def test_2021_sprint_weekend_pole_is_the_sprint_winner(self):
+        text = ask("Who was on pole for the 2021 British Grand Prix?", {}, [])["text"]
+        self.assertTrue(text.startswith("**Max Verstappen**"))

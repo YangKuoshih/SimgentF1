@@ -88,6 +88,11 @@ UNSUPPORTED_DATA_PATTERNS = [
     re.compile(r"(?i)\b(fp1|fp2|fp3|free\s+practice)\s+(lap\s+times|replay|telemetry|track\s+data)\b"),
     # Pre-1950 Formula 1
     re.compile(r"(?i)\b(18\d\d|19[0-4]\d)\s*(f1|formula\s*1|grand\s+prix|world\s+championship)\b"),
+    # Car telemetry (speed, throttle, brake, gear traces, onboard) is not in the data
+    re.compile(r"(?i)\b(throttle|brak(e|es|ing)|gear|rpm|speed)\s+(traces?|data|telemetry|channels?)\b"),
+    re.compile(r"(?i)\b(telemetry\s+traces?|onboard\s+(camera|footage|video|telemetry)|speed\s+trap)\b"),
+    # Team radio of any kind is not in the data
+    re.compile(r"(?i)\b(team\s+radio|pit\s+radio|radio\s+messages?)\b"),
     # Private / Encrypted team radio
     re.compile(r"(?i)\b(listen\s+to|eavesdrop|unfiltered|encrypted|secret|private)\s+(team\s+radio|pit\s+radio|strategy\s+channel|audio\s+feed)\b"),
     # Proprietary engineering CAD / CFD / blueprints

@@ -7,6 +7,19 @@ Welcome to the **SimGent** automated test suite. This testing infrastructure pro
 
 ---
 
+## 🎯 Agent evals
+
+| Eval | What it checks | Run |
+|---|---|---|
+| `eval_golden.py` | Every Grand Prix since 1950 (~5,900 questions: winner, pole, fastest lap, circuit, laps, champions, declines), graded against **F1DB**, a different source from the one the agent answers from. Counts correct, declined (said it doesn't have the data) and **wrong**; flags any lap time quoted that isn't in the data. CI fails on any wrong answer. | `python tests/eval_golden.py --verbose` |
+| `promptfoo/` | Behaviour through the real chat endpoint: prompt injection, out-of-scope, data SimGent doesn't have (practice, car telemetry, team radio, pre-1950, future seasons), phrasing. | `PROMPTFOO_PYTHON=python npx promptfoo@0.124.1 eval -c tests/promptfoo/promptfooconfig.yaml`, then `npx promptfoo@0.124.1 view` for the dashboard |
+| `eval_cross_era.py`, `eval_multi_turn.py`, `eval_session_scope.py`, `eval_router.py` | Cached-data answers across eras, follow-up questions, on-screen session scope, the semantic router | `python tests/<name>.py` |
+
+The golden answer key (`golden/f1db_truth.json`) is rebuilt with `python scripts/build_golden_set.py`
+(F1DB, CC BY 4.0). promptfoo needs Node 22.22+ and the packages in `requirements-eval.txt`.
+
+---
+
 ## ⚡ Quick Start (1-Command Test Runner)
 
 After installing Python dependencies, run `npm ci` and `npx playwright install chromium`. The unified runner starts its own server on port 8080 and removes its temporary private runtime directory afterward. Stop any existing local server first. Individual browser commands require a running app.
