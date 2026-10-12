@@ -15,6 +15,17 @@ Welcome to the **SimGent** automated test suite. This testing infrastructure pro
 | `promptfoo/` | Behaviour through the real chat endpoint: prompt injection, out-of-scope, data SimGent doesn't have (practice, car telemetry, team radio, pre-1950, future seasons), phrasing. | `PROMPTFOO_PYTHON=python npx promptfoo@0.124.1 eval -c tests/promptfoo/promptfooconfig.yaml`, then `npx promptfoo@0.124.1 view` for the dashboard |
 | `eval_cross_era.py`, `eval_multi_turn.py`, `eval_session_scope.py`, `eval_router.py` | Cached-data answers across eras, follow-up questions, on-screen session scope, the semantic router | `python tests/<name>.py` |
 
+### Playground: find wrong answers
+
+`npm run playground` (or `scripts/agent_playground.sh [local|live|both] [N]`) asks the agent your
+questions from `tests/promptfoo/my_questions.yaml` plus N random questions (default 30) about races
+from every season, in varied phrasings, and checks each answer against F1DB where there is a known
+answer (`tests/promptfoo/checks.py`). `npm run playground:view` opens the results dashboard:
+failures say what F1DB expected, and you can thumbs-down any other answer you think is wrong.
+`live` asks simgent.tonyyang.work instead of the local code; `both` shows them side by side.
+Wrong answers it finds get fixed in the agent and added to `promptfoo/promptfooconfig.yaml`, which
+CI runs on every pull request.
+
 The golden answer key (`golden/f1db_truth.json`) is rebuilt with `python scripts/build_golden_set.py`
 (F1DB, CC BY 4.0). promptfoo needs Node 22.22+ and the packages in `requirements-eval.txt`.
 

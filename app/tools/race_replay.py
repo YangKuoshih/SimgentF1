@@ -1414,6 +1414,7 @@ def _build_sprint_replay(year: int, rnd: int, net: bool = True, circuit_override
 
 def _build_race_replay(year: int, rnd: int, net: bool = True, circuit_override: Optional[str] = None) -> Optional[Dict[str, Any]]:
     res = J.results(year, rnd, net)
+    results_complete = bool(res)
     if not res:
         w_map = J.season_winners(year, net)
         w_entry = w_map.get(rnd)
@@ -1680,6 +1681,9 @@ def _build_race_replay(year: int, rnd: int, net: bool = True, circuit_override: 
         "circuit_id": cid, "circuit_name": cname,
         "locality": loc, "country": country,
         "total_laps": max(1, winner_laps), "has_lap_data": bool(lap_rows), "fastest_lap": fl,
+        # False when only the winner is known (results not cached and Jolpica unreachable): the
+        # rest of the field, retirements and positions are unknown, not empty
+        "results_complete": results_complete, "has_pit_data": bool(stops),
         "session_type": "race",
         "session_name": "Grand Prix Race",
         "source": "Jolpica-F1 (lap timing) + bacinger/f1-circuits (geometry)",

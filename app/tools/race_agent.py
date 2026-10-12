@@ -405,73 +405,6 @@ CURATED_RETIREMENTS = _content.retirements()
 
 
 
-def _get_driver_tyre_stints(d: Dict[str, Any], events: List[Dict[str, Any]], total_laps: int) -> Dict[str, Any]:
-    """
-    Computes precise stint lap windows, tyre compounds, and strategic context for a driver.
-    Accounts for wet weather start declarations, safety car pit windows, and dry compound allocations.
-    """
-    pits = sorted(d.get("pits", []))
-    completed_laps = d.get("laps", total_laps)
-    
-    # Check if wet weather condition was declared at start of session
-    is_wet_start = any(
-        e.get("type") == "WEATHER" and any(k in e.get("message", "").lower() for k in ["rain", "deluge", "wet", "intermediate"])
-        for e in events
-    )
-    
-    num_stops = len(pits)
-    stint_boundaries = [1]
-    for p in pits:
-        stint_boundaries.append(p)
-    stint_boundaries.append(completed_laps)
-    
-    # Compound assignment logic
-    if is_wet_start:
-        # e.g., Bahrain 2026 wet start: Inters -> Mediums -> Softs
-        compounds = ["Intermediate", "Medium", "Soft", "Soft"]
-    else:
-        # Standard dry allocations
-        if num_stops == 0:
-            compounds = ["Hard"]
-        elif num_stops == 1:
-            compounds = ["Medium", "Hard"]
-        elif num_stops == 2:
-            compounds = ["Medium", "Hard", "Soft"]
-        else:
-            compounds = ["Medium", "Hard", "Hard", "Soft"]
-            
-    stints = []
-    for i in range(len(stint_boundaries) - 1):
-        start_lap = stint_boundaries[i] if i == 0 else stint_boundaries[i] + 1
-        end_lap = stint_boundaries[i + 1]
-        if start_lap > end_lap:
-            start_lap = end_lap
-        compound = compounds[i] if i < len(compounds) else "Soft"
-        color = {
-            "Soft": "#EF4444",
-            "Medium": "#FFD166",
-            "Hard": "#FFFFFF",
-            "Intermediate": "#10B981",
-            "Wet": "#3B82F6"
-        }.get(compound, "#FFFFFF")
-        
-        stints.append({
-            "stint": i + 1,
-            "start_lap": start_lap,
-            "end_lap": end_lap,
-            "laps": max(1, end_lap - start_lap + 1),
-            "compound": compound,
-            "color": color
-        })
-        
-    return {
-        "is_wet_start": is_wet_start,
-        "num_stops": num_stops,
-        "pits": pits,
-        "stints": stints
-    }
-
-
 _SESSION_NAMES = {"sprint_qualifying": "Sprint Qualifying", "sprint": "Sprint", "qualifying": "Qualifying"}
 # Race-data tools that still give a useful general answer without a race (e.g. how an
 # undercut works); everything else in _RACE_DATA_TOOLS needs the race's result.
@@ -658,6 +591,9 @@ def _answer_once(
     out_of_range = _out_of_range_season(query.lower())
     if out_of_range:
         return out_of_range
+    # Other ways of asking who won ("who took the chequered flag at ...") were read as safety-car
+    # or flag questions; say them the way every handler understands
+    query = _WIN_WORDING.sub("who won", query)
     history = scope_history_to_view(history, context)
     # Nothing on screen (API, MCP, first visit): the latest completed race is the default,
     # and the answer's footer says so
@@ -702,6 +638,17 @@ def _answer_once(
 
 
 _CURRENT_SEASON = 2026
+PIT_DATA_FROM = 2011  # Jolpica-F1 has pit stops from 2011
+
+
+# Questions answerable when only the race winner is known
+_PARTIAL_OK = re.compile(r"\b(who won|winner|won the|fastest lap|how many laps|number of laps|race distance|circuit|track|"
+                         r"where|held|hosted|venue|what happened|story|why|champion\w*|title|standings|career|"
+                         r"regulations?|rules|era|pole|practice|fp[123])\b")
+
+_WIN_WORDING = re.compile(
+    r"\bwho (?:took|saw|received|got) the (?:chequered|checkered) flag\b|\bwho (?:finished|came|crossed the line) first\b"
+    r"|\bwho was victorious\b|\bwho triumphed\b", re.I)
 
 
 def _out_of_range_season(q: str) -> Optional[Dict[str, Any]]:
@@ -841,6 +788,17 @@ def _answer_core(
     drivers = model["drivers"] if model else []
     events = model["events"] if model else []
     winner = drivers[0] if drivers else None
+
+    # Only the winner is known (results not cached and Jolpica unreachable, e.g. rate-limited):
+    # answer what that supports and never present a one-car field as the race (it used to say
+    # "all 1 classified cars finished with zero retirements")
+    pre_pit_data = year < PIT_DATA_FROM and re.search(r"\b(pit|stops?|strateg\w*|tyres?|tires?|compounds?)\b", q)
+    if model and meta.get("results_complete") is False and winner and not _PARTIAL_OK.search(q) and not pre_pit_data:
+        return {"role": "assistant", "tool": "race_results_partial", "a2ui_card": None,
+                "intent": "Race Results Unavailable",
+                "text": (f"I only have the winner of the **{meta.get('race_name', 'race')} ({year})** right now "
+                         f"(**{winner['name']}**), not the full results, so I can't answer that reliably. "
+                         "Please try again in a moment.")}
 
     # Question shape. Factual result questions ("who won", "who finished second", "pole")
     # must be answered from the classification, not intercepted by narrative/career handlers.
@@ -1788,69 +1746,40 @@ def _answer_core(
             }
 
         d = target_driver or winner
-        total_laps = meta.get("total_laps", 55)
-        stint_info = _get_driver_tyre_stints(d, events, total_laps)
-        stints = stint_info["stints"]
-        stops_count = len(d.get("pits", []))
-        stops_str = ", ".join(f"Lap {l}" for l in d.get("pits", [])) if stops_count > 0 else "None (0 Stops)"
-
-        # Check if user specifically asked about tyre compounds
+        pits = sorted(d.get("pits", []))
+        stops_count = len(pits)
+        stops_str = ", ".join(f"Lap {l}" for l in pits) if pits else "None"
+        race_title = meta.get("race_name", "Grand Prix")
+        laps_done = d.get("laps") or meta.get("total_laps") or 0
+        # Stints from the real pit laps. Tyre compounds are not in the data (Jolpica-F1 records
+        # when a car pitted, not what it fitted); they used to be guessed from the stop count.
+        bounds = [0] + pits + [laps_done]
+        stints = [{"stint": i + 1, "start_lap": bounds[i] + 1, "end_lap": bounds[i + 1],
+                   "laps": bounds[i + 1] - bounds[i]} for i in range(len(bounds) - 1) if bounds[i + 1] > bounds[i]]
         is_compound_question = any(w in q for w in [
             "medium", "soft", "hard", "inter", "wet", "compound", "compounds", "tires", "tyres"
         ])
-        
-        # Check if user asked binary choice e.g. "mediums or softs"
-        asks_medium_or_soft = ("medium" in q and "soft" in q)
-        
-        stint_desc = []
-        for s in stints:
-            note = f"Stint {s['stint']} (Laps {s['start_lap']}–{s['end_lap']}): **{s['compound']}** ({s['laps']} laps)"
-            stint_desc.append(note)
-        stints_summary = "\n".join(f"• {x}" for x in stint_desc)
-        
-        if asks_medium_or_soft:
-            used_medium = any("medium" in s["compound"].lower() for s in stints)
-            used_soft = any("soft" in s["compound"].lower() for s in stints)
-            if used_medium and used_soft:
-                verdict = f"**{d['name']} ran both Mediums and Softs**"
-            elif used_medium:
-                verdict = f"**{d['name']} ran Mediums (not Softs)**"
-            elif used_soft:
-                verdict = f"**{d['name']} ran Softs (not Mediums)**"
-            else:
-                verdict = f"**{d['name']} ran neither**"
-                
-            text = (
-                f"{verdict} during the {meta.get('race_name', 'Grand Prix')}:\n\n"
-                f"{stints_summary}\n\n"
-                f"He executed a **{stops_count}-stop strategy** (boxing on {stops_str}) to take P{d['finish']} for {d['team']}."
-            )
-        elif is_compound_question:
-            compounds_used = list(dict.fromkeys(s["compound"] for s in stints))
-            comp_str = ", ".join(compounds_used)
-            text = (
-                f"**{d['name']}** ran a **{stops_count}-stop strategy** using **{comp_str} tyres** "
-                f"(boxing on {stops_str}) to finish P{d['finish']} for {d['team']}:\n\n"
-                f"{stints_summary}"
-            )
+        if year < PIT_DATA_FROM:
+            text = (f"Pit stop data starts in {PIT_DATA_FROM}, so I can't describe {d['name']}'s stops at the "
+                    f"**{race_title} ({year})**. {d['name']} finished P{d['finish']} for {d['team']}.")
+            stints = []
+        elif not meta.get("has_pit_data"):
+            text = (f"Pit stop data for the **{race_title} ({year})** isn't available right now, so I can't say how "
+                    f"many times {d['name']} stopped. {d['name']} finished P{d['finish']} for {d['team']}.")
+            stints = []
+        elif pits:
+            stint_lines = "\n".join(f"• Stint {s['stint']}: laps {s['start_lap']}–{s['end_lap']} ({s['laps']} laps)" for s in stints)
+            text = (f"**{d['name']}** made **{stops_count} pit stop{'s' if stops_count != 1 else ''}** ({stops_str}) "
+                    f"and finished P{d['finish']} for {d['team']} at the **{race_title} ({year})**.\n\n**Stints**:\n{stint_lines}")
         else:
-            if stops_count > 0:
-                text = (
-                    f"**{d['name']}** ran a **{stops_count}-stop strategy**, boxing on {stops_str} "
-                    f"to finish P{d['finish']} for {d['team']}.\n\n"
-                    f"**Tyre Stints**:\n{stints_summary}"
-                )
-            else:
-                text = f"**{d['name']}** completed the session on a **zero-stop strategy**, managing tyre degradation to finish P{d['finish']} for {d['team']} on **{stints[0]['compound'] if stints else 'Hard'} tyres**."
+            text = (f"**{d['name']}** didn't make a pit stop at the **{race_title} ({year})** and finished "
+                    f"P{d['finish']} for {d['team']}.")
+        if is_compound_question and year >= PIT_DATA_FROM and meta.get("has_pit_data"):
+            text += ("\n\nTyre compounds aren't in SimGent's data: Jolpica-F1 records when drivers pitted, "
+                     "not which tyres they fitted.")
 
-        # Build card metrics from stints
-        card_metrics = []
-        for s in stints[:3]:
-            card_metrics.append({
-                "label": f"Stint {s['stint']} (L{s['start_lap']}-{s['end_lap']})",
-                "value": f"{s['compound']} ({s['laps']}L)",
-                "color": s["color"]
-            })
+        card_metrics = [{"label": f"Stint {s['stint']}", "value": f"Laps {s['start_lap']}–{s['end_lap']} ({s['laps']}L)",
+                         "color": "#FFFFFF"} for s in stints[:3]]
         if len(card_metrics) < 4:
             card_metrics.append({
                 "label": "Total Pit Stops",
@@ -1862,10 +1791,10 @@ def _answer_core(
             "role": "assistant",
             "text": text,
             "tool": "pit_strategy_profile",
-            "intent": "Pit Window, Stints & Compounds",
+            "intent": "Pit Stops & Stints",
             "a2ui_card": {
                 "type": "strategy_card",
-                "title": f"Pit Stop & Tyre Profile — {d['name']} (#{d['number']})",
+                "title": f"Pit Stops — {d['name']} (#{d['number']})",
                 "metrics": card_metrics,
                 "action": "SIMULATE UNDERCUT",
                 "target": {
@@ -1965,7 +1894,7 @@ def _answer_core(
                         {"label": "Lap", "value": f"Lap {target_lap}", "color": "#FFB703"},
                         {"label": "Event Type", "value": matching_events[0].get("type", "INCIDENT"), "color": "#00F5D4"},
                         {"label": "Incident", "value": matching_events[0].get("message", "").split("—")[0].strip(), "color": "#FFFFFF"},
-                        {"label": "Session", "value": meta.get("circuit_name", "Baku"), "color": "#64748B"}
+                        {"label": "Circuit", "value": meta.get("circuit_name") or "—", "color": "#64748B"}
                     ],
                     "action": f"JUMP TO LAP {target_lap} REPLAY",
                     "target": {
@@ -1989,8 +1918,7 @@ def _answer_core(
         events_str = "\n".join(sc_lines) if sc_lines else "• No major full-course safety cars deployed."
         text = (
             f"**Race Control & Safety Car Debrief — {meta.get('race_name', 'Grand Prix')}**\n\n"
-            f"{events_str}\n\n"
-            f"Neutralisations in Baku are notoriously critical due to narrow castle sections and 350 km/h straightline speeds."
+            f"{events_str}"
         )
         return {
             "role": "assistant",
