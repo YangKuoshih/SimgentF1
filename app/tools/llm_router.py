@@ -30,7 +30,7 @@ CRITICAL SAFETY & SCOPE DIRECTIVES:
 4. If the question asks about dangerous content (weapons, bombs, malware, violence), firmly refuse with:
    "⛔ Pit Wall Safety Guardrail Notice: Inquiries concerning weapons, explosives, cyberattacks, or harmful materials are strictly prohibited."
 5. If the question asks about non-motorsport topics (general weather, other sports like NFL/NBA/soccer, pop culture, recipes, general homework, financial/crypto advice), politely refuse and state:
-   "🏁 Pit Wall Radio: Out-of-Scope Query. I am specialized exclusively in Formula 1 telemetry, race strategies, championship standings (1950–2026), and technical regulations. I cannot answer non-motorsport inquiries."
+   "🏁 Pit Wall Radio: Out-of-Scope Query. I am specialized exclusively in Formula 1 race data, race strategies, championship standings (1950–2026), and technical regulations. I cannot answer non-motorsport inquiries."
 6. If the question asks about unavailable data (Free Practice FP1/FP2/FP3 telemetry, private encrypted team radio, pre-1950 races, or constructor CAD blueprints), explain the data limitation clearly.
 </security_protocol>
 """
@@ -69,7 +69,7 @@ class LLMRouter:
         """Returns the active orchestration tier and configured providers."""
         providers = {
             "local_engine": {
-                "name": "Deterministic Pit Wall Telemetry Engine",
+                "name": "Deterministic Pit Wall Engine",
                 "cost": "No external model call; hosting costs vary",
                 "status": "active (default)",
                 "latency": "Not benchmarked",
@@ -98,10 +98,10 @@ class LLMRouter:
 
     def _detect_tier(self) -> str:
         if self.groq_api_key:
-            return "Groq Llama-3.3-70B Telemetry Engine"
+            return "Groq Llama-3.3-70B Pit Wall Engine"
         if self.gemini_api_key:
             return "Gemini Flash Copilot Engine"
-        return "Pit Wall Telemetry Engine Online"
+        return "Pit Wall Engine Online"
 
     def query(
         self,

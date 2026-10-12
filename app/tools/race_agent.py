@@ -1345,7 +1345,7 @@ def _answer_core(
                     "text": curated["explanation"],
                     "sources": [source] if source else [],
                     "tool": "incident_investigation",
-                    "intent": "Curated Historical Incident Telemetry & Steward Report",
+                    "intent": "Curated Historical Incident & Steward Report",
                     "a2ui_card": {
                         "type": "retirement_card",
                         "title": f"Retirement Debrief — {d['name']} (#{d['number']})",
@@ -1381,7 +1381,7 @@ def _answer_core(
                 "role": "assistant",
                 "text": text,
                 "tool": "incident_investigation",
-                "intent": "Leader-Synchronized Telemetry Exit Analysis",
+                "intent": "Retirement Lap Analysis",
                 "a2ui_card": {
                     "type": "retirement_card",
                     "title": f"Retirement Report — {d['name']} (#{d['number']})",
@@ -1483,13 +1483,13 @@ def _answer_core(
         race_title = meta.get('race_name', f'{year} Grand Prix')
 
         text = (
-            f"**Free Practice Telemetry Debrief — {race_title} ({year})**:\n\n"
+            f"**Free Practice Debrief — {race_title} ({year})**:\n\n"
             f"• **FP1 (Aerodynamic Baseline)**: Teams focused on flow-vis paint sweeps and ride-height sweeps. "
             f"{d_name} (#{d.get('number', '1') if d else '1'} {d_team}) dialed in mechanical balance with low degradation on Hard tyres.\n"
             f"• **FP2 (Twilight Race Simulations)**: Representative high-fuel long runs revealed an estimated degradation rate of **0.08s/lap** "
             f"on the Medium (C3) compound, with {d_code} establishing the benchmark long-run average pace (1:34.1).\n"
             f"• **FP3 (Qualifying Prep)**: Final low-fuel qualifying trim simulations confirmed strong high-speed apex stability.\n\n"
-            f"> *Note: Free Practice data is indexed directly within the Pit Wall Agent's telemetry knowledge base. "
+            f"> *Note: Free Practice data is indexed directly within the Pit Wall Agent's practice data. "
             f"Interactive 2D replays are dedicated to competitive sessions (Grand Prix, Qualifying, and Sprint).* "
         )
         return {
@@ -1612,7 +1612,7 @@ def _answer_core(
                 "role": "assistant",
                 "text": text,
                 "tool": "fastest_lap_lookup",
-                "intent": f"{year} Fastest Lap Telemetry Record",
+                "intent": f"{year} Fastest Lap Record",
                 "a2ui_card": {
                     "type": "fastest_lap_card",
                     "title": f"Fastest Lap — {meta.get('race_name', 'Grand Prix')}",
@@ -1822,7 +1822,7 @@ def _answer_core(
             "role": "assistant",
             "text": text,
             "tool": "pit_strategy_profile",
-            "intent": "Pit Window, Stint Degradation & Compound Telemetry",
+            "intent": "Pit Window, Stints & Compounds",
             "a2ui_card": {
                 "type": "strategy_card",
                 "title": f"Pit Stop & Tyre Profile — {d['name']} (#{d['number']})",
@@ -1849,7 +1849,7 @@ def _answer_core(
                 "role": "assistant",
                 "text": f"**Pit Wall Agent active** for the **{meta.get('race_name', 'Grand Prix')} ({year})** — Lap {cur_lap} of {meta.get('total_laps', 51)} with {len(drivers)} cars running.",
                 "tool": "session_telemetry_briefing",
-                "intent": "Session Telemetry Briefing",
+                "intent": "Session Briefing",
                 "a2ui_card": None
             }
         started = f"P{d['grid']}" if d.get('grid') else "Pit Lane"
@@ -1878,7 +1878,7 @@ def _answer_core(
             "role": "assistant",
             "text": text,
             "tool": "driver_performance_lookup",
-            "intent": "Driver Telemetry, Grid Delta & Pace Analysis",
+            "intent": "Driver Result, Grid Delta & Pace Analysis",
             "a2ui_card": {
                 "type": "driver_performance_card",
                 "title": f"Driver Profile — {d['name']} (#{d['number']})",
@@ -1910,14 +1910,14 @@ def _answer_core(
             lines = []
             for e in matching_events:
                 end_s = f"–{e['end_lap']}" if 'end_lap' in e else ""
-                con_s = f"\n  ↳ *Telemetry Note*: {e['consequence']}" if e.get('consequence') else ""
+                con_s = f"\n  ↳ *Note*: {e['consequence']}" if e.get('consequence') else ""
                 lines.append(f"• **Lap {e['lap']}{end_s}**: {e['message']}{con_s}")
             events_str = "\n".join(lines)
             return {
                 "role": "assistant",
-                "text": f"**Race Control Log & Telemetry — Lap {target_lap} ({meta.get('race_name', 'Grand Prix')})**\n\n{events_str}",
+                "text": f"**Race Control Log — Lap {target_lap} ({meta.get('race_name', 'Grand Prix')})**\n\n{events_str}",
                 "tool": "race_control_lookup",
-                "intent": "FIA Steward Directives & Lap Event Telemetry",
+                "intent": "FIA Steward Directives & Lap Events",
                 "a2ui_card": {
                     "type": "race_control_card",
                     "title": f"Race Control Event — Lap {target_lap}",
@@ -2049,10 +2049,10 @@ def _answer_core(
         "role": "assistant",
         "text": (
             f"**Pit Wall Agent active** for the **{meta.get('race_name', 'Grand Prix')} ({year})** — Lap {cur_lap} of {meta.get('total_laps', 51)} with {len(drivers)} cars running.\n\n"
-            f"Ask me about any race incident, driver telemetry, pit stop delta, championship standings, or 2026 regulations."
+            f"Ask me about any race incident, driver result, pit stops, championship standings, or 2026 regulations."
         ),
         "tool": "session_telemetry_briefing",
-        "intent": "Session Telemetry Briefing & Live Pit Wall Status",
+        "intent": "Session Briefing & Pit Wall Status",
         "a2ui_card": None
     }
 

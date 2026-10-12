@@ -20,7 +20,7 @@ logging.basicConfig(level=logging.INFO, stream=sys.stderr, format="%(asctime)s [
 TOOLS = [
     {
         "name": "query_race_engineer",
-        "description": "Natural language pit wall race engineering copilot. Resolves driver telemetry, incident investigations, pit strategies, championship standings, and 2026 regulations across seasons 1950-2026.",
+        "description": "Natural language pit wall race engineering copilot. Answers driver results, incident investigations, pit strategies, championship standings, and 2026 regulations across seasons 1950-2026.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -49,7 +49,7 @@ TOOLS = [
     },
     {
         "name": "investigate_incident",
-        "description": "Investigate verified telemetry and steward debriefs for race retirements, crashes, and technical failures (e.g., Hamilton Australia 2024, Verstappen Silverstone 2021, Schumacher Spa 1998).",
+        "description": "Investigate curated debriefs and race data for retirements, crashes, and technical failures (e.g., Hamilton Australia 2024, Verstappen Silverstone 2021, Schumacher Spa 1998).",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -171,7 +171,7 @@ RESOURCES = [
 PROMPTS = [
     {
         "name": "race_incident_investigation",
-        "description": "Investigate a driver retirement, crash, or mechanical failure with verified telemetry debrief.",
+        "description": "Investigate a driver retirement, crash, or mechanical failure from the race data and curated debriefs.",
         "arguments": [
             {"name": "driver", "description": "Driver surname or code (e.g. 'hamilton', 'VER')", "required": True},
             {"name": "year", "description": "Season year (e.g. 2024, 2026)", "required": True},
@@ -300,7 +300,7 @@ def handle_prompt_get(name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
                     "role": "user",
                     "content": {
                         "type": "text",
-                        "text": f"Please conduct a comprehensive incident investigation for {driver} during the {year} {race}. Provide official retirement lap, telemetry indicators, mechanical or collision root cause, and steward findings."
+                        "text": f"Please conduct a comprehensive incident investigation for {driver} during the {year} {race}. Provide the retirement lap, laps completed, mechanical or collision cause, and steward findings where known."
                     }
                 }
             ]

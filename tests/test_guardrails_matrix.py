@@ -97,7 +97,7 @@ class TestGuardrailsMatrix(unittest.TestCase):
             self.assertIn("Domain Guardrail", resp.get("provider", ""))
             self.assertIn("Out-of-Scope", resp.get("text", ""))
             # Must provide constructive in-scope alternatives
-            self.assertIn("Replay & Telemetry", resp.get("text", ""))
+            self.assertIn("Replay & Lap Times", resp.get("text", ""))
             self.assertIn("Race Strategy", resp.get("text", ""))
 
     # =========================================================================
@@ -117,7 +117,7 @@ class TestGuardrailsMatrix(unittest.TestCase):
             blocked, resp = evaluate_all_guardrails(q)
             self.assertTrue(blocked, f"Expected query to be flagged as unsupported data: '{q}'")
             self.assertIsNotNone(resp)
-            self.assertIn("Telemetry Guardrail", resp.get("provider", ""))
+            self.assertIn("Pit Wall Guardrail", resp.get("provider", ""))
             self.assertIn("Data Scope Notice", resp.get("text", ""))
             self.assertIn("Free Practice", resp.get("text", ""))
 

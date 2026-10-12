@@ -285,7 +285,13 @@ def track_for_year(cid: str, year: int, circuit_info: Optional[Dict[str, Any]] =
     mode replaces DRS from 2026), a lap record only if it was set by that season, and for
     races before 1996 (results-only replays) or on an earlier layout (LAYOUT_SINCE) none of
     today's length, turn or pit figures.
-    Circuits without layout data get a labelled schematic with their real name."""
+    Circuits without layout data get a labelled schematic with their real name.
+
+    When F1DB has the race (every championship race to date), the layout actually raced and
+    its facts come from there instead: see _track_for_race."""
+    facts = race_layout(year, rnd)
+    if facts and facts["layout_info"].get("shape"):
+        return _track_for_race(cid, year, circuit_info, facts)
     geo = circuit_geometry(cid) if cid else None
     if not geo:
         return None
@@ -319,6 +325,39 @@ def track_for_year(cid: str, year: int, circuit_info: Optional[Dict[str, Any]] =
     else:
         geo["layout_note"] = ("Length and turn count not shown: sources disagree for this circuit."
                               if cid in UNVERIFIED_LENGTH else "Track figures are for the layout raced that year.")
+    return geo
+
+
+def _track_for_race(cid: str, year: int, circuit_info: Optional[Dict[str, Any]],
+                    facts: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    """The layout raced that day: its outline, and F1DB's length, turns, laps and distance."""
+    lay = facts["layout_info"]
+    ci = circuit_info or {}
+    if lay["shape"] == "svg":
+        geo = layout_geometry(facts["layout"])
+        if not geo:
+            return None
+        geo = dict(geo, name=ci.get("circuitName") or cid.replace("_", " ").title(),
+                   country=ci.get("Location", {}).get("country", ""))
+        note = (f"Layout raced in {year}. Outline from f1-circuits-svg, scaled to the official length; "
+                "the start line position is estimated.")
+    else:
+        geo = circuit_geometry(lay.get("circuit") or cid, start_frac=facts.get("start_frac", 0.0))
+        if not geo or geo.get("schematic"):
+            return None
+        geo = dict(geo)
+        # Lap records, pit loss and throttle figures are for this layout; only records set by then
+        record_year = re.search(r"\b(19|20)\d{2}\b", geo.get("lap_record") or "")
+        if record_year and int(record_year.group(0)) > year:
+            geo["lap_record"] = None
+        note = ("Outline traced along today's roads (some junctions of the period have since been rebuilt)."
+                if geo.get("traced_along_roads") else "")
+    geo.update(length_km=facts["length_km"], turns_count=facts["turns"], direction=facts["direction"],
+               laps=facts.get("laps"), distance_km=facts.get("distance_km"),
+               race_fastest_lap=facts.get("fastest_lap"), layout_id=facts["layout"], layout_note=note,
+               aero_zone_label="Straight-line mode" if year >= ACTIVE_AERO_FROM else "DRS")
+    if year < DRS_FROM:
+        geo["drs_zones"], geo["drs_detections"] = [], []
     return geo
 
 
@@ -576,9 +615,92 @@ def _detect_apex_indices(speed_kmh: List[int], n_points: int) -> List[int]:
     return [idx for idx, _ in res]
 
 
+DEFAULT_SECTORS = [
+    {"sector": 1, "start_pct": 0.0, "end_pct": 0.33, "color": "#FF7A00", "label": "SECTOR 1"},
+    {"sector": 2, "start_pct": 0.33, "end_pct": 0.67, "color": "#FF1867", "label": "SECTOR 2"},
+    {"sector": 3, "start_pct": 0.67, "end_pct": 1.0, "color": "#E10600", "label": "SECTOR 3"},
+]
+
+
+def _is_clockwise(pts: List[Tuple[float, float]]) -> bool:
+    """On screen (y pointing down) a positive shoelace sum is clockwise."""
+    n = len(pts)
+    return sum(pts[i][0] * pts[(i + 1) % n][1] - pts[(i + 1) % n][0] * pts[i][1] for i in range(n)) > 0
+
+
+def _outline_model(pts: List[Tuple[float, float]], rot_deg: float, n_points: int,
+                   start_shift: int = 0) -> Dict[str, Any]:
+    """Outline in metres (y down, race direction, index 0 = start line) -> rotated, arc-length
+    resampled, normalised points with a curvature-based speed profile. start_shift moves the
+    start line by that many resampled points."""
+    pts = list(pts)
+    if pts[0] != pts[-1]:
+        pts.append(pts[0])
+
+    # Apply official Formula 1 broadcast orientation rotation
+    if rot_deg:
+        rot_rad = math.radians(rot_deg)
+        cos_a, sin_a = math.cos(rot_rad), math.sin(rot_rad)
+        pts = [(x * cos_a - y * sin_a, x * sin_a + y * cos_a) for x, y in pts]
+
+    # Arc-length resample
+    seg = [math.dist(pts[i], pts[i + 1]) for i in range(len(pts) - 1)]
+    total = sum(seg)
+    out, acc, j = [], 0.0, 0
+    for i in range(n_points):
+        target = total * i / n_points
+        while j < len(seg) - 1 and acc + seg[j] < target:
+            acc += seg[j]
+            j += 1
+        t = (target - acc) / seg[j] if seg[j] else 0
+        a, b = pts[j], pts[j + 1]
+        out.append((a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t))
+    if start_shift:
+        out = out[start_shift:] + out[:start_shift]
+
+    # Speed profile: v = sqrt(a_lat * R), then accel/brake limited passes
+    ds = total / n_points
+    w = 6
+    v = []
+    for i in range(n_points):
+        p0, p1, p2 = out[i - w], out[i], out[(i + w) % n_points]
+        a_, b_, c_ = math.dist(p0, p1), math.dist(p1, p2), math.dist(p0, p2)
+        area2 = abs((p1[0] - p0[0]) * (p2[1] - p0[1]) - (p1[1] - p0[1]) * (p2[0] - p0[0]))
+        R = (a_ * b_ * c_) / (2 * area2) if area2 > 1e-6 else 1e9
+        v.append(min(90.0, math.sqrt(4.5 * 9.81 * R)))  # m/s, cap ~324 km/h
+    for _ in range(2):
+        for i in range(1, 2 * n_points):  # traction
+            a, b = (i - 1) % n_points, i % n_points
+            v[b] = min(v[b], math.sqrt(v[a] ** 2 + 2 * 11.0 * ds))
+        for i in range(2 * n_points, 0, -1):  # braking
+            a, b = i % n_points, (i - 1) % n_points
+            v[b] = min(v[b], math.sqrt(v[a] ** 2 + 2 * 40.0 * ds))
+
+    # Cumulative time fraction for time->distance mapping
+    tcum = [0.0]
+    for i in range(n_points):
+        tcum.append(tcum[-1] + ds / max(v[i], 15.0))
+    lap_t = tcum[-1]
+
+    xs, ys = [p[0] for p in out], [p[1] for p in out]
+    minx, maxx, miny, maxy = min(xs), max(xs), min(ys), max(ys)
+    span = max(maxx - minx, maxy - miny)
+    return {
+        "points": [[round((x - minx) / span, 4), round((y - miny) / span, 4)] for x, y in out],
+        "aspect": round((maxx - minx) / (maxy - miny), 4),
+        "speed_kmh": [round(s * 3.6) for s in v],
+        "tfrac": [round(t / lap_t, 5) for t in tcum],
+        "rotation_deg": rot_deg,
+    }
+
+
 @lru_cache(maxsize=64)
-def circuit_geometry(circuit_id: str, n_points: int = 720) -> Optional[Dict[str, Any]]:
-    """Projected, rotated, arc-length-resampled outline + curvature-based speed profile & Tracing Insights styling metadata."""
+def circuit_geometry(circuit_id: str, n_points: int = 720, start_frac: float = 0.0) -> Optional[Dict[str, Any]]:
+    """Projected, rotated, arc-length-resampled outline + curvature-based speed profile & Tracing Insights styling metadata.
+
+    Runs in the race direction F1DB gives for this outline's layout (two outlines in the source
+    data are drawn backwards). start_frac moves the start line round the lap (Silverstone 2010
+    still started on the old pit straight)."""
     feat = _geo_features().get(CIRCUIT_MAP.get(circuit_id, ""))
     rot_deg = CIRCUIT_ORIENTATIONS.get(circuit_id, 0)
     meta = CIRCUIT_METADATA.get(circuit_id, {})
@@ -626,83 +748,40 @@ def circuit_geometry(circuit_id: str, n_points: int = 720) -> Optional[Dict[str,
     lat0 = sum(c[1] for c in coords) / len(coords)
     k = 111_320.0
     pts = [((c[0]) * k * math.cos(math.radians(lat0)), -(c[1]) * k) for c in coords]  # metres, y-down
-    if pts[0] != pts[-1]:
-        pts.append(pts[0])
-
-    # Apply official Formula 1 broadcast orientation rotation
-    if rot_deg:
-        rot_rad = math.radians(rot_deg)
-        cos_a, sin_a = math.cos(rot_rad), math.sin(rot_rad)
-        pts = [(x * cos_a - y * sin_a, x * sin_a + y * cos_a) for x, y in pts]
-
-    # Arc-length resample
-    seg = [math.dist(pts[i], pts[i + 1]) for i in range(len(pts) - 1)]
-    total = sum(seg)
-    out, acc, j = [], 0.0, 0
-    for i in range(n_points):
-        target = total * i / n_points
-        while j < len(seg) - 1 and acc + seg[j] < target:
-            acc += seg[j]
-            j += 1
-        t = (target - acc) / seg[j] if seg[j] else 0
-        a, b = pts[j], pts[j + 1]
-        out.append((a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t))
-
-    # Speed profile: v = sqrt(a_lat * R), then accel/brake limited passes
-    ds = total / n_points
-    w = 6
-    v = []
-    for i in range(n_points):
-        p0, p1, p2 = out[i - w], out[i], out[(i + w) % n_points]
-        a_, b_, c_ = math.dist(p0, p1), math.dist(p1, p2), math.dist(p0, p2)
-        area2 = abs((p1[0] - p0[0]) * (p2[1] - p0[1]) - (p1[1] - p0[1]) * (p2[0] - p0[0]))
-        R = (a_ * b_ * c_) / (2 * area2) if area2 > 1e-6 else 1e9
-        v.append(min(90.0, math.sqrt(4.5 * 9.81 * R)))  # m/s, cap ~324 km/h
-    for _ in range(2):
-        for i in range(1, 2 * n_points):  # traction
-            a, b = (i - 1) % n_points, i % n_points
-            v[b] = min(v[b], math.sqrt(v[a] ** 2 + 2 * 11.0 * ds))
-        for i in range(2 * n_points, 0, -1):  # braking
-            a, b = i % n_points, (i - 1) % n_points
-            v[b] = min(v[b], math.sqrt(v[a] ** 2 + 2 * 40.0 * ds))
-
-    # Cumulative time fraction for time->distance mapping
-    tcum = [0.0]
-    for i in range(n_points):
-        tcum.append(tcum[-1] + ds / max(v[i], 15.0))
-    lap_t = tcum[-1]
-    tfrac = [round(t / lap_t, 5) for t in tcum]
-
-    xs, ys = [p[0] for p in out], [p[1] for p in out]
-    minx, maxx, miny, maxy = min(xs), max(xs), min(ys), max(ys)
-    span = max(maxx - minx, maxy - miny)
-    v_kmh = [round(s * 3.6) for s in v]
+    if pts[0] == pts[-1]:
+        pts = pts[:-1]
+    want = geographic_direction(circuit_id)
+    reversed_outline = bool(want) and _is_clockwise(pts) != (want == "CLOCKWISE")
+    if reversed_outline:
+        pts = [pts[0]] + pts[1:][::-1]
+    shift = int(round(start_frac * n_points)) % n_points
+    model = _outline_model(pts, rot_deg, n_points, shift)
+    move = lambda idx: (idx - shift) % n_points
+    move_pct = lambda pct: round(((pct * n_points - shift) % n_points) / n_points, 4)
 
     # Turns / corners
     # Numbered corners only where their positions are known; detected apexes would carry
-    # numbers that don't match the official turn numbering
-    turn_indices = meta.get("turn_indices") or []
-    turns = [{"number": i + 1, "idx": idx, "pct": round(idx / n_points, 4)} for i, idx in enumerate(turn_indices)]
+    # numbers that don't match the official turn numbering (and none on a reversed outline)
+    turn_indices = [] if reversed_outline else (meta.get("turn_indices") or [])
+    turns = [{"number": i + 1, "idx": move(idx), "pct": round(move(idx) / n_points, 4)}
+             for i, idx in enumerate(turn_indices)]
 
-    # Sectors
-    sectors = meta.get("sectors") or [
-        {"sector": 1, "start_pct": 0.0, "end_pct": 0.33, "color": "#FF7A00", "label": "SECTOR 1"},
-        {"sector": 2, "start_pct": 0.33, "end_pct": 0.67, "color": "#FF1867", "label": "SECTOR 2"},
-        {"sector": 3, "start_pct": 0.67, "end_pct": 1.0, "color": "#E10600", "label": "SECTOR 3"},
-    ]
+    # Sectors (stored positions only where known)
+    sectors = DEFAULT_SECTORS
+    if meta.get("sectors") and not reversed_outline and not shift:
+        sectors = meta["sectors"]
 
     # DRS zones & detection points
     # Only real zones (none are invented where the positions aren't known)
-    drs_zones = meta.get("drs_zones") or []
-    drs_detections = meta.get("drs_detections") or []
+    drs_zones = [] if reversed_outline else [
+        {**z, "start_idx": move(z["start_idx"]), "end_idx": move(z["end_idx"])} for z in meta.get("drs_zones") or []]
+    drs_detections = [] if reversed_outline else [
+        {**z, "idx": move(z["idx"])} for z in meta.get("drs_detections") or []]
 
     bp = TRACK_BLUEPRINTS.get(circuit_id) or TRACK_BLUEPRINTS.get(CIRCUIT_MAP.get(circuit_id, "")) or {}
 
     return {
-        "points": [[round((x - minx) / span, 4), round((y - miny) / span, 4)] for x, y in out],
-        "aspect": round((maxx - minx) / (maxy - miny), 4),
-        "speed_kmh": v_kmh,
-        "tfrac": tfrac,
+        **model,
         # Official length (blueprint, else the outline data's own figure), not the measured outline
         "length_km": bp.get("length_km") or (round(feat["properties"]["length"] / 1000, 3)
                                              if feat["properties"].get("length") and circuit_id not in UNVERIFIED_LENGTH
@@ -713,7 +792,6 @@ def circuit_geometry(circuit_id: str, n_points: int = 720) -> Optional[Dict[str,
         "traced_along_roads": bool(feat["properties"].get("traced_along_roads")),
         "country": bp.get("country", ""),
         "country_code": bp.get("country_code", ""),
-        "rotation_deg": rot_deg,
         "sectors": sectors,
         "turns": turns,
         "drs_zones": drs_zones,
@@ -725,6 +803,58 @@ def circuit_geometry(circuit_id: str, n_points: int = 720) -> Optional[Dict[str,
         "pit_loss_s": bp.get("pit_loss_s"),
         "turns_count": bp.get("turns_count") or CIRCUIT_TURNS.get(circuit_id) or (len(turns) or None),
         "key_turns": bp.get("turns", [])
+    }
+
+
+# ---------------------------------------------------------------- layouts raced, per race
+# data/circuit-layouts.json (scripts/build_circuit_layouts.py): for every Grand Prix, the
+# layout raced and its facts from F1DB (CC BY 4.0), and an outline for every layout: our
+# geographic outline where one matches, otherwise f1-circuits-svg (MIT, (c) Jules Roy).
+CIRCUIT_LAYOUTS = os.path.join(ROOT, "data", "circuit-layouts.json")
+
+
+@lru_cache(maxsize=1)
+def _circuit_layouts() -> Dict[str, Any]:
+    try:
+        with open(CIRCUIT_LAYOUTS, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {"layouts": {}, "races": {}}
+
+
+def race_layout(year: int, rnd: Optional[int]) -> Optional[Dict[str, Any]]:
+    """F1DB facts for a race (layout, direction, length, turns, laps, distance, fastest lap)."""
+    if rnd is None:
+        return None
+    data = _circuit_layouts()
+    race = data["races"].get(f"{year}_{rnd}")
+    if not race:
+        return None
+    return {**race, "layout_info": data["layouts"].get(race["layout"], {})}
+
+
+def geographic_direction(circuit_id: str) -> Optional[str]:
+    """F1DB race direction of the layout our geographic outline of this circuit matches."""
+    for lay in _circuit_layouts()["layouts"].values():
+        if lay.get("shape") == "geographic" and lay.get("circuit") == circuit_id:
+            return lay["direction"]
+    return None
+
+
+@lru_cache(maxsize=64)
+def layout_geometry(layout_id: str, n_points: int = 720) -> Optional[Dict[str, Any]]:
+    """Replay model of a layout drawn from f1-circuits-svg (scaled to F1DB's length, in race
+    direction). Drawn in the venue's map orientation when it has a geographic outline."""
+    lay = _circuit_layouts()["layouts"].get(layout_id) or {}
+    if lay.get("shape") != "svg":
+        return None
+    rot = CIRCUIT_ORIENTATIONS.get(lay.get("circuit") or "", 0) if lay.get("frame") == "geographic" else 0
+    return {
+        **_outline_model([tuple(p) for p in lay["points"]], rot, n_points),
+        "length_km": lay.get("length_km"), "turns_count": lay.get("turns"),
+        "outline_source": "f1-circuits-svg", "start_line_estimated": True,
+        "sectors": DEFAULT_SECTORS, "turns": [], "drs_zones": [], "drs_detections": [], "key_turns": [],
+        "lap_record": None, "full_throttle_pct": None, "tyre_stress": None, "pit_loss_s": None,
     }
 
 
@@ -1526,6 +1656,12 @@ def _build_race_replay(year: int, rnd: int, net: bool = True, circuit_override: 
                     "lap": _safe_int(fl_data.get("lap"), fallback=1),
                     "time": time_val
                 }
+    # Jolpica has fastest laps from 2004; F1DB has them for every race
+    if not fl and geo and geo.get("race_fastest_lap"):
+        f1 = geo["race_fastest_lap"]
+        who = next((d for d in drivers if d["name"] == f1["driver"]), None)
+        fl = {"code": who["code"] if who else f1["driver"].split()[-1][:3].upper(),
+              "lap": f1.get("lap") or 1, "time": f1["time"]}
 
     cname = geo["name"] if geo else res.get("Circuit", {}).get("circuitName", cid.replace("_", " ").title())
     loc = res.get("Circuit", {}).get("Location", {}).get("locality", "")
