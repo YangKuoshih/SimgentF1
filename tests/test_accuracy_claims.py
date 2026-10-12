@@ -170,6 +170,20 @@ class EveryRaceShowsItsOwnCircuit(unittest.TestCase):
         self.assertEqual(R.race_layout(1989, 6)["layout_info"]["svg_layout"], "montreal-2")
         self.assertEqual(track(1992, 7)[1]["layout_id"], "montreal-3")
 
+    def test_layout_data_is_for_the_circuit_raced(self):
+        # Keyed by year and round: every race's F1DB layout must be at the circuit Jolpica lists
+        wrong = []
+        for y, r, race, _ in self.races:
+            cid = R.resolve_canonical_circuit(y, r, raw_circuit_id=race["Circuit"]["circuitId"], race_name=race["raceName"])
+            facts = R.race_layout(y, r)
+            if not facts or facts["layout_info"].get("circuit") != cid:
+                wrong.append((y, r, cid, facts and facts["layout_info"].get("circuit")))
+        self.assertEqual(wrong, [])
+
+    def test_a_round_renumbered_upstream_falls_back_instead_of_showing_another_track(self):
+        geo = R.track_for_year("monza", 2026, None, 17)  # round 17 is Singapore in the layout data
+        self.assertNotEqual(geo.get("layout_id"), "marina-bay-4")
+
     def test_race_direction(self):
         # The outline data had Marina Bay and Paul Ricard backwards; the Indy 500 oval runs anticlockwise
         for (year, rnd), clockwise in (((2026, 17), False), ((2018, 8), True), ((1960, 3), False), ((2019, 10), True)):
