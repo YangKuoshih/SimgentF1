@@ -258,7 +258,9 @@ def evaluate_all_guardrails(query: str, context: Optional[Dict[str, Any]] = None
     return False, None
 
 
-_CONTROL = re.compile(r"[\x00-\x1f\x7f]")
+# Control characters and angle brackets never occur in card text (race and driver names,
+# figures), so they are dropped: no markup can reach a client that forgets to escape.
+_CONTROL = re.compile(r"[\x00-\x1f\x7f<>]")
 
 
 def _plain(value: Any, limit: int) -> str:
@@ -268,9 +270,9 @@ def _plain(value: Any, limit: int) -> str:
 def sanitize_a2ui_card(card: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
     """
     Validates and hardens A2UI card schemas before transmitting to client.
-    Validates allowed actions and payload fields, caps lengths and drops control characters.
-    Text is NOT HTML-escaped here: the client escapes every field when it renders
-    (escaping here too showed "&amp;" in card titles). Colours are restricted to hex.
+    Validates allowed actions and payload fields, caps lengths and drops control characters
+    and angle brackets. Text is not HTML-escaped here: the client escapes every field when it
+    renders (escaping here too showed "&amp;" in card titles). Colours are restricted to hex.
     """
     if not card or not isinstance(card, dict):
         return None

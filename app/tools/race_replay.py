@@ -1172,7 +1172,7 @@ def _build_sprint_replay(year: int, rnd: int, net: bool = True, circuit_override
     fmt = lambda p: f"{p:g} pt{'s' if p != 1 else ''}"
     events = [
         {"lap": 1, "type": "FLAG", "message": "SPRINT START — 100km sprint underway",
-         "consequence": f"No mandatory pit stops; points to the top {len(scorers)} ({'-'.join(f'{d['points']:g}' for d in scorers)})." if scorers else "No mandatory pit stops."},
+         "consequence": f"No mandatory pit stops; points to the top {len(scorers)} ({'-'.join(format(d['points'], 'g') for d in scorers)})." if scorers else "No mandatory pit stops."},
         {"lap": max(1, winner_laps), "type": "CHEQUERED", "message": f"SPRINT FINISH — {drivers[0]['code'] if drivers else 'Leader'} wins the Sprint",
          "consequence": ("; ".join(f"{d['code']} P{d['finish']} ({fmt(d['points'])})" for d in drivers[:3])) if len(drivers) > 2 else "Sprint finished."}
     ]

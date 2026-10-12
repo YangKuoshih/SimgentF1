@@ -102,6 +102,7 @@ class CardsAreNotDoubleEscaped(unittest.TestCase):
         self.assertEqual(card["title"], "Results & Classification")
         self.assertEqual(card["metrics"][0]["label"], "P1 & P2")
         self.assertNotIn("&amp;", str(card))
+        self.assertEqual(card["metrics"][0]["value"], "bx/b")  # no markup survives
         self.assertTrue(re.fullmatch(r"#[0-9A-Fa-f]{3,8}", card["metrics"][0]["color"]))
 
     def test_control_characters_and_length_are_capped(self):
