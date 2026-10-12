@@ -334,7 +334,7 @@ def _track_for_race(cid: str, year: int, circuit_info: Optional[Dict[str, Any]],
     lay = facts["layout_info"]
     ci = circuit_info or {}
     if lay["shape"] == "svg":
-        geo = layout_geometry(facts["layout"])
+        geo = layout_geometry(facts.get("outline") or facts["layout"])
         if not geo:
             return None
         geo = dict(geo, name=ci.get("circuitName") or cid.replace("_", " ").title(),
@@ -830,7 +830,8 @@ def race_layout(year: int, rnd: Optional[int]) -> Optional[Dict[str, Any]]:
     race = data["races"].get(f"{year}_{rnd}")
     if not race:
         return None
-    return {**race, "layout_info": data["layouts"].get(race["layout"], {})}
+    # "outline": the drawing for this race's own season when the sources split a layout differently
+    return {**race, "layout_info": data["layouts"].get(race.get("outline") or race["layout"], {})}
 
 
 def geographic_direction(circuit_id: str) -> Optional[str]:

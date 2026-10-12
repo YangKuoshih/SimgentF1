@@ -48,9 +48,18 @@ DIRECTION_OVERRIDES = {"indianapolis-1": "ANTI_CLOCKWISE"}
 # current layout. Applied to every layout up to that season, and per race on the current one.
 START_BEFORE = {"silverstone": {"until": 2010, "between_turns": (8, 9)}}
 
+# A geographic outline stands for a layout only if what it draws measures within this of the
+# layout's official length (polylines cut corners: our good outlines measure 0.0-1.2% short).
+# Estoril, Indianapolis and Jacarepagua outlines are other layouts of those circuits (-1.5% to
+# -4.5%) and fall back to the drawing.
+GEO_MEASURED_TOL = 0.013
+# Reims-Gueux 1950-51 was traced along today's roads, where some junctions have been rebuilt
+# (-3.2%); it is still the route of that layout.
+GEO_LENGTH_EXCEPTIONS = {"reims-1"}
+
 N_SAMPLE = 1200
 N_OUT = 360
-GEO_FIT_MAX = 0.15          # loose shape check (SVG drawings are approximate); length decides
+GEO_FIT_MAX = 0.08          # shape check: genuine matches fit <= 0.066; Jacarepagua (0.109) is another layout
 
 
 def fetch(url, sha256=None):
@@ -240,7 +249,7 @@ def main():
             lo, _, hi = part.partition("-")
             out.update(range(int(lo), int(hi or lo) + 1))
         return out
-    svg_layout = {}
+    svg_layout, year_svg = {}, {}
     for lid, yrs in years_of.items():
         c = f1db_circuits[re.sub(r"-\d+$", "", lid)]
         sc = min(svg_circuits, key=lambda x: km((float(c["latitude"]), float(c["longitude"])), (x["latitude"], x["longitude"])))
@@ -258,6 +267,13 @@ def main():
             best = numbered[-1] if numbered else None
         if best:
             svg_layout[lid] = best
+            # The two sets can split a layout differently (F1DB: Montreal 1988-93 is one layout;
+            # the SVG set draws 1988-90 and 1991-93 separately): each race gets the drawing listed
+            # for its own season where there is one
+            for y in yrs:
+                own = [l["layoutId"] for l in sc["layouts"] if y in seasons(l["seasons"]) and l["layoutId"] in shapes]
+                if own and own[0] != best:
+                    year_svg[(lid, y)] = own[0]
 
     def svg_shape(lid, n):
         S, _ = resample(shapes[svg_layout[lid]], n)
@@ -280,6 +296,8 @@ def main():
         for lid in years_of:
             if re.sub(r"-\d+$", "", lid) != f1_cid or dist(lid) / layout_len[lid] > 0.01:
                 continue
+            if abs(measured - layout_len[lid]) / layout_len[lid] > GEO_MEASURED_TOL and lid not in GEO_LENGTH_EXCEPTIONS:
+                continue
             err = 0.0
             if lid in svg_layout:
                 S = svg_shape(lid, N_OUT)
@@ -287,7 +305,11 @@ def main():
                     S = S[::-1]
                 err = procrustes(S, G)[0]
             cands.append((err, lid))
-        good = [c for c in cands if c[0] <= GEO_FIT_MAX]
+        # a close shape fit, or a near-exact measured length when the drawing is the imprecise one
+        # (Bahrain: outline -0.2%, drawing fit 0.094); Jacarepagua fails both (-1.5%, 0.109): its
+        # outline is the later 4.93 km road course
+        good = [c for c in cands if c[0] <= GEO_FIT_MAX
+                or abs(measured - layout_len[c[1]]) / layout_len[c[1]] <= 0.005]
         if good:
             # closest length decides (Albert Park 5.278 = 2022+, not 5.303); shape fit only
             # breaks ties within 3 m (Barcelona 4.655: 2007-20 vs 4.657: 2023+)
@@ -304,20 +326,11 @@ def main():
               f"{'  ' + str([(l, round(e, 3)) for e, l in cands]) if cands else ''}")
 
     layouts, transferred = {}, {}  # venue -> [(last season, points from the start line)]
-    for lid in sorted(years_of, key=lambda l: (re.sub(r"-\d+$", "", l), min(years_of[l]))):
+    def svg_entry(lid, drawing, yrs, entry):
+        """Outline of F1DB layout lid from SVG drawing, for races in seasons yrs."""
         f1_cid = re.sub(r"-\d+$", "", lid)
-        entry = {"length_km": layout_len.get(lid), "turns": layout_turns.get(lid), "direction": direction[lid],
-                 "circuit": jolpica_of.get(f1_cid), "years": [min(years_of[lid]), max(years_of[lid])]}
-        if lid in geo_layout:
-            entry.update(shape="geographic", **geo_layout[lid])
-            layouts[lid] = entry
-            continue
-        if lid not in svg_layout:
-            entry.update(shape=None)
-            layouts[lid] = entry
-            print(f"  {lid}: no outline in either source")
-            continue
-        P, plen = resample(shapes[svg_layout[lid]], N_SAMPLE)
+        entry = dict(entry)
+        P, plen = resample(shapes[drawing], N_SAMPLE)
         P = P * (layout_len[lid] * 1000 / plen)  # SVG units -> metres
         frame = "drawing"
         if f1_cid in venue_rotation:
@@ -330,7 +343,7 @@ def main():
         if G is not None:
             Gd, _ = resample(G, N_SAMPLE)
             rule = START_BEFORE.get(jolpica_of.get(f1_cid, ""))
-            ruled = bool(rule and max(years_of[lid]) <= rule["until"])
+            ruled = bool(rule and max(yrs) <= rule["until"])
             if ruled:
                 Gd = np.roll(Gd, -int(round(start_frac(jolpica_of[f1_cid], rule) * len(Gd))), axis=0)
             i, overlap = transfer_start(P, Gd, min_overlap=0.25 if ruled else 0.35)
@@ -347,11 +360,29 @@ def main():
             start = longest_straight_start(P)
         P = np.roll(P, -start, axis=0)
         if how.startswith("shared"):
-            transferred.setdefault(f1_cid, []).append((max(years_of[lid]), P.copy()))
+            transferred.setdefault(f1_cid, []).append((max(yrs), P.copy()))
         P, _ = resample(P, N_OUT)
-        entry.update(shape="svg", svg_layout=svg_layout[lid], start_line=how, frame=frame,
+        entry.update(shape="svg", svg_layout=drawing, start_line=how, frame=frame,
                      points=[[round(float(x), 1), round(float(y), 1)] for x, y in P])
-        layouts[lid] = entry
+        return entry
+
+    for lid in sorted(years_of, key=lambda l: (re.sub(r"-\d+$", "", l), min(years_of[l]))):
+        f1_cid = re.sub(r"-\d+$", "", lid)
+        entry = {"length_km": layout_len.get(lid), "turns": layout_turns.get(lid), "direction": direction[lid],
+                 "circuit": jolpica_of.get(f1_cid), "years": [min(years_of[lid]), max(years_of[lid])]}
+        if lid in geo_layout:
+            entry.update(shape="geographic", **geo_layout[lid])
+            layouts[lid] = entry
+            continue
+        if lid not in svg_layout:
+            entry.update(shape=None)
+            layouts[lid] = entry
+            print(f"  {lid}: no outline in either source")
+            continue
+        layouts[lid] = svg_entry(lid, svg_layout[lid], years_of[lid], entry)
+        for drawing in sorted({d for (l, _), d in year_svg.items() if l == lid}):
+            yrs = {y for (l, y), d in year_svg.items() if l == lid and d == drawing}
+            layouts[f"{lid}/{drawing}"] = svg_entry(lid, drawing, yrs, dict(entry, years=[min(yrs), max(yrs)]))
 
     races = {}
     for r in f1db["races"]:
@@ -365,6 +396,9 @@ def main():
             "fastest_lap": {"time": fl["time"], "driver": f"{d['firstName']} {d['lastName']}" if d else fl["driverId"],
                             "lap": int(fl["lap"]) if fl["lap"] else None} if fl else None,
         }
+        variant = year_svg.get((r["circuitLayoutId"], int(r["year"])))
+        if variant and r["circuitLayoutId"] not in geo_layout:
+            races[key]["outline"] = f"{r['circuitLayoutId']}/{variant}"
         lay = layouts.get(r["circuitLayoutId"], {})
         rule = START_BEFORE.get(lay.get("circuit") or "")
         if lay.get("shape") == "geographic" and rule and int(r["year"]) <= rule["until"]:
