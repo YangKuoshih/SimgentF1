@@ -401,6 +401,12 @@
       <div id="track-wrap" class="h-[48vh] min-h-[300px] max-h-[460px] lg:h-auto lg:max-h-none lg:flex-1 relative min-h-0 overflow-hidden shrink-0 lg:shrink">
         <canvas id="trackCanvas" class="absolute inset-0 w-full h-full cursor-crosshair"></canvas>
 
+        <!-- Credit for OpenStreetMap outlines (ODbL); shown only for those circuits -->
+        <a id="map-attribution" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer"
+           class="hidden absolute bottom-1 right-2 z-10 px-1.5 py-0.5 rounded bg-black/60 text-[9px] font-mono text-slate-300 hover:text-white underline-offset-2 hover:underline">
+          Track outline © OpenStreetMap contributors
+        </a>
+
         <!-- 5-Red-Lights Gantry HUD -->
         <div id="lights-gantry-hud" class="absolute top-3 sm:top-4 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1 select-none pointer-events-none transition-all duration-300">
           <div class="px-3 py-0.5 rounded-t bg-black/90 border border-b-0 border-white/20 text-[9px] font-mono tracking-widest text-slate-300 uppercase flex items-center gap-1.5 shadow-lg backdrop-blur-md">
@@ -1284,8 +1290,18 @@
             <strong>SimGent</strong> is an independent, non-commercial fan project and open-source demonstration. It is not affiliated, associated, authorized, endorsed by, or in any way officially connected with Formula One Licensing B.V., Formula One World Championship Limited, the FIA, or any Formula 1 team.
           </p>
           <p class="text-slate-400 text-[9px]">
-            F1, FORMULA ONE, FORMULA 1, FIA FORMULA ONE WORLD CHAMPIONSHIP, GRAND PRIX, and related marks are registered trademarks of Formula One Licensing B.V. Race telemetry and historical archives are referenced solely under nominative fair use for non-commercial educational and analytical purposes.
+            F1, FORMULA ONE, FORMULA 1, FIA FORMULA ONE WORLD CHAMPIONSHIP, GRAND PRIX, and related marks are registered trademarks of Formula One Licensing B.V. Names and marks are used only to refer to the real events, teams and drivers. Race data is used under the licenses listed under Data sources.
           </p>
+        </div>
+      </div>
+
+      <!-- Data sources and their licenses (attribution required by each) -->
+      <div class="pt-2">
+        <div class="text-[10px] font-mono text-slate-300 leading-relaxed bg-black/50 p-3 rounded-lg border border-white/10 space-y-1">
+          <div class="text-cyan-400 font-bold uppercase tracking-wider text-[9px]">Data sources</div>
+          <p>Results, timing and standings: <a class="underline hover:text-white" href="https://github.com/jolpica/jolpica-f1" target="_blank" rel="noopener noreferrer">Jolpica-F1</a> and <a class="underline hover:text-white" href="https://openf1.org" target="_blank" rel="noopener noreferrer">OpenF1</a>, <a class="underline hover:text-white" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a>.</p>
+          <p>Circuit outlines: <a class="underline hover:text-white" href="https://github.com/bacinger/f1-circuits" target="_blank" rel="noopener noreferrer">bacinger/f1-circuits</a> (MIT), and for Jerez, Fuji and Korea © <a class="underline hover:text-white" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap contributors</a> (ODbL).</p>
+          <p class="text-slate-400">Lap-by-lap timing from 1996; earlier races are reconstructed from results. Positions within a lap and speed profiles are modelled; there is no car telemetry.</p>
         </div>
       </div>
 
@@ -3297,6 +3313,7 @@
     if (!S.model) return;
     const tr = S.model.track || {};
     const meta = S.model.meta || {};
+    $('map-attribution')?.classList.toggle('hidden', tr.outline_source !== 'OpenStreetMap');
 
     const nameEl = $('tic-name');
     const locEl = $('tic-location');
@@ -5148,7 +5165,7 @@
     ]);
     const done = races.filter(r => r.completed || (S.season < CURRENT_SEASON)).length;
     $('st-title').textContent = `${S.season} World Championship Standings`;
-    $('st-sub').textContent = `${done} of ${races.length} rounds completed · Jolpica / Ergast historical telemetry record`;
+    $('st-sub').textContent = `${done} of ${races.length} rounds completed · standings from Jolpica-F1`;
 
     const row = (rank, color, name, sub, pts, wins) => {
       let rankBadge = `<span class="w-6 font-mono text-slate-400 font-bold">P${rank}</span>`;

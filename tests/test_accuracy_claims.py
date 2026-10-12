@@ -3,6 +3,7 @@
 Historic circuits are never shown as another circuit or with today's figures, cards are not
 double-escaped, questions without a race on screen use the latest race, "why" championship
 questions explain, and the UI does not claim live timing or car telemetry. Offline."""
+import json
 import os
 import re
 import sys
@@ -138,8 +139,53 @@ class EveryRaceShowsItsOwnCircuit(unittest.TestCase):
         geo = R.circuit_geometry("hungaroring")  # no stored DRS or corner positions
         self.assertEqual(geo["drs_zones"], [])
         self.assertEqual(geo["turns"], [])
-        self.assertIsNone(geo["turns_count"])
+        self.assertEqual(geo["turns_count"], 14)  # official count, not detected apexes
         self.assertEqual(geo["length_km"], 4.381)  # official length, not the measured outline
+
+
+class CircuitOutlinesAndLicensing(unittest.TestCase):
+    def test_openstreetmap_outlines_match_the_official_length(self):
+        with open(os.path.join(ROOT, "data", "osm-circuits.geojson"), encoding="utf-8") as f:
+            data = json.load(f)
+        self.assertEqual(data["license"], "ODbL-1.0")
+        self.assertIn("OpenStreetMap contributors", data["attribution"])
+        self.assertEqual({f["properties"]["id"] for f in data["features"]}, {"osm-jerez", "osm-fuji", "osm-yeongam"})
+        for feat in data["features"]:
+            p = feat["properties"]
+            self.assertLess(abs(p["measured_length"] - p["length"]) / p["length"], 0.01, p["id"])
+            self.assertEqual(feat["geometry"]["coordinates"][0], feat["geometry"]["coordinates"][-1])
+
+    def test_openstreetmap_outlines_are_shown_and_credited(self):
+        for year, rnd_cid in ((1997, "jerez"), (2008, "fuji"), (2010, "yeongam")):
+            geo = R.track_for_year(rnd_cid, year)
+            self.assertFalse(geo.get("schematic"), rnd_cid)
+            self.assertEqual(geo["outline_source"], "OpenStreetMap")
+            self.assertTrue(geo["length_km"] and geo["turns_count"], rnd_cid)
+        self.assertEqual(R.track_for_year("silverstone", 2020)["outline_source"], "bacinger/f1-circuits")
+        self.assertIsNone(R.track_for_year("fuji", 1976)["length_km"])  # old layout
+
+    def test_license_files_and_credits_exist(self):
+        for path in ("data/OSM-LICENSE.md", "data/f1-circuits.LICENSE"):
+            self.assertTrue(os.path.exists(os.path.join(ROOT, path)), path)
+        with open(os.path.join(ROOT, "NOTICE.md"), encoding="utf-8") as f:
+            notice = f.read()
+        self.assertIn("ODbL", notice)
+        self.assertIn("Tomislav Bacinger", notice)
+        with open(os.path.join(ROOT, "frontend", "static", "index.html"), encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn('id="map-attribution"', html)
+        self.assertIn("openstreetmap.org/copyright", html)
+        self.assertIn("Jolpica-F1", html)
+
+    def test_turn_counts_and_layout_years(self):
+        self.assertEqual(R.track_for_year("marina_bay", 2025)["turns_count"], 19)
+        self.assertIsNone(R.track_for_year("catalunya", 2022)["length_km"])  # chicane until 2022
+        self.assertEqual(R.track_for_year("catalunya", 2023)["turns_count"], 14)
+        self.assertEqual(R.track_for_year("losail", 2021)["length_km"], 5.38)
+        self.assertIsNone(R.track_for_year("losail", 2023)["length_km"])  # 5.419 km layout
+        madring = R.track_for_year("madring", 2026)
+        self.assertIsNone(madring["length_km"])
+        self.assertIn("sources disagree", madring["layout_note"])
 
 
 class ReconstructedSessionsAreLabelled(unittest.TestCase):

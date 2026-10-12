@@ -24,6 +24,9 @@ from app.tools.f1_telemetry import TRACK_BLUEPRINTS
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 GEOJSON = os.path.join(ROOT, "data", "f1-circuits.geojson")
+# Outlines bacinger/f1-circuits doesn't cover, built from OpenStreetMap by
+# scripts/import_osm_circuits.py (ODbL 1.0, (c) OpenStreetMap contributors: data/OSM-LICENSE.md)
+OSM_GEOJSON = os.path.join(ROOT, "data", "osm-circuits.geojson")
 
 # Jolpica circuitId -> bacinger GeoJSON feature id
 CIRCUIT_MAP = {
@@ -37,6 +40,8 @@ CIRCUIT_MAP = {
     "estoril": "pt-1972", "jacarepagua": "br-1977", "jeddah": "sa-2021", "miami": "us-2022",
     "losail": "qa-2004", "madring": "es-2026", "baku": "az-2016", "vegas": "us-2023",
     "indianapolis": "us-1909", "galvez": "ar-1952", "kyalami": "za-1961", "watkins_glen": "us-1956",
+    # OpenStreetMap outlines (data/osm-circuits.geojson)
+    "jerez": "osm-jerez", "fuji": "osm-fuji", "yeongam": "osm-yeongam",
 }
 
 
@@ -217,18 +222,20 @@ def _schedule_circuit_id(year: int, rnd: int) -> str:
 
 DRS_FROM, ACTIVE_AERO_FROM, LAP_TIMING_FROM = 2011, 2026, 1996
 
-# First season of the layout our outline and figures describe (outline = bacinger/f1-circuits,
-# matched by its official length). Earlier races ran a different layout, so they get the
-# outline for reference only and none of its figures. Circuits not listed kept the layout
-# for all their races since 1996 (Barcelona changed several times by under 2%, so it carries
-# only the general "today's layout" note).
+# First season of the layout our outline and figures describe (outline matched to a layout by
+# its official length). Earlier races ran a different layout, so they get the outline for
+# reference only and none of its figures. Circuits not listed kept the layout for all their
+# races since 1996, apart from changes of well under 1% (Monaco 2015, Red Bull Ring 2014).
 LAYOUT_SINCE = {
     "albert_park": 2022,     # 2021 rework: 5.303 -> 5.278 km, 16 -> 14 turns
+    "catalunya": 2023,       # outline is the layout without the final chicane (F1 from 2023)
+    "fuji": 2005,            # rebuilt 2005; F1 raced the old 4.359 km layout in 1976-77
     "galvez": 9999,          # outline is not the No. 6 layout F1 used in 1995-98
     "hockenheimring": 2002,  # 6.8 km forest layout until 2001
     "hungaroring": 2003,     # 3.975 km until 2002
     "imola": 2008,           # 4.930 km until 2006
     "interlagos": 2000,      # 4.292 km until 1999
+    "jerez": 1994,           # 4.218 km until 1990; the 4.428 km layout with the chicane from 1994
     "magny_cours": 2003,     # last-chicane change, 4.25 -> 4.41 km
     "marina_bay": 2023,      # 5.06 km until 2019; turns 16-19 removed for 2023
     "monaco": 2003,          # swimming pool and Rascasse reprofiled, 3.37 -> 3.34 km
@@ -239,6 +246,22 @@ LAYOUT_SINCE = {
     "suzuka": 2003,          # 5.859 km until 2002
     "villeneuve": 2002,      # hairpin moved, 4.421 km until 2001
     "yas_marina": 2021,      # 5.554 km until 2020
+}
+# Official turn counts for outlines without a blueprint, from each circuit's Wikipedia infobox,
+# taken only from the layout whose length matches the outline's official length (Madring is
+# left out: its sources disagree on the length).
+CIRCUIT_TURNS = {
+    "americas": 20, "catalunya": 14, "estoril": 13, "fuji": 16, "hockenheimring": 17,
+    "hungaroring": 14, "imola": 19, "indianapolis": 13, "istanbul": 14, "jerez": 15,
+    "losail": 16, "magny_cours": 17, "marina_bay": 19, "mugello": 15, "nurburgring": 15,
+    "portimao": 15, "ricard": 15, "rodriguez": 17, "shanghai": 16, "sochi": 18,
+    "vegas": 17, "yeongam": 18,
+}
+UNVERIFIED_LENGTH = {"madring"}
+
+# Last season of the layout our outline describes, when the circuit has changed since
+LAYOUT_UNTIL = {
+    "losail": 2021,          # outline is the original 5.380 km layout; 5.419 km from 2023
 }
 # Single races on another layout of the same circuit: (year, round)
 OTHER_LAYOUT_RACES = {
@@ -267,7 +290,7 @@ def track_for_year(cid: str, year: int, circuit_info: Optional[Dict[str, Any]] =
         geo["layout_note"] = "No layout data for this circuit: the track shown is a schematic, not the real shape."
         return geo
     other_layout = OTHER_LAYOUT_RACES.get((year, rnd)) if rnd is not None else None
-    earlier_layout = year < LAYOUT_SINCE.get(cid, 0) or other_layout
+    earlier_layout = year < LAYOUT_SINCE.get(cid, 0) or year > LAYOUT_UNTIL.get(cid, 9999) or other_layout
     if year < DRS_FROM or earlier_layout:
         geo["drs_zones"], geo["drs_detections"] = [], []
     geo["aero_zone_label"] = "Straight-line mode" if year >= ACTIVE_AERO_FROM else "DRS"
@@ -278,10 +301,11 @@ def track_for_year(cid: str, year: int, circuit_info: Optional[Dict[str, Any]] =
         for key in ("length_km", "turns_count", "pit_loss_s", "full_throttle_pct", "tyre_stress", "lap_record"):
             geo[key] = None
         geo["turns"], geo["key_turns"] = [], []
-        geo["layout_note"] = (f"Today's layout shown for reference; this race used {other_layout}." if other_layout
-                              else f"Today's layout shown for reference; the {year} circuit was different.")
+        geo["layout_note"] = (f"Outline shown for reference; this race used {other_layout}." if other_layout
+                              else f"Outline shown for reference; the {year} layout was different.")
     else:
-        geo["layout_note"] = "Track figures are for today's layout."
+        geo["layout_note"] = ("Length and turn count not shown: sources disagree for this circuit."
+                              if cid in UNVERIFIED_LENGTH else "Track figures are for the layout raced that year.")
     return geo
 
 
@@ -410,9 +434,12 @@ def _valid_time_str(*times: Optional[str]) -> Optional[str]:
 
 @lru_cache(maxsize=1)
 def _geo_features() -> Dict[str, Dict[str, Any]]:
-    with open(GEOJSON) as f:
-        data = json.load(f)
-    return {feat["properties"]["id"]: feat for feat in data["features"]}
+    features = {}
+    for path in (GEOJSON, OSM_GEOJSON):
+        if os.path.exists(path):
+            with open(path, encoding="utf-8") as f:
+                features.update({feat["properties"]["id"]: feat for feat in json.load(f)["features"]})
+    return features
 
 
 # Official F1 broadcast orientations (rotation degrees) matching TV broadcast track maps (optimized for horizontal widescreen 16:9 displays)
@@ -665,8 +692,11 @@ def circuit_geometry(circuit_id: str, n_points: int = 720) -> Optional[Dict[str,
         "tfrac": tfrac,
         # Official length (blueprint, else the outline data's own figure), not the measured outline
         "length_km": bp.get("length_km") or (round(feat["properties"]["length"] / 1000, 3)
-                                             if feat["properties"].get("length") else None),
+                                             if feat["properties"].get("length") and circuit_id not in UNVERIFIED_LENGTH
+                                             else None),
         "name": bp.get("name") or feat["properties"].get("Name"),
+        # Shown under the map for outlines that must be credited (OpenStreetMap, ODbL)
+        "outline_source": feat["properties"].get("source", "bacinger/f1-circuits"),
         "country": bp.get("country", ""),
         "country_code": bp.get("country_code", ""),
         "rotation_deg": rot_deg,
@@ -679,7 +709,7 @@ def circuit_geometry(circuit_id: str, n_points: int = 720) -> Optional[Dict[str,
         "full_throttle_pct": bp.get("full_throttle_pct"),
         "tyre_stress": bp.get("tyre_stress"),
         "pit_loss_s": bp.get("pit_loss_s"),
-        "turns_count": bp.get("turns_count") or (len(turns) or None),
+        "turns_count": bp.get("turns_count") or CIRCUIT_TURNS.get(circuit_id) or (len(turns) or None),
         "key_turns": bp.get("turns", [])
     }
 

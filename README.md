@@ -14,7 +14,7 @@
   <a href="tests/README.md"><img src="https://img.shields.io/badge/Tests-Python%20%2B%20Playwright%20E2E-00E073.svg" alt="Tests: Python + Playwright E2E" /></a>
   <a href=".github/workflows/ci.yml"><img src="https://img.shields.io/badge/CI-GitHub%20Actions-blue.svg" alt="CI" /></a>
   <a href="https://scorecard.dev/viewer/?uri=github.com/YangKuoshih/SimgentF1"><img src="https://api.scorecard.dev/projects/github.com/YangKuoshih/SimgentF1/badge" alt="OpenSSF Scorecard" /></a>
-  <a href="NOTICE.md"><img src="https://img.shields.io/badge/License-MIT%20code%20%C2%B7%20CC%20BY--NC--SA%20data-white.svg" alt="License: MIT code, CC BY-NC-SA data" /></a>
+  <a href="NOTICE.md"><img src="https://img.shields.io/badge/License-MIT%20code%20%C2%B7%20CC%20BY--NC--SA%20%2F%20ODbL%20data-white.svg" alt="License: MIT code, CC BY-NC-SA and ODbL data" /></a>
   <a href="https://www.python.org/"><img src="https://img.shields.io/badge/python-3.14.8-3776AB.svg" alt="Python 3.14.8" /></a>
   <a href="https://fastapi.tiangolo.com"><img src="https://img.shields.io/badge/FastAPI-Hash%20locked-009688.svg" alt="FastAPI" /></a>
   <a href="https://modelcontextprotocol.io"><img src="https://img.shields.io/badge/MCP-Protocol%20v1.0-8A2BE2.svg" alt="Model Context Protocol" /></a>
@@ -50,7 +50,8 @@ What started as a family race-day side project became **SimGent** (short for **S
 > times from **1996 onwards**; earlier races are reconstructed from the results (finishing order,
 > laps completed, retirements). Car positions *within* a lap, the speed profile and the circuit
 > figures are modelled from today's circuit outlines. There is no car telemetry (speed, throttle,
-> brake) in the data. Circuits without layout data replay on a labelled schematic.
+> brake) in the data. Circuit outlines come from bacinger/f1-circuits and, for Jerez, Fuji and
+> Korea, from OpenStreetMap; circuits without an outline replay on a labelled schematic.
 
 ---
 
@@ -424,6 +425,11 @@ Results, timing and historical records come from two community APIs, neither aff
 
 The cached copies in `data/cache/` (and anything derived from them) stay under CC BY-NC-SA 4.0: credit the source, **non-commercial use only**, and share adaptations under the same license. See [`data/cache/LICENSE.md`](data/cache/LICENSE.md).
 
+Circuit outlines come from two sources:
+
+- [bacinger/f1-circuits](https://github.com/bacinger/f1-circuits) (`data/f1-circuits.geojson`), MIT License, © 2019-2025 Tomislav Bacinger ([license](data/f1-circuits.LICENSE)).
+- [OpenStreetMap](https://www.openstreetmap.org) (`data/osm-circuits.geojson`: Jerez, Fuji and Korea), **© OpenStreetMap contributors**, available under the [Open Database License (ODbL) 1.0](https://opendatacommons.org/licenses/odbl/1-0/). The app credits OpenStreetMap on the track map when these outlines are shown. Reuse the file under the ODbL and keep the credit. See [`data/OSM-LICENSE.md`](data/OSM-LICENSE.md); `scripts/import_osm_circuits.py` rebuilds it.
+
 ---
 
 ## 📄 License & Attribution
@@ -431,6 +437,8 @@ The cached copies in `data/cache/` (and anything derived from them) stay under C
 The **source code** is distributed under the **MIT License**. See [`LICENSE`](LICENSE).
 
 The **race data** in `data/cache/` is **not** covered by the MIT License. It comes from Jolpica-F1 and OpenF1 and is licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) (attribution, non-commercial, share-alike). See [`data/cache/LICENSE.md`](data/cache/LICENSE.md) and [`NOTICE.md`](NOTICE.md).
+
+The **OpenStreetMap circuit outlines** in `data/osm-circuits.geojson` are © OpenStreetMap contributors and licensed under the [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/), not MIT. See [`data/OSM-LICENSE.md`](data/OSM-LICENSE.md). The bacinger/f1-circuits outlines are MIT ([license](data/f1-circuits.LICENSE)).
 - Built with passion by **Tony Yang** ([tonyyang.work](https://tonyyang.work) | [GitHub @YangKuoshih](https://github.com/YangKuoshih)).
 
 ## Contributing and security
