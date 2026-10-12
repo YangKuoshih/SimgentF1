@@ -42,6 +42,7 @@ CIRCUIT_MAP = {
     "indianapolis": "us-1909", "galvez": "ar-1952", "kyalami": "za-1961", "watkins_glen": "us-1956",
     # OpenStreetMap outlines (data/osm-circuits.geojson)
     "jerez": "osm-jerez", "fuji": "osm-fuji", "yeongam": "osm-yeongam",
+    "reims": "osm-reims",  # 1926-1951 layout traced along today's roads (French GP 1950-51)
 }
 
 
@@ -262,6 +263,12 @@ UNVERIFIED_LENGTH = {"madring"}
 # Last season of the layout our outline describes, when the circuit has changed since
 LAYOUT_UNTIL = {
     "losail": 2021,          # outline is the original 5.380 km layout; 5.419 km from 2023
+    "reims": 1951,           # outline is the 1926-1951 layout through Gueux; 8.3 km from 1953
+}
+# Outlines of a pre-1996 layout: the seasons that layout was raced. Within them the outline
+# is the real one for that race (its figures stay hidden: no lap data before 1996).
+HISTORIC_LAYOUT = {
+    "reims": (1926, 1951),
 }
 # Single races on another layout of the same circuit: (year, round)
 OTHER_LAYOUT_RACES = {
@@ -301,8 +308,14 @@ def track_for_year(cid: str, year: int, circuit_info: Optional[Dict[str, Any]] =
         for key in ("length_km", "turns_count", "pit_loss_s", "full_throttle_pct", "tyre_stress", "lap_record"):
             geo[key] = None
         geo["turns"], geo["key_turns"] = [], []
-        geo["layout_note"] = (f"Outline shown for reference; this race used {other_layout}." if other_layout
-                              else f"Outline shown for reference; the {year} layout was different.")
+        first, last = HISTORIC_LAYOUT.get(cid, (0, -1))
+        if not other_layout and first <= year <= last:
+            geo["layout_note"] = (f"Outline of the {first}-{last} layout raced that year, traced along today's roads "
+                                  "(some junctions of the period have since been rebuilt)."
+                                  if geo.get("traced_along_roads") else f"Outline of the {first}-{last} layout raced that year.")
+        else:
+            geo["layout_note"] = (f"Outline shown for reference; this race used {other_layout}." if other_layout
+                                  else f"Outline shown for reference; the {year} layout was different.")
     else:
         geo["layout_note"] = ("Length and turn count not shown: sources disagree for this circuit."
                               if cid in UNVERIFIED_LENGTH else "Track figures are for the layout raced that year.")
@@ -697,6 +710,7 @@ def circuit_geometry(circuit_id: str, n_points: int = 720) -> Optional[Dict[str,
         "name": bp.get("name") or feat["properties"].get("Name"),
         # Shown under the map for outlines that must be credited (OpenStreetMap, ODbL)
         "outline_source": feat["properties"].get("source", "bacinger/f1-circuits"),
+        "traced_along_roads": bool(feat["properties"].get("traced_along_roads")),
         "country": bp.get("country", ""),
         "country_code": bp.get("country_code", ""),
         "rotation_deg": rot_deg,
