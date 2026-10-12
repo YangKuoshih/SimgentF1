@@ -290,7 +290,9 @@ def track_for_year(cid: str, year: int, circuit_info: Optional[Dict[str, Any]] =
     When F1DB has the race (every championship race to date), the layout actually raced and
     its facts come from there instead: see _track_for_race."""
     facts = race_layout(year, rnd)
-    if facts and facts["layout_info"].get("shape"):
+    # Only when F1DB's race is at this circuit: layouts are keyed by year and round, so a calendar
+    # change (a cancelled round renumbering the rest) must not put another round's track here
+    if facts and facts["layout_info"].get("shape") and facts["layout_info"].get("circuit") == cid:
         return _track_for_race(cid, year, circuit_info, facts)
     geo = circuit_geometry(cid) if cid else None
     if not geo:
