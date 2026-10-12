@@ -6301,7 +6301,8 @@
   function openTelemetryModal() {
     if (!S.model || !telModal) return;
     const cName = S.model.meta.circuit_name || S.model.meta.locality || 'Grand Prix Circuit';
-    $('tel-sub').textContent = `${cName} · estimated from corner geometry, not car telemetry`;
+    const layoutNote = S.model.track && S.model.track.layout_note ? ` · ${S.model.track.layout_note}` : '';
+    $('tel-sub').textContent = `${cName} · estimated from corner geometry, not car telemetry${layoutNote}`;
 
     telModal.classList.remove('hidden');
     requestAnimationFrame(() => {
@@ -6468,14 +6469,13 @@
       }
     });
 
-    // Label corner apexes at local speed minima
-    let cCount = 1;
+    // Mark slow corners at local speed minima (unnumbered: not the official turn numbering)
     for (let i = 4; i < n - 4; i++) {
       if (baseSpeed[i] <= baseSpeed[i-1] && baseSpeed[i] <= baseSpeed[i+1] && baseSpeed[i] < 190) {
         const x = padL + (i / n) * chartW;
         tctx_tel.fillStyle = '#E10600';
         tctx_tel.font = 'bold 9px JetBrains Mono';
-        tctx_tel.fillText(`T${cCount++}`, x - 6, H - 8);
+        tctx_tel.fillText('▲', x - 4, H - 8);
         tctx_tel.strokeStyle = 'rgba(225,6,0,0.3)';
         tctx_tel.setLineDash([2, 2]);
         tctx_tel.beginPath();

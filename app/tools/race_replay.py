@@ -179,8 +179,11 @@ def resolve_canonical_circuit(
     except Exception:
         pass
 
-    # 5. Match against race/event name semantics with word boundary and season-specific routing
-    if race_name:
+    # 5. Only when no circuit id is known at all: guess from the event name. Never when the id
+    # is known but has no layout data, or the "British Grand Prix" at Brands Hatch became
+    # Silverstone, Adelaide became Albert Park and Fuji became Suzuka (91 races).
+    known_id = (raw_circuit_id or "").strip() or _main_circuit_id(year, rnd) or _schedule_circuit_id(year, rnd)
+    if race_name and not known_id:
         rn_lower = race_name.lower().replace("_", " ").replace("-", " ")
         if re.search(r'\b(spanish|spain|madrid|madring)\b', rn_lower):
             return "madring" if year >= 2026 else "catalunya"
@@ -214,13 +217,44 @@ def _schedule_circuit_id(year: int, rnd: int) -> str:
 
 DRS_FROM, ACTIVE_AERO_FROM, LAP_TIMING_FROM = 2011, 2026, 1996
 
+# First season of the layout our outline and figures describe (outline = bacinger/f1-circuits,
+# matched by its official length). Earlier races ran a different layout, so they get the
+# outline for reference only and none of its figures. Circuits not listed kept the layout
+# for all their races since 1996 (Barcelona changed several times by under 2%, so it carries
+# only the general "today's layout" note).
+LAYOUT_SINCE = {
+    "albert_park": 2022,     # 2021 rework: 5.303 -> 5.278 km, 16 -> 14 turns
+    "galvez": 9999,          # outline is not the No. 6 layout F1 used in 1995-98
+    "hockenheimring": 2002,  # 6.8 km forest layout until 2001
+    "hungaroring": 2003,     # 3.975 km until 2002
+    "imola": 2008,           # 4.930 km until 2006
+    "interlagos": 2000,      # 4.292 km until 1999
+    "magny_cours": 2003,     # last-chicane change, 4.25 -> 4.41 km
+    "marina_bay": 2023,      # 5.06 km until 2019; turns 16-19 removed for 2023
+    "monaco": 2003,          # swimming pool and Rascasse reprofiled, 3.37 -> 3.34 km
+    "monza": 2000,           # first chicane reprofiled, 5.770 km until 1999
+    "nurburgring": 2002,     # 4.556 km GP circuit until 2001
+    "silverstone": 2010,     # 5.14 km before the Arena section
+    "spa": 2007,             # Bus Stop rebuilt, 6.968 -> 7.004 km
+    "suzuka": 2003,          # 5.859 km until 2002
+    "villeneuve": 2002,      # hairpin moved, 4.421 km until 2001
+    "yas_marina": 2021,      # 5.554 km until 2020
+}
+# Single races on another layout of the same circuit: (year, round)
+OTHER_LAYOUT_RACES = {
+    (2010, 1): "the 6.299 km Endurance layout",
+    (2020, 16): "the 3.543 km Outer layout (Sakhir Grand Prix)",
+}
 
-def track_for_year(cid: str, year: int, circuit_info: Optional[Dict[str, Any]] = None) -> Optional[Dict[str, Any]]:
+
+def track_for_year(cid: str, year: int, circuit_info: Optional[Dict[str, Any]] = None,
+                   rnd: Optional[int] = None) -> Optional[Dict[str, Any]]:
     """The circuit as it can honestly be shown for a given season.
 
     Layouts come from today's circuit outlines, so: DRS zones only from 2011 (straight-line
     mode replaces DRS from 2026), a lap record only if it was set by that season, and for
-    races before 1996 (results-only replays) none of today's length, turn or pit figures.
+    races before 1996 (results-only replays) or on an earlier layout (LAYOUT_SINCE) none of
+    today's length, turn or pit figures.
     Circuits without layout data get a labelled schematic with their real name."""
     geo = circuit_geometry(cid) if cid else None
     if not geo:
@@ -232,17 +266,20 @@ def track_for_year(cid: str, year: int, circuit_info: Optional[Dict[str, Any]] =
         geo["country"] = ci.get("Location", {}).get("country", "")
         geo["layout_note"] = "No layout data for this circuit: the track shown is a schematic, not the real shape."
         return geo
-    if year < DRS_FROM:
+    other_layout = OTHER_LAYOUT_RACES.get((year, rnd)) if rnd is not None else None
+    earlier_layout = year < LAYOUT_SINCE.get(cid, 0) or other_layout
+    if year < DRS_FROM or earlier_layout:
         geo["drs_zones"], geo["drs_detections"] = [], []
     geo["aero_zone_label"] = "Straight-line mode" if year >= ACTIVE_AERO_FROM else "DRS"
     record_year = re.search(r"\b(19|20)\d{2}\b", geo.get("lap_record") or "")
     if record_year and int(record_year.group(0)) > year:
         geo["lap_record"] = None
-    if year < LAP_TIMING_FROM:
-        for key in ("length_km", "turns_count", "pit_loss_s", "full_throttle_pct", "tyre_stress"):
+    if year < LAP_TIMING_FROM or earlier_layout:
+        for key in ("length_km", "turns_count", "pit_loss_s", "full_throttle_pct", "tyre_stress", "lap_record"):
             geo[key] = None
         geo["turns"], geo["key_turns"] = [], []
-        geo["layout_note"] = f"Today's layout shown for reference; the {year} circuit was different."
+        geo["layout_note"] = (f"Today's layout shown for reference; this race used {other_layout}." if other_layout
+                              else f"Today's layout shown for reference; the {year} circuit was different.")
     else:
         geo["layout_note"] = "Track figures are for today's layout."
     return geo
@@ -602,7 +639,9 @@ def circuit_geometry(circuit_id: str, n_points: int = 720) -> Optional[Dict[str,
     v_kmh = [round(s * 3.6) for s in v]
 
     # Turns / corners
-    turn_indices = meta.get("turn_indices") or _detect_apex_indices(v_kmh, n_points)
+    # Numbered corners only where their positions are known; detected apexes would carry
+    # numbers that don't match the official turn numbering
+    turn_indices = meta.get("turn_indices") or []
     turns = [{"number": i + 1, "idx": idx, "pct": round(idx / n_points, 4)} for i, idx in enumerate(turn_indices)]
 
     # Sectors
@@ -613,12 +652,9 @@ def circuit_geometry(circuit_id: str, n_points: int = 720) -> Optional[Dict[str,
     ]
 
     # DRS zones & detection points
-    drs_zones = meta.get("drs_zones") or [
-        {"name": "ACTIVATION ZONE 1", "start_idx": int(n_points * 0.92), "end_idx": int(n_points * 0.05), "label": "ACTIVATION ZONE 1"}
-    ]
-    drs_detections = meta.get("drs_detections") or [
-        {"name": "DETECTION POINT 1", "idx": int(n_points * 0.88)}
-    ]
+    # Only real zones (none are invented where the positions aren't known)
+    drs_zones = meta.get("drs_zones") or []
+    drs_detections = meta.get("drs_detections") or []
 
     bp = TRACK_BLUEPRINTS.get(circuit_id) or TRACK_BLUEPRINTS.get(CIRCUIT_MAP.get(circuit_id, "")) or {}
 
@@ -627,7 +663,9 @@ def circuit_geometry(circuit_id: str, n_points: int = 720) -> Optional[Dict[str,
         "aspect": round((maxx - minx) / (maxy - miny), 4),
         "speed_kmh": v_kmh,
         "tfrac": tfrac,
-        "length_km": bp.get("length_km") or round(total / 1000, 3),
+        # Official length (blueprint, else the outline data's own figure), not the measured outline
+        "length_km": bp.get("length_km") or (round(feat["properties"]["length"] / 1000, 3)
+                                             if feat["properties"].get("length") else None),
         "name": bp.get("name") or feat["properties"].get("Name"),
         "country": bp.get("country", ""),
         "country_code": bp.get("country_code", ""),
@@ -641,7 +679,7 @@ def circuit_geometry(circuit_id: str, n_points: int = 720) -> Optional[Dict[str,
         "full_throttle_pct": bp.get("full_throttle_pct"),
         "tyre_stress": bp.get("tyre_stress"),
         "pit_loss_s": bp.get("pit_loss_s"),
-        "turns_count": bp.get("turns_count", len(turns)),
+        "turns_count": bp.get("turns_count") or (len(turns) or None),
         "key_turns": bp.get("turns", [])
     }
 
@@ -937,7 +975,7 @@ def _build_qualifying_replay(year: int, rnd: int, net: bool = True, circuit_over
 
     raw_cid = circuit_info.get("circuitId", "") if circuit_info else ""
     cid = resolve_canonical_circuit(year, rnd, raw_circuit_id=raw_cid, race_name=race_name, circuit_override=circuit_override)
-    geo = track_for_year(cid, year, circuit_info)
+    geo = track_for_year(cid, year, circuit_info, rnd)
     cname = geo.get("name") if geo else (circuit_info.get("circuitName") if circuit_info else cid.replace("_", " ").title())
     loc = circuit_info.get("Location", {}).get("locality", "") if circuit_info else ""
     country = geo.get("country", "") if geo else (circuit_info.get("Location", {}).get("country", "") if circuit_info else "")
@@ -1109,7 +1147,7 @@ def _build_sprint_replay(year: int, rnd: int, net: bool = True, circuit_override
 
     raw_cid = circuit_info.get("circuitId", "") if circuit_info else ""
     cid = resolve_canonical_circuit(year, rnd, raw_circuit_id=raw_cid, race_name=race_name, circuit_override=circuit_override)
-    geo = track_for_year(cid, year, circuit_info)
+    geo = track_for_year(cid, year, circuit_info, rnd)
     cname = geo.get("name") if geo else (circuit_info.get("circuitName") if circuit_info else cid.replace("_", " ").title())
     loc = circuit_info.get("Location", {}).get("locality", "") if circuit_info else ""
     country = geo.get("country", "") if geo else (circuit_info.get("Location", {}).get("country", "") if circuit_info else "")
@@ -1223,7 +1261,7 @@ def _build_race_replay(year: int, rnd: int, net: bool = True, circuit_override: 
     raw_cid = res.get("Circuit", {}).get("circuitId", "")
     race_name = res.get("raceName", "")
     cid = resolve_canonical_circuit(year, rnd, raw_circuit_id=raw_cid, race_name=race_name, circuit_override=circuit_override)
-    geo = track_for_year(cid, year, res.get("Circuit"))
+    geo = track_for_year(cid, year, res.get("Circuit"), rnd)
 
     # Per-driver lap times from real lap data
     lap_times: Dict[str, List[float]] = {}

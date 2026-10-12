@@ -86,6 +86,62 @@ class HistoricCircuits(unittest.TestCase):
             self.assertNotIn(default, src)
 
 
+class EveryRaceShowsItsOwnCircuit(unittest.TestCase):
+    """All 1950-2026 races from the cached schedules, offline."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.races = []
+        for year in range(1950, 2027):
+            winners = J.season_winners(year, net=False)
+            for race in J.schedule(year, net=False):
+                rnd = int(race["round"])
+                if rnd in winners:
+                    cls.races.append((year, rnd, race, winners[rnd]))
+        assert len(cls.races) > 1100
+
+    def test_resolved_circuit_is_the_one_raced(self):
+        # The event-name fallback once put the British GP at Brands Hatch on Silverstone,
+        # Adelaide on Albert Park and Fuji on Suzuka (91 races)
+        wrong = [(y, r, race["Circuit"]["circuitId"], cid) for y, r, race, _ in self.races
+                 if (cid := R.resolve_canonical_circuit(y, r, raw_circuit_id=race["Circuit"]["circuitId"],
+                                                        race_name=race["raceName"])) != race["Circuit"]["circuitId"]
+                 and (y, r) not in R.EVENT_RELOCATIONS]
+        self.assertEqual(wrong, [])
+
+    def test_shown_length_fits_the_race_distance(self):
+        # Winner laps x shown length is a race distance unless the race was cut short;
+        # anything else means the layout shown is not the one raced that year
+        shortened = {(2003, 3), (2009, 2), (2021, 12), (2022, 7), (2022, 18)}
+        odd = []
+        for y, r, race, w in self.races:
+            if y < 1996:
+                continue
+            cid = R.resolve_canonical_circuit(y, r, raw_circuit_id=race["Circuit"]["circuitId"], race_name=race["raceName"])
+            geo = R.track_for_year(cid, y, race["Circuit"], r) or {}
+            if geo.get("length_km") and (y, r) not in shortened:
+                dist = int(w["laps"]) * geo["length_km"]
+                if not 250 <= dist <= 320:
+                    odd.append((y, r, cid, round(dist)))
+        self.assertEqual(odd, [])
+
+    def test_earlier_layouts_show_no_figures(self):
+        for cid, year, rnd in (("silverstone", 2005, None), ("hockenheimring", 2001, None),
+                               ("bahrain", 2010, 1), ("bahrain", 2020, 16)):
+            geo = R.track_for_year(cid, year, None, rnd)
+            self.assertIsNone(geo["length_km"], (cid, year))
+            self.assertIn("reference", geo["layout_note"])
+        self.assertEqual(R.track_for_year("bahrain", 2020, None, 15)["length_km"], 5.412)
+        self.assertEqual(R.track_for_year("hockenheimring", 2002, None)["length_km"], 4.574)
+
+    def test_no_invented_drs_zones_or_turn_numbers(self):
+        geo = R.circuit_geometry("hungaroring")  # no stored DRS or corner positions
+        self.assertEqual(geo["drs_zones"], [])
+        self.assertEqual(geo["turns"], [])
+        self.assertIsNone(geo["turns_count"])
+        self.assertEqual(geo["length_km"], 4.381)  # official length, not the measured outline
+
+
 class ReconstructedSessionsAreLabelled(unittest.TestCase):
     def test_sprint_points_come_from_the_classification(self):
         m = R.build_replay(2021, 10, session_type="sprint")  # 2021 sprints paid 3-2-1
