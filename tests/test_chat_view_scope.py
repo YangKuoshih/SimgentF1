@@ -35,7 +35,7 @@ class ChatViewScopeTests(unittest.TestCase):
 
     def test_pit_strategy_follows_race_on_screen_after_switch(self):
         r = ask("Explain VER's pit strategy", R16, AUSTRALIA_TALK)
-        self.assertIn("3-stop", r["text"])
+        self.assertIn("3 pit stops", r["text"])
         self.assertIn("Lap 9, Lap 33, Lap 43", r["text"])
 
     def test_race_level_question_is_not_hijacked_by_earlier_driver(self):

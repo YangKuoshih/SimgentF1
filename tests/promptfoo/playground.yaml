@@ -1,0 +1,23 @@
+# SimGent agent playground: your questions (my_questions.yaml) plus random ones from every season
+# since 1950 in varied phrasings, each checked against F1DB where it has a known answer.
+# Run with scripts/agent_playground.sh [local|live|both] [number of random questions];
+# results show in `npx promptfoo@0.124.1 view`.
+description: SimGent pit wall - playground
+
+prompts:
+  - "{{question}}"
+
+providers:
+  - id: file://provider.py
+    label: local      # the code in this repo, cached data, no network
+  - id: file://live_provider.py
+    label: live       # simgent.tonyyang.work
+
+defaultTest:
+  assert:
+    - type: python
+      value: file://checks.py
+
+tests:
+  - file://my_questions.yaml
+  - file://random_questions.py:generate_tests

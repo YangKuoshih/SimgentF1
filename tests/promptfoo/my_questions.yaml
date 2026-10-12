@@ -1,0 +1,21 @@
+# Your playground questions. Add any question on its own `- vars:` entry and run
+#   scripts/agent_playground.sh
+# Answers with a known answer (winner, pole, fastest lap, laps, circuit, champion) are checked
+# against F1DB automatically; anything else shows "not auto-checked": judge it in the dashboard
+# with thumbs up / down and a comment, and the thumbs-down ones can be turned into fixes and tests.
+#
+# Optional: give a question its own check, e.g.
+#   - vars: {question: "Who won the 2008 Brazilian Grand Prix?"}
+#     assert: [{type: icontains, value: "Felipe Massa"}]
+
+- vars: {question: "Who won the 2008 Brazilian Grand Prix?"}
+  assert: [{type: icontains, value: "Felipe Massa"}]
+- vars: {question: "Who won the 2008 drivers' championship?"}
+- vars: {question: "Who was on pole at Monaco in 1996?"}
+- vars: {question: "How many laps was the 2011 Canadian Grand Prix?"}
+- vars: {question: "Why did Hamilton retire in Australia 2024?"}
+- vars: {question: "Compare Senna and Prost"}
+- vars: {question: "What were the cars like in the turbo era?"}
+- vars: {question: "Explain the 2026 active aero rules"}
+- vars: {question: "Who has the most wins in F1 history?"}
+- vars: {question: "Where did Norris finish at Silverstone 2024?"}

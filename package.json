@@ -13,7 +13,9 @@
     "test:mobile": "node tests/test_mobile_replay_speed.js",
     "start": "node scripts/python.mjs frontend/main.py",
     "test:browser": "node scripts/python.mjs scripts/run_tests.py --browser-only",
-    "test:guardrails": "node scripts/python.mjs tests/test_guardrails_matrix.py"
+    "test:guardrails": "node scripts/python.mjs tests/test_guardrails_matrix.py",
+    "playground": "bash scripts/agent_playground.sh",
+    "playground:view": "npx --yes promptfoo@0.124.1 view"
   },
   "keywords": [
     "formula-1",

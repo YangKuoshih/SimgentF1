@@ -101,3 +101,19 @@ tests:
   - description: the story is still there when asked for
     vars: {question: "What happened at the 1989 Japanese Grand Prix?"}
     assert: [{type: icontains, value: "Senna"}]
+
+  # --- found by the playground (scripts/agent_playground.sh)
+  - description: 'chequered flag means the winner, not a safety-car question'
+    vars: {question: "who took the chequered flag at the 2003 San Marino Grand Prix?"}
+    assert: [{type: icontains, value: "Michael Schumacher"}]
+  - description: safety-car answers carry no text from another circuit
+    vars: {question: "Did the safety car come out at the 2024 Bahrain Grand Prix?"}
+    assert: [{type: not-icontains, value: "Baku"}]
+  - description: tyre compounds aren't in the data and are never guessed
+    vars: {question: "Which tyres did Verstappen use at the 2024 Bahrain Grand Prix?"}
+    assert:
+      - {type: icontains, value: "aren't in SimGent's data"}
+      - {type: not-regex, value: "\\*\\*(Soft|Medium|Hard)"}
+  - description: 'before 2011 there is no pit data, and no zero-stops claim'
+    vars: {question: "How many pit stops did Hamilton make at the 2008 British Grand Prix?"}
+    assert: [{type: icontains, value: "Pit stop data starts in 2011"}]
