@@ -9,12 +9,18 @@ the race direction. A loop more than 1% off the official length is rejected.
 The output is derived from OpenStreetMap data, (c) OpenStreetMap contributors, and is
 licensed under the Open Database License (ODbL) 1.0: see data/OSM-LICENSE.md.
 
+Historic road circuits (ROAD_CIRCUITS) were public roads, not race tracks, so they are traced
+instead: the lap is routed over today's roads through waypoints taken from the layout's
+diagram, using the road data from the OpenStreetMap API.
+
     python scripts/import_osm_circuits.py              # query the Overpass API
     python scripts/import_osm_circuits.py --from DIR   # reuse saved Overpass responses
+    python scripts/import_osm_circuits.py --only reims # rebuild some circuits, keep the rest
 """
 
 import collections
 import datetime
+import heapq
 import json
 import math
 import os
@@ -38,6 +44,40 @@ CIRCUITS = {
     "yeongam": {"length_km": 5.615, "clockwise": False, "year": 2013, "firstgp": 2010},
 }
 MAX_LENGTH_ERROR = 0.01
+
+# Historic circuits on public roads. Waypoints (lat, lon, road ref or name the point must snap
+# to) follow the layout's diagram in race direction from the start/finish line. Routing between
+# them prefers the circuit's roads ("roads"); where a junction of the period was later replaced
+# (Reims' Garenne corner, demolished when the RN31 became a dual carriageway), the circuit's
+# roads are joined where they pass within JOIN_M of each other.
+ROAD_CIRCUITS = {
+    # Reims-Gueux 1926-1951 (French GP 1950-51): pits on the D27, through the centre of Gueux,
+    # north past La Hovette (D26) to the Garenne corner, the RN31 to the Thillois hairpin and
+    # back on the D27. https://en.wikipedia.org/wiki/Reims-Gueux (layout 1926-1951, 7.826 km)
+    "reims": {
+        "length_km": 7.826, "firstgp": 1950, "layout": "1926-1951",
+        "name": "Reims-Gueux", "locality": "Gueux",
+        "bbox": (3.89, 49.24, 3.975, 49.285),  # min lon, min lat, max lon, max lat
+        "roads": ("D 27", "D 26", "N 31"),
+        "waypoints": [
+            (49.25434, 3.93165, "D 27"),   # start/finish, at the grandstand (OSM way 870242942)
+            (49.2506, 3.9100, "D 27"),     # into Gueux
+            (49.2556, 3.9095, None),       # Gueux corner, north out of the village
+            (49.2620, 3.9125, "D 26"),     # La Hovette
+            (49.2668, 3.9185, "D 26"),     # up to the Garenne corner
+            (49.2660, 3.9260, "N 31"),     # RN31
+            (49.2600, 3.9480, "N 31"),     # into the Thillois hairpin
+            (49.2585, 3.9460, "D 27"),     # out of Thillois on the D27
+        ],
+        # The diagram's 7.826 km is the published figure; today's roads (and the rebuilt
+        # Garenne corner) trace about 3% shorter. Larger gaps mean a waypoint snapped wrongly.
+        "max_length_error": 0.05,
+    },
+}
+OSM_API = "https://api.openstreetmap.org/api/0.6"
+NOT_ROADS = {"motorway", "motorway_link", "footway", "path", "cycleway", "steps", "pedestrian",
+             "bridleway", "construction", "proposed", "platform", "corridor"}
+JOIN_M = 35
 
 
 def haversine(a, b):
@@ -64,6 +104,76 @@ def fetch(lat, lon):
         except OSError:
             time.sleep(30 * (attempt + 1))
     raise RuntimeError("Overpass API unavailable")
+
+
+def fetch_roads(bbox):
+    """Ways and nodes in a bounding box from the OpenStreetMap API (Overpass isn't needed)."""
+    url = f"{OSM_API}/map.json?bbox={','.join(str(v) for v in bbox)}"
+    req = urllib.request.Request(url, headers={"User-Agent": "simgent-circuit-import (github.com/YangKuoshih/SimgentF1)"})
+    for attempt in range(4):
+        try:
+            with urllib.request.urlopen(req, timeout=180) as resp:
+                return json.load(resp)
+        except OSError:
+            time.sleep(30 * (attempt + 1))
+    raise RuntimeError("OpenStreetMap API unavailable")
+
+
+def trace_road_loop(data, spec):
+    """The lap routed over the road graph through the circuit's waypoints: (length m, points, way ids)."""
+    nodes = {e["id"]: (e["lat"], e["lon"]) for e in data["elements"] if e["type"] == "node"}
+    ways = [e for e in data["elements"] if e["type"] == "way"
+            and e.get("tags", {}).get("highway") and e["tags"]["highway"] not in NOT_ROADS]
+    label = lambda w: w["tags"].get("ref") or w["tags"].get("name")
+    adj = collections.defaultdict(list)  # node -> [(next, cost, way id)]
+    for w in ways:
+        # Prefer the circuit's own roads; other public roads only where the lap left them
+        cost = 1.0 if w["tags"].get("ref") in spec["roads"] else 1.3
+        for a, b in zip(w["nodes"], w["nodes"][1:]):
+            if a in nodes and b in nodes:
+                d = haversine(nodes[a], nodes[b])
+                adj[a].append((b, d * cost, w["id"]))
+                adj[b].append((a, d * cost, w["id"]))
+    main = sorted({n for w in ways if w["tags"].get("ref") in spec["roads"] for n in w["nodes"] if n in nodes})
+    for i, a in enumerate(main):
+        for b in main[i + 1:]:
+            d = haversine(nodes[a], nodes[b])
+            if 0 < d < JOIN_M:
+                adj[a].append((b, d, None))
+                adj[b].append((a, d, None))
+
+    def snap(lat, lon, road):
+        cands = [n for w in ways if road is None or label(w) == road for n in w["nodes"] if n in nodes]
+        return min(cands, key=lambda n: haversine(nodes[n], (lat, lon)))
+
+    def route(a, b):
+        dist, prev, queue = {a: 0.0}, {}, [(0.0, a)]
+        while queue:
+            c, u = heapq.heappop(queue)
+            if u == b:
+                break
+            if c > dist[u]:
+                continue
+            for v, w, way in adj[u]:
+                if c + w < dist.get(v, float("inf")):
+                    dist[v], prev[v] = c + w, (u, way)
+                    heapq.heappush(queue, (c + w, v))
+        path, used = [b], set()
+        while path[-1] != a:
+            u, way = prev[path[-1]]
+            path.append(u)
+            used.add(way)
+        return path[::-1], used
+
+    stops = [snap(*wp) for wp in spec["waypoints"]]
+    loop, used = [], set()
+    for a, b in zip(stops, stops[1:] + stops[:1]):
+        path, ways_used = route(a, b)
+        loop += path[:-1]
+        used |= ways_used
+    points = [nodes[n] for n in loop]
+    length = sum(haversine(p, q) for p, q in zip(points, points[1:] + points[:1]))
+    return length, points, sorted(w for w in used if w is not None)
 
 
 def is_pit(way):
@@ -167,10 +277,44 @@ def orient(points, ways, clockwise):
     return points[mid:] + points[:mid]
 
 
+def road_circuit_feature(cid, spec):
+    data = fetch_roads(spec["bbox"])
+    target = spec["length_km"] * 1000
+    length, points, way_ids = trace_road_loop(data, spec)
+    if abs(length - target) / target > spec["max_length_error"]:
+        print(f"{cid}: traced {length / 1000:.3f} km, more than {spec['max_length_error']:.0%} off "
+              f"{spec['length_km']} km; skipped")
+        return None
+    points = densify(points)
+    coords = [[round(p[1], 6), round(p[0], 6)] for p in points + points[:1]]
+    lons, lats = [c[0] for c in coords], [c[1] for c in coords]
+    print(f"{cid}: traced {length / 1000:.3f} km along roads (official {spec['length_km']}), {len(points)} points")
+    return {
+        "type": "Feature",
+        "properties": {
+            "id": f"osm-{cid}", "Name": spec["name"], "Location": spec["locality"],
+            "length": int(round(target)), "measured_length": int(round(length)), "firstgp": spec["firstgp"],
+            "layout": spec["layout"], "traced_along_roads": True,
+            "source": "OpenStreetMap", "osm_timestamp": data.get("timestamp"),
+            "osm_ways": way_ids,
+        },
+        "bbox": [min(lons), min(lats), max(lons), max(lats)],
+        "geometry": {"type": "LineString", "coordinates": coords},
+    }
+
+
 def main():
     saved = sys.argv[sys.argv.index("--from") + 1] if "--from" in sys.argv else None
-    features = []
+    only = set(sys.argv[sys.argv.index("--only") + 1].split(",")) if "--only" in sys.argv else None
+    features, kept = [], {}
+    if only and os.path.exists(OUT):  # keep the circuits not being rebuilt, in their place
+        with open(OUT, encoding="utf-8") as f:
+            kept = {x["properties"]["id"].removeprefix("osm-"): x for x in json.load(f)["features"]}
     for cid, spec in CIRCUITS.items():
+        if only and cid not in only:
+            if cid in kept:
+                features.append(kept[cid])
+            continue
         circ = circuit_info(cid, spec["year"])
         lat, lon = float(circ["Location"]["lat"]), float(circ["Location"]["long"])
         if saved:
@@ -203,6 +347,14 @@ def main():
             "geometry": {"type": "LineString", "coordinates": coords},
         })
         print(f"{cid}: {length / 1000:.3f} km (official {spec['length_km']}), {len(points)} points")
+    for cid, spec in ROAD_CIRCUITS.items():
+        if only and cid not in only:
+            if cid in kept:
+                features.append(kept[cid])
+            continue
+        feature = road_circuit_feature(cid, spec)
+        if feature:
+            features.append(feature)
     collection = {
         "type": "FeatureCollection", "name": "osm-circuits",
         "license": "ODbL-1.0", "attribution": "© OpenStreetMap contributors",

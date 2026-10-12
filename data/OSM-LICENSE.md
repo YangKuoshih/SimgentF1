@@ -12,8 +12,11 @@ What it contains: one outline each for Circuito de Jerez, Fuji Speedway and the 
 International Circuit, the F1 circuits that the bacinger/f1-circuits dataset does not cover.
 Each outline is the closed loop of OpenStreetMap race-track ways (`highway=raceway`) whose
 length matches the official F1 layout, starting at the start/finish line and running in the
-race direction. The source way IDs and the OpenStreetMap data timestamp are recorded in each
-feature. `scripts/import_osm_circuits.py` rebuilds the file from the Overpass API.
+race direction. It also holds the 1926-1951 layout of Reims-Gueux, a circuit of public roads:
+that lap is traced along today's OpenStreetMap roads (D27, D26, RN31 and through Gueux) and is
+marked `traced_along_roads`. The source way IDs and the OpenStreetMap data timestamp are
+recorded in each feature. `scripts/import_osm_circuits.py` rebuilds the file from the Overpass
+API and, for the road circuit, the OpenStreetMap API.
 
 If you reuse this file or a database adapted from it:
 

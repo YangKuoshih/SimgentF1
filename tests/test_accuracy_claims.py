@@ -36,8 +36,8 @@ def track(year, rnd):
 
 class HistoricCircuits(unittest.TestCase):
     def test_circuit_without_layout_keeps_its_own_name_on_a_labelled_schematic(self):
-        for rnd, name in ((4, "Bremgarten"), (6, "Reims")):
-            meta, tr = track(1950, rnd)
+        for year, rnd, name in ((1950, 4, "Bremgarten"), (1951, 8, "Pedralbes")):
+            meta, tr = track(year, rnd)
             self.assertIn(name, meta["circuit_name"])
             self.assertNotIn("Silverstone", meta["circuit_name"])
             self.assertTrue(tr["schematic"])
@@ -149,10 +149,14 @@ class CircuitOutlinesAndLicensing(unittest.TestCase):
             data = json.load(f)
         self.assertEqual(data["license"], "ODbL-1.0")
         self.assertIn("OpenStreetMap contributors", data["attribution"])
-        self.assertEqual({f["properties"]["id"] for f in data["features"]}, {"osm-jerez", "osm-fuji", "osm-yeongam"})
+        self.assertEqual({f["properties"]["id"] for f in data["features"]},
+                         {"osm-jerez", "osm-fuji", "osm-yeongam", "osm-reims"})
         for feat in data["features"]:
             p = feat["properties"]
-            self.assertLess(abs(p["measured_length"] - p["length"]) / p["length"], 0.01, p["id"])
+            # Race-track outlines match the official length within 1%; a historic road circuit
+            # traced along today's roads (Reims-Gueux, rebuilt Garenne corner) within 5%
+            limit = 0.05 if p.get("traced_along_roads") else 0.01
+            self.assertLess(abs(p["measured_length"] - p["length"]) / p["length"], limit, p["id"])
             self.assertEqual(feat["geometry"]["coordinates"][0], feat["geometry"]["coordinates"][-1])
 
     def test_openstreetmap_outlines_are_shown_and_credited(self):
@@ -163,6 +167,24 @@ class CircuitOutlinesAndLicensing(unittest.TestCase):
             self.assertTrue(geo["length_km"] and geo["turns_count"], rnd_cid)
         self.assertEqual(R.track_for_year("silverstone", 2020)["outline_source"], "bacinger/f1-circuits")
         self.assertIsNone(R.track_for_year("fuji", 1976)["length_km"])  # old layout
+
+    def test_reims_gueux_is_the_1926_1951_layout(self):
+        # The 1950 French GP was drawn on a made-up schematic loop
+        geo = R.track_for_year("reims", 1950)
+        self.assertFalse(geo.get("schematic"))
+        self.assertEqual(geo["outline_source"], "OpenStreetMap")
+        self.assertIn("1926-1951 layout raced that year", geo["layout_note"])
+        self.assertIsNone(geo["length_km"])  # no figures before 1996
+        # Shape: a triangle about 3 km wide and 1.8 km tall, the long side the RN31 to Thillois
+        with open(os.path.join(ROOT, "data", "osm-circuits.geojson"), encoding="utf-8") as f:
+            feat = next(x for x in json.load(f)["features"] if x["properties"]["id"] == "osm-reims")
+        lon0, lat0, lon1, lat1 = feat["bbox"]
+        self.assertAlmostEqual((lon1 - lon0) * 111.32 * 0.653, 3.0, delta=0.3)
+        self.assertAlmostEqual((lat1 - lat0) * 110.57, 1.8, delta=0.2)
+        start = feat["geometry"]["coordinates"][0]  # start/finish by the grandstand on the D27
+        self.assertLess(abs(start[0] - 3.9317) + abs(start[1] - 49.2543), 0.002)
+        # From 1953 Reims ran a longer layout: the outline is only a reference
+        self.assertIn("layout was different", R.track_for_year("reims", 1958)["layout_note"])
 
     def test_license_files_and_credits_exist(self):
         for path in ("data/OSM-LICENSE.md", "data/f1-circuits.LICENSE"):
