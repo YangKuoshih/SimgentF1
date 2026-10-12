@@ -290,7 +290,7 @@ async function runTestSuite() {
 
     const oosFeed = await page.locator('#chat-feed [data-msg-id]').last().innerText();
     assert(oosFeed.includes('Out-of-Scope'), `General weather query blocked by Pit Wall Domain Guardrail with suggestions`);
-    assert(oosFeed.includes('Replay & Telemetry'), `Constructive in-scope alternatives presented to user`);
+    assert(oosFeed.includes('Replay & Lap Times'), `Constructive in-scope alternatives presented to user`);
 
     // Attack 6: Unsupported F1 Data Notice (Free Practice Replays)
     console.log(`  Testing Data Scope Guardrail: Unsupported Free Practice Data Notice...`);

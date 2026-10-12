@@ -24,7 +24,7 @@ SAFE_REFUSAL_MESSAGE = (
     "🛡️ **Pit Wall Security Guardrail**\n\n"
     "• **Radio Link Protected**: Transponder frequencies are secured against prompt injection, jailbreaking, and unauthorized command overrides.\n"
     "• Zero system instructions, secrets, or API keys are disclosed.\n"
-    "• Telemetry link re-centered on Grand Prix pit wall operations."
+    "• Pit wall radio back on Grand Prix topics."
 )
 
 
@@ -44,7 +44,7 @@ SAFE_DANGEROUS_REFUSAL = (
     "⛔ **Pit Wall Safety Guardrail Notice**\n\n"
     "• **Safety Protocol Active**: Inquiries concerning weapons, explosives, harmful materials, cyberattacks, violence, self-harm, or illicit activities are strictly prohibited.\n"
     "• The Pit Wall Agent operates under strict ethical and safety directives.\n"
-    "• Transponder radio link is restricted strictly to competitive motorsport telemetry."
+    "• The pit wall radio covers Formula 1 only."
 )
 
 
@@ -71,10 +71,10 @@ MOTORSPORT_CONTEXT_OVERRIDE = re.compile(
 
 SAFE_OUT_OF_SCOPE_REFUSAL = (
     "🏁 **Pit Wall Radio: Out-of-Scope Query**\n\n"
-    "I am the **SimGent Pit Wall Race Engineer**, specialized exclusively in Formula 1 telemetry, race physics, pit strategies, championship archives (1950–2026), and technical regulations.\n\n"
+    "I am the **SimGent Pit Wall Race Engineer**, specialized exclusively in Formula 1 races, pit strategies, championship archives (1950–2026), and technical regulations.\n\n"
     "I cannot assist with general weather, non-motorsport topics, general trivia, or creative writing.\n\n"
     "**Here is what you can ask me across the pit wall:**\n"
-    "• **Replay & Telemetry**: *\"What tires did Verstappen run in Bahrain 2026?\"*, *\"Who had the highest apex speed at Turn 4?\"*\n"
+    "• **Replay & Lap Times**: *\"What tyres did Verstappen run in Bahrain 2026?\"*, *\"Who set the fastest lap?\"*\n"
     "• **Race Strategy**: *\"Simulate an undercut for Leclerc against Norris\"*, *\"Why did Hamilton retire in Australia 2024?\"*\n"
     "• **Championship Standings**: *\"Who leads the 2026 Drivers Championship?\"*, *\"How many points did McLaren score in 2024?\"*\n"
     "• **2026 Regulations**: *\"How does the 2026 50/50 hybrid power unit work?\"*, *\"Explain Active Aero X-Mode and Z-Mode\"*"
@@ -211,7 +211,7 @@ def evaluate_all_guardrails(query: str, context: Optional[Dict[str, Any]] = None
             "tier": "Security Interceptor",
             "tool": "security_guardrail",
             "intent": "Adversarial Prompt Injection Blocked",
-            "cost": "Local Telemetry Guard (no external model call)",
+            "cost": "Local guard (no external model call)",
             "tokens_billed": 0,
             "latency_ms": 0.3,
             "query": clean_q,
@@ -225,11 +225,11 @@ def evaluate_all_guardrails(query: str, context: Optional[Dict[str, Any]] = None
         return True, {
             "role": "assistant",
             "text": unsupp_msg,
-            "provider": "Pit Wall Telemetry Guardrail",
+            "provider": "Pit Wall Guardrail",
             "tier": "Data Scope Interceptor",
             "tool": "unsupported_data_notice",
             "intent": "Unavailable Formula 1 Data Limitation",
-            "cost": "Telemetry Feed Active (no external model call)",
+            "cost": "Local data (no external model call)",
             "tokens_billed": 0,
             "latency_ms": 0.3,
             "query": clean_q,

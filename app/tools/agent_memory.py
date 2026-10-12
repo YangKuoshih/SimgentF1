@@ -223,10 +223,10 @@ class AgentMemory:
             return {
                 "role": "assistant",
                 "text": best_match["answer"],
-                "provider": "Pit Wall Telemetry Engine (RAG Grounded)",
+                "provider": "Pit Wall Engine (memory grounded)",
                 "tier": "Verified Memory Bank",
                 "tool": "telemetry_memory_retrieval",
-                "intent": f"Grounded Recall: {best_match.get('topic', 'General Telemetry')}",
+                "intent": f"Grounded Recall: {best_match.get('topic', 'General')}",
                 "memory_id": best_match.get("id"),
                 "confidence": best_match.get("confidence", 1.0),
                 "a2ui_card": best_match.get("a2ui_card")

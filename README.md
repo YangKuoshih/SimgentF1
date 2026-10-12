@@ -48,11 +48,12 @@ What started as a family race-day side project became **SimGent** (short for **S
 > standings come from [Jolpica-F1](https://github.com/jolpica/jolpica-f1) (OpenF1 fills in
 > sprint and qualifying sessions before Jolpica publishes them). Lap-by-lap replays use real lap
 > times from **1996 onwards**; earlier races are reconstructed from the results (finishing order,
-> laps completed, retirements). Car positions *within* a lap, the speed profile and the circuit
-> figures are modelled from today's circuit outlines. There is no car telemetry (speed, throttle,
-> brake) in the data. Circuit outlines come from bacinger/f1-circuits and, for Jerez, Fuji,
-> Korea and Reims-Gueux (1926-1951, traced along today's roads), from OpenStreetMap; circuits
-> without an outline replay on a labelled schematic.
+> laps completed, retirements). Car positions *within* a lap and the speed profile are modelled
+> from the circuit outline. There is no car telemetry (speed, throttle, brake) in the data.
+> Every race is shown on the layout actually raced that year, with its length, turns and
+> direction from [F1DB](https://github.com/f1db/f1db). Outlines come from bacinger/f1-circuits,
+> OpenStreetMap (Jerez, Fuji, Korea, Reims-Gueux 1950-51) and, for the other historic layouts,
+> f1-circuits-svg, whose start/finish line is estimated.
 
 ---
 
@@ -426,7 +427,12 @@ Results, timing and historical records come from two community APIs, neither aff
 
 The cached copies in `data/cache/` (and anything derived from them) stay under CC BY-NC-SA 4.0: credit the source, **non-commercial use only**, and share adaptations under the same license. See [`data/cache/LICENSE.md`](data/cache/LICENSE.md).
 
-Circuit outlines come from two sources:
+Circuit layouts:
+
+- [F1DB](https://github.com/f1db/f1db), licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/): the layout raced at every Grand Prix, with its direction, length, turns and the race's fastest lap.
+- [f1-circuits-svg](https://github.com/MisterSix2295/f1-circuits-svg) (MIT, © 2024-2025 Jules Roy, [license](data/f1-circuits-svg.LICENSE)): outlines of every layout since 1950, used where no geographic outline exists. Both are combined in `data/circuit-layouts.json` by `scripts/build_circuit_layouts.py`; see [`data/CIRCUIT-LAYOUTS-LICENSE.md`](data/CIRCUIT-LAYOUTS-LICENSE.md).
+
+Geographic circuit outlines come from two sources:
 
 - [bacinger/f1-circuits](https://github.com/bacinger/f1-circuits) (`data/f1-circuits.geojson`), MIT License, © 2019-2025 Tomislav Bacinger ([license](data/f1-circuits.LICENSE)).
 - [OpenStreetMap](https://www.openstreetmap.org) (`data/osm-circuits.geojson`: Jerez, Fuji, Korea and Reims-Gueux), **© OpenStreetMap contributors**, available under the [Open Database License (ODbL) 1.0](https://opendatacommons.org/licenses/odbl/1-0/). The app credits OpenStreetMap on the track map when these outlines are shown. Reuse the file under the ODbL and keep the credit. See [`data/OSM-LICENSE.md`](data/OSM-LICENSE.md); `scripts/import_osm_circuits.py` rebuilds it.

@@ -35,16 +35,19 @@ def track(year, rnd):
 
 
 class HistoricCircuits(unittest.TestCase):
-    def test_circuit_without_layout_keeps_its_own_name_on_a_labelled_schematic(self):
-        for year, rnd, name in ((1950, 4, "Bremgarten"), (1951, 8, "Pedralbes")):
+    def test_historic_circuits_are_drawn_on_the_layout_raced(self):
+        # Bremgarten and Rouen used to replay on a generic loop; Reims 1950 on its OSM outline
+        for (year, rnd), layout, name, source in (((1950, 4), "bremgarten-1", "Bremgarten", "f1-circuits-svg"),
+                                                  ((1957, 4), "rouen-2", "Rouen", "f1-circuits-svg"),
+                                                  ((1957, 7), "pescara-1", "Pescara", "f1-circuits-svg"),
+                                                  ((1950, 6), "reims-1", "Reims", "OpenStreetMap")):
             meta, tr = track(year, rnd)
             self.assertIn(name, meta["circuit_name"])
-            self.assertNotIn("Silverstone", meta["circuit_name"])
-            self.assertTrue(tr["schematic"])
-            self.assertIn("schematic", tr["layout_note"])
-            self.assertIsNone(tr["length_km"])
+            self.assertFalse(tr.get("schematic"), layout)
+            self.assertEqual(tr["layout_id"], layout)
+            self.assertEqual(tr["outline_source"], source)
+            self.assertTrue(tr["length_km"] and tr["turns_count"], layout)
             self.assertEqual(tr["drs_zones"], [])
-            self.assertEqual(tr["turns"], [])
 
     def test_resolver_never_substitutes_another_circuit(self):
         for year in (1950, 1955, 1961):
@@ -55,13 +58,13 @@ class HistoricCircuits(unittest.TestCase):
                     self.assertNotEqual(R.resolve_canonical_circuit(year, race["round"], raw_circuit_id=raw),
                                         "silverstone", (year, race["round"], raw))
 
-    def test_pre_1996_races_show_none_of_todays_figures(self):
+    def test_pre_1996_races_show_the_layout_raced(self):
         meta, tr = track(1950, 1)
         self.assertEqual(meta["circuit_name"], "Silverstone Circuit")
-        for key in ("length_km", "turns_count", "pit_loss_s", "full_throttle_pct", "lap_record"):
-            self.assertIsNone(tr[key], key)
+        self.assertEqual((tr["layout_id"], tr["length_km"], tr["turns_count"]), ("silverstone-1", 4.649, 8))
+        self.assertIsNone(tr["lap_record"])  # today's record never appears on an old layout
+        self.assertEqual(tr["race_fastest_lap"]["driver"], "Nino Farina")
         self.assertEqual(tr["drs_zones"], [])
-        self.assertIn("1950", tr["layout_note"])
 
     def test_drs_only_from_2011_and_straight_line_mode_from_2026(self):
         self.assertEqual(track(2005, 9)[1]["drs_zones"], [])
@@ -113,7 +116,7 @@ class EveryRaceShowsItsOwnCircuit(unittest.TestCase):
     def test_shown_length_fits_the_race_distance(self):
         # Winner laps x shown length is a race distance unless the race was cut short;
         # anything else means the layout shown is not the one raced that year
-        shortened = {(2003, 3), (2009, 2), (2021, 12), (2022, 7), (2022, 18)}
+        shortened = {(2003, 3), (2009, 2), (2021, 12), (2022, 7), (2022, 18), (1996, 6), (1997, 5), (1997, 7)}
         odd = []
         for y, r, race, w in self.races:
             if y < 1996:
@@ -126,14 +129,33 @@ class EveryRaceShowsItsOwnCircuit(unittest.TestCase):
                     odd.append((y, r, cid, round(dist)))
         self.assertEqual(odd, [])
 
-    def test_earlier_layouts_show_no_figures(self):
-        for cid, year, rnd in (("silverstone", 2005, None), ("hockenheimring", 2001, None),
-                               ("bahrain", 2010, 1), ("bahrain", 2020, 16)):
-            geo = R.track_for_year(cid, year, None, rnd)
-            self.assertIsNone(geo["length_km"], (cid, year))
-            self.assertIn("reference", geo["layout_note"])
-        self.assertEqual(R.track_for_year("bahrain", 2020, None, 15)["length_km"], 5.412)
-        self.assertEqual(R.track_for_year("hockenheimring", 2002, None)["length_km"], 4.574)
+    def test_earlier_layouts_are_drawn_as_raced(self):
+        cases = {(2005, 11): ("silverstone-7", 5.141), (2001, 12): ("hockenheimring-3", 6.825),
+                 (2010, 1): ("bahrain-2", 6.299), (2020, 15): ("bahrain-1", 5.412), (2020, 16): ("bahrain-3", 3.543)}
+        for (year, rnd), (layout, km) in cases.items():
+            tr = track(year, rnd)[1]
+            self.assertEqual(tr["layout_id"], layout, (year, rnd))
+            self.assertAlmostEqual(tr["length_km"], km, places=2)
+
+    def test_every_race_has_its_layout_and_figures(self):
+        missing = []
+        for y, r, race, _ in self.races:
+            cid = R.resolve_canonical_circuit(y, r, raw_circuit_id=race["Circuit"]["circuitId"], race_name=race["raceName"])
+            geo = R.track_for_year(cid, y, race["Circuit"], r) or {}
+            if geo.get("schematic") or not geo.get("layout_id") or not (geo.get("length_km") and geo.get("turns_count")):
+                missing.append((y, r, cid))
+        self.assertEqual(missing, [])
+
+    def test_race_direction(self):
+        # The outline data had Marina Bay and Paul Ricard backwards; the Indy 500 oval runs anticlockwise
+        for (year, rnd), clockwise in (((2026, 17), False), ((2018, 8), True), ((1960, 3), False), ((2019, 10), True)):
+            tr = track(year, rnd)[1]
+            self.assertEqual(R._is_clockwise([tuple(p) for p in tr["points"]]), clockwise, (year, rnd))
+            self.assertEqual(tr["direction"], "CLOCKWISE" if clockwise else "ANTI_CLOCKWISE")
+
+    def test_silverstone_2010_started_on_the_old_pit_straight(self):
+        p2010, p2019 = track(2010, 10)[1]["points"][0], track(2019, 10)[1]["points"][0]
+        self.assertGreater(abs(p2010[0] - p2019[0]) + abs(p2010[1] - p2019[1]), 0.2)
 
     def test_no_invented_drs_zones_or_turn_numbers(self):
         geo = R.circuit_geometry("hungaroring")  # no stored DRS or corner positions
@@ -185,6 +207,19 @@ class CircuitOutlinesAndLicensing(unittest.TestCase):
         self.assertLess(abs(start[0] - 3.9317) + abs(start[1] - 49.2543), 0.002)
         # From 1953 Reims ran a longer layout: the outline is only a reference
         self.assertIn("layout was different", R.track_for_year("reims", 1958)["layout_note"])
+
+    def test_circuit_layouts_file_is_pinned_and_credited(self):
+        with open(os.path.join(ROOT, "data", "circuit-layouts.json"), encoding="utf-8") as f:
+            data = json.load(f)
+        self.assertEqual(data["sources"]["f1db"]["license"], "CC-BY-4.0")
+        self.assertRegex(data["sources"]["f1-circuits-svg"]["commit"], r"^[0-9a-f]{40}$")
+        for path in ("data/CIRCUIT-LAYOUTS-LICENSE.md", "data/f1-circuits-svg.LICENSE"):
+            self.assertTrue(os.path.exists(os.path.join(ROOT, path)), path)
+        with open(os.path.join(ROOT, "frontend", "static", "index.html"), encoding="utf-8") as f:
+            html = f.read()
+        self.assertIn("github.com/f1db/f1db", html)
+        self.assertIn("f1-circuits-svg", html)
+        self.assertTrue(all(l["shape"] for l in data["layouts"].values()))
 
     def test_license_files_and_credits_exist(self):
         for path in ("data/OSM-LICENSE.md", "data/f1-circuits.LICENSE"):
