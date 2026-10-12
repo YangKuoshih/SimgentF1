@@ -4,6 +4,7 @@ Historic circuits are never shown as another circuit or with today's figures, ca
 double-escaped, questions without a race on screen use the latest race, "why" championship
 questions explain, and the UI does not claim live timing or car telemetry. Offline."""
 import json
+import math
 import os
 import re
 import sys
@@ -145,6 +146,29 @@ class EveryRaceShowsItsOwnCircuit(unittest.TestCase):
             if geo.get("schematic") or not geo.get("layout_id") or not (geo.get("length_km") and geo.get("turns_count")):
                 missing.append((y, r, cid))
         self.assertEqual(missing, [])
+
+    def test_map_outlines_measure_the_layout_they_stand_for(self):
+        # Estoril's outline is the post-2000 layout (-4.5%), Indianapolis' and Jacarepagua's other
+        # road courses: those races must use the drawing of the layout raced
+        feats = R._geo_features()
+        for lid, lay in R._circuit_layouts()["layouts"].items():
+            if lay["shape"] != "geographic" or lid == "reims-1":  # Reims: traced along rebuilt roads
+                continue
+            f = feats[R.CIRCUIT_MAP[lay["circuit"]]]
+            c = f["geometry"]["coordinates"]
+            lat0 = sum(p[1] for p in c) / len(c)
+            P = [(p[0] * 111320 * math.cos(math.radians(lat0)), p[1] * 110540) for p in c]
+            length = sum(math.dist(P[i], P[i + 1]) for i in range(len(P) - 1)) / 1000
+            self.assertLess(abs(length - lay["length_km"]) / lay["length_km"], 0.013, lid)
+        for year, rnd, layout in ((1985, 2, "estoril-1"), (2005, 9, "indianapolis-2"), (1985, 1, "jacarepagua-1")):
+            tr = track(year, rnd)[1]
+            self.assertEqual((tr["layout_id"], tr["outline_source"]), (layout, "f1-circuits-svg"))
+
+    def test_each_race_gets_the_drawing_for_its_own_season(self):
+        # F1DB: Montreal 1988-93 is one layout; the drawings split 1988-90 and 1991-93
+        self.assertEqual(R.race_layout(1992, 7)["layout_info"]["svg_layout"], "montreal-3")
+        self.assertEqual(R.race_layout(1989, 6)["layout_info"]["svg_layout"], "montreal-2")
+        self.assertEqual(track(1992, 7)[1]["layout_id"], "montreal-3")
 
     def test_race_direction(self):
         # The outline data had Marina Bay and Paul Ricard backwards; the Indy 500 oval runs anticlockwise
