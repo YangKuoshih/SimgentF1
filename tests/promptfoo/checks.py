@@ -26,7 +26,7 @@ _SCHED = None
 def _data():
     global _TRUTH, _SCHED
     if _TRUTH is None:
-        with open(os.path.join(G.GOLDEN, "f1db_truth.json"), encoding="utf-8") as f:
+        with open(os.path.join(ROOT, "data", "f1db_facts.json"), encoding="utf-8") as f:
             _TRUTH = json.load(f)
         _SCHED = {}
         import glob
@@ -88,6 +88,8 @@ def get_assert(output, context):
     category = v.get("category") or category_of(q)
     m = re.search(r"\b(19[5-9]\d|20[0-2]\d)\b", q)
     year = int(v["year"]) if v.get("year") else (int(m.group(1)) if m else None)
+    if "Which one do you mean" in output or re.match(r"(Which .+ do you mean|Do you mean)", output):
+        return {"pass": True, "score": 1, "reason": "asked a clarifying question"}
     if not category or not year:
         return {"pass": True, "score": 1, "reason": "not auto-checked (no known answer for this kind of question)"}
     if category == "champion":
@@ -109,7 +111,12 @@ def get_assert(output, context):
         if unknown:
             return {"pass": False, "score": 0, "reason": f"quotes a lap time that isn't in the data for {year} R{rnd}"}
     resp = {"text": output, "tool": ""}
+    gate = (((context or {}).get("providerResponse") or {}).get("metadata") or {}).get("gate") or {}
     if G.grade(case, resp):
+        if gate.get("verdict") == "corrected":
+            # the visitor got the right answer, but only because the gate fixed the engine's: an
+            # engine bug to fix
+            return {"pass": True, "score": 0.75, "reason": f"correct after the answer gate corrected the engine ({category})"}
         return {"pass": True, "score": 1, "reason": f"correct ({category}, checked against F1DB)"}
     if G.DECLINED.search(output):
         return {"pass": True, "score": 0.5, "reason": f"declined: said it doesn't have the data ({category})"}

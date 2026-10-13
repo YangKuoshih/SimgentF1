@@ -210,9 +210,10 @@ class TestF1HistoryAgent(unittest.TestCase):
     # =========================================================================
     def test_driver_career_metric_queries(self):
         cases = [
-            ("How many podiums does Fernando Alonso have?", "Fernando Alonso", "106 Podiums"),
-            ("How many wins does Max Verstappen have?", "Max Verstappen", "Wins"),
-            ("How many championships does Lewis Hamilton have?", "Lewis Hamilton", "7 Titles"),
+            # career totals now come from F1DB (data/f1db_facts.json)
+            ("How many podiums does Fernando Alonso have?", "Fernando Alonso", "106 podiums"),
+            ("How many wins does Max Verstappen have?", "Max Verstappen", "Grand Prix wins"),
+            ("How many championships does Lewis Hamilton have?", "Lewis Hamilton", "7 World Championships"),
         ]
         for query, expected_driver, expected_stat in cases:
             res = answer_race_engineer_query(query)

@@ -220,6 +220,15 @@ def _subject_driver(text: str) -> Optional[str]:
 
 
 def resolve_follow_up(query: str, history: Optional[List[Dict[str, Any]]], _depth: int = 0) -> str:
+    # A reply to a clarifying question ("the second one", "Ralf") -> the option's full question
+    from app.agent.gate import match_clarification
+    picked = match_clarification(query, history) if _depth == 0 else None
+    if picked:
+        return picked
+    return _resolve_follow_up(query, history, _depth)
+
+
+def _resolve_follow_up(query: str, history: Optional[List[Dict[str, Any]]], _depth: int = 0) -> str:
     """Rewrite a context-dependent follow-up into a self-contained question.
 
     - Elliptical: "What about 2025?" after "Who won the 2024 world championship?"
@@ -536,12 +545,19 @@ def answer_race_engineer_query(
     """Main entry point: the engine answers, then the semantic router checks the answer fits
     what was asked (docs/AGENT_ARCHITECTURE.md, step 3a)."""
     resp = _answer_once(query, context, history)
-    if os.environ.get("SIMGENT_ROUTER", "on") == "off":
-        return resp
+    if os.environ.get("SIMGENT_ROUTER", "on") != "off":
+        try:
+            resp = _routed(query, context, history, resp)
+        except Exception as e:  # the router must never break an answer
+            logger.warning(f"router failed: {type(e).__name__}")
+    # The answer gate (app/agent/gate.py): checks the answer fits the question and its facts
+    # before it goes out; may ask a clarifying question instead
+    from app.agent import gate
     try:
-        return _routed(query, context, history, resp)
-    except Exception as e:  # the router must never break an answer
-        logger.warning(f"router failed: {type(e).__name__}")
+        question = resolve_follow_up(query, scope_history_to_view(history, context))
+        return gate.check(question, context, history, resp, lambda q, ctx: _answer_once(q, ctx, history))
+    except Exception as e:  # the gate must never break an answer
+        logger.warning(f"answer gate failed: {type(e).__name__}: {e}")
         return resp
 
 

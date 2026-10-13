@@ -28,7 +28,7 @@ def generate_tests(config=None):
     n = int(os.environ.get("PLAYGROUND_N", "30"))
     seed = int(os.environ.get("PLAYGROUND_SEED", str(int(time.time()))))
     rng = random.Random(seed)
-    with open(os.path.join(ROOT, "tests", "golden", "f1db_truth.json"), encoding="utf-8") as f:
+    with open(os.path.join(ROOT, "data", "f1db_facts.json"), encoding="utf-8") as f:
         truth = json.load(f)
     sched = {}
     for name in os.listdir(os.path.join(ROOT, "data", "cache", "jolpica")):

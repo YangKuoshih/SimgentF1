@@ -9,6 +9,7 @@ SimgentF1 combines code and data under different licenses.
 | Router embedding model (downloaded to `models/`, not in the repository) | [MIT](https://huggingface.co/minishlab/potion-base-8M), [minishlab/potion-base-8M](https://huggingface.co/minishlab/potion-base-8M) |
 | Sprint qualifying data in `data/cache/openf1/` | [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/), from [OpenF1](https://openf1.org) |
 | Circuit outlines in `data/f1-circuits.geojson` | [MIT](data/f1-circuits.LICENSE), © 2019-2025 Tomislav Bacinger, from [bacinger/f1-circuits](https://github.com/bacinger/f1-circuits) |
+| Race facts in `data/f1db_facts.json` (answer key for the evals and the answer gate) | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/), from [F1DB](https://github.com/f1db/f1db) |
 | Circuit layouts in `data/circuit-layouts.json` | Race layout facts from [F1DB](https://github.com/f1db/f1db), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/); outlines from [f1-circuits-svg](https://github.com/MisterSix2295/f1-circuits-svg), [MIT](data/f1-circuits-svg.LICENSE), © 2024-2025 Jules Roy. See [`data/CIRCUIT-LAYOUTS-LICENSE.md`](data/CIRCUIT-LAYOUTS-LICENSE.md) |
 | Circuit outlines in `data/osm-circuits.geojson` (Jerez, Fuji, Korea, Reims-Gueux 1926-1951) | [ODbL 1.0](https://opendatacommons.org/licenses/odbl/1-0/), © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright). See [`data/OSM-LICENSE.md`](data/OSM-LICENSE.md) |
 

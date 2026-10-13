@@ -4269,6 +4269,10 @@
   }
 
   $('chips').addEventListener('click', e => { const b = e.target.closest('.chip'); if (b) sendChat(b.textContent); });
+  document.addEventListener('click', e => {
+    const b = e.target.closest('.chat-option');
+    if (b && b.dataset.query) sendChat(b.dataset.query);
+  });
 
   // -------------------------------------------------------------
   // Local Chat Memory Engine & Multi-Turn Stream Persistence
@@ -4536,6 +4540,17 @@
     return `<div class="text-[10px] font-mono text-slate-500" data-sources>Source: ${links}</div>`;
   }
 
+  // Clarifying-question options and follow-up suggestions from the answer gate: each sends its
+  // full question, so the next turn can't be misread
+  function renderOptionButtons(msg) {
+    const opts = [...(Array.isArray(msg.options) ? msg.options : []), ...(Array.isArray(msg.suggestions) ? msg.suggestions : [])]
+      .filter(o => o && o.label && o.query).slice(0, 5);
+    if (!opts.length) return '';
+    return `<div class="flex flex-wrap gap-1.5 pt-1" data-options>${opts.map(o =>
+      `<button type="button" class="chat-option min-h-[32px] px-2.5 py-1 rounded border border-cyan-500/40 bg-cyan-500/10 hover:bg-cyan-500/20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-cyan-300 text-cyan-100 text-[11px] font-mono cursor-pointer" data-query="${esc(o.query)}">${esc(o.label)}</button>`
+    ).join('')}</div>`;
+  }
+
   function renderAssistantMessageHtml(msg) {
     const msgId = msg.id || ('chat-msg-' + Date.now());
     let providerBadge = 'TELEMETRY';
@@ -4563,6 +4578,7 @@
 
         <div class="text-slate-200 leading-relaxed font-sans">${formattedText}</div>
         ${cardHtml}
+        ${renderOptionButtons(msg)}
         ${renderSources(msg.sources)}
         ${renderFeedbackBar(msgId)}
       </div>
@@ -4651,7 +4667,9 @@
     const historyPayload = history.slice(-9, -1).map(m => ({
       role: m.role,
       content: m.text,
-      view: m.view || null
+      view: m.view || null,
+      // a clarifying question's options, so a typed reply ("the second one") can pick one
+      ...(m.role === 'assistant' && Array.isArray(m.options) ? { options: m.options } : {})
     }));
 
     try {
@@ -4699,6 +4717,8 @@
         tool: res.tool || '',
         a2ui_card: res.a2ui_card || null,
         sources: Array.isArray(res.sources) ? res.sources : [],
+        options: (res.clarify && Array.isArray(res.clarify.options)) ? res.clarify.options : null,
+        suggestions: Array.isArray(res.suggestions) ? res.suggestions : null,
         timestamp: Date.now(),
         context: context,
         view: userMsg.view

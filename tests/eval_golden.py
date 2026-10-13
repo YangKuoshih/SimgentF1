@@ -1,6 +1,6 @@
 """Golden eval: the pit wall agent against F1DB, for every Grand Prix since 1950.
 
-The answers come from tests/golden/f1db_truth.json (scripts/build_golden_set.py), built from
+The answers come from data/f1db_facts.json (scripts/build_golden_set.py), built from
 F1DB: a different source from the one the agent answers from (Jolpica-F1). The network is
 stubbed off, as in CI, so the agent answers from the cached data only.
 
@@ -13,7 +13,7 @@ Graded strictly:
 - invented lap times: any lap time quoted in any answer must exist in F1DB or in the race's
   cached Jolpica data.
 
-    python tests/eval_golden.py [--out scorecard.json] [--markdown summary.md] [--gate] [--verbose]
+    python tests/eval_golden.py [--out scorecard.json] [--markdown summary.md] [--gate] [--verbose] [--with-gate]
     --gate      exit non-zero if a category falls below tests/golden/baseline.json
 """
 
@@ -28,6 +28,11 @@ import unicodedata
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
+
+# The engine is measured on its own: the answer gate corrects facts against the same F1DB key,
+# so grading with it on would be circular. --with-gate measures what visitors get.
+if "--with-gate" not in sys.argv:
+    os.environ["SIMGENT_GATE"] = "off"
 
 from app.tools import jolpica_sync as J  # noqa: E402
 
@@ -85,7 +90,7 @@ def ms(t):
     return round(sec * 1000)
 
 
-LAP_TIME = re.compile(r"(?<![\d:])(\d{1,2}:\d{2}\.\d{1,3})(?![\d.])")
+LAP_TIME = re.compile(r"(?<![\d:])(\d{1,2}:\d{2}\.\d{1,3})(?!\d|\.\d)")  # a full stop may follow
 
 
 def known_times(year, rnd, truth):
@@ -185,7 +190,7 @@ def era(year):
 
 
 def main():
-    truth = json.load(open(os.path.join(GOLDEN, "f1db_truth.json"), encoding="utf-8"))
+    truth = json.load(open(os.path.join(ROOT, "data", "f1db_facts.json"), encoding="utf-8"))
     cases = build_cases(truth)
     started = time.time()
     by_cat = collections.defaultdict(collections.Counter)

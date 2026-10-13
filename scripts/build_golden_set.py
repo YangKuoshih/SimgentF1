@@ -1,4 +1,5 @@
-"""Build tests/golden/f1db_truth.json: the answer key for tests/eval_golden.py.
+"""Build data/f1db_facts.json: the answer key for tests/eval_golden.py, which the answer gate
+(app/agent/gate.py) also checks answers against at run time.
 
 The answers come from F1DB (https://github.com/f1db/f1db, CC BY 4.0), a source the agent does
 not read (it answers from Jolpica-F1), so the eval checks the agent against independent data.
@@ -17,7 +18,7 @@ import urllib.request
 import zipfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(ROOT, "tests", "golden", "f1db_truth.json")
+OUT = os.path.join(ROOT, "data", "f1db_facts.json")
 F1DB_TAG = "v2026.17.0"
 F1DB_URL = f"https://github.com/f1db/f1db/releases/download/{F1DB_TAG}/f1db-csv.zip"
 F1DB_SHA256 = "1c5c07d064e2988cb31a44206cc679662e0523a9bde0c191eed8ffc22831eec6"
@@ -75,6 +76,28 @@ def main():
             "lap_times": sorted({t for t in [row["time"] for row in g] + [fl["time"] if fl else ""] if t}),
         }
 
+    # Drivers entered each season, and all-time drivers with 20+ starts: the answer gate asks which
+    # driver is meant when a bare last name fits more than one (Michael or Ralf Schumacher)
+    season_drivers = collections.defaultdict(set)
+    for e in read("seasons-entrants-drivers"):
+        if e["testDriver"] != "true":
+            d = drivers[e["driverId"]]
+            season_drivers[e["year"]].add((d["firstName"], d["lastName"]))
+    notable = sorted({(d["firstName"], d["lastName"]) for d in drivers.values() if int(d["totalRaceStarts"] or 0) >= 20})
+
+    # Career totals for every driver who started a Grand Prix (career-metric answers)
+    driver_totals = sorted(({"first": d["firstName"], "last": d["lastName"], "starts": int(d["totalRaceStarts"] or 0),
+                             "wins": int(d["totalRaceWins"] or 0), "poles": int(d["totalPolePositions"] or 0),
+                             "podiums": int(d["totalPodiums"] or 0), "titles": int(d["totalChampionshipWins"] or 0),
+                             "fastest_laps": int(d["totalFastestLaps"] or 0),
+                             "seasons": sorted(int(y) for y, v in season_drivers.items() if (d["firstName"], d["lastName"]) in v)}
+                            for d in drivers.values() if int(d["totalRaceStarts"] or 0) > 0),
+                           key=lambda x: (x["last"], x["first"]))
+    for t in driver_totals:
+        t["seasons"] = [t["seasons"][0], t["seasons"][-1]] if t["seasons"] else []
+    last_race = max(races, key=lambda k: tuple(map(int, k.split("_"))))
+    last_name = next(r["officialName"] for r in read("races") if f"{r['year']}_{r['round']}" == last_race)
+
     champions = {}
     for s in read("seasons-driver-standings"):
         if s["championshipWon"] == "true":
@@ -83,7 +106,10 @@ def main():
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump({"source": {"f1db": F1DB_TAG, "license": "CC-BY-4.0", "url": "https://github.com/f1db/f1db"},
-                   "races": races, "champions": champions}, f, ensure_ascii=False, indent=0, sort_keys=True)
+                   "races": races, "champions": champions,
+                   "season_drivers": {y: sorted(v) for y, v in season_drivers.items()},
+                   "drivers": driver_totals, "facts_through": {"race": last_race, "name": last_name},
+                   "notable_drivers": notable}, f, ensure_ascii=False, indent=0, sort_keys=True)
         f.write("\n")
     print(f"wrote {os.path.relpath(OUT, ROOT)}: {len(races)} races, {len(champions)} champions")
 
