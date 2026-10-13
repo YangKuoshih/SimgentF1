@@ -53,5 +53,22 @@ class Comebacks(unittest.TestCase):
         self.assertNotEqual(ask("who started last", SPAIN_2026, [])["tool"], "comeback_lookup")
 
 
+class PitLaneAndBackOfTheGrid(unittest.TestCase):
+    """'Who started from the pit lane?' used to list the front row and never say."""
+
+    def test_nobody_started_from_the_pit_lane(self):
+        r = ask("who started from the pit lane", SPAIN_2026, [])
+        self.assertTrue(r["text"].startswith("Nobody started from the pit lane at the **Spanish Grand Prix (2026)**"))
+
+    def test_names_the_pit_lane_starter(self):
+        r = ask("who started from the pit lane", {"year": 2023, "round": 15, "session": "race"}, [])
+        self.assertTrue(r["text"].startswith("**Lance Stroll** started from the pit lane"))
+
+    def test_who_started_last(self):
+        r = ask("who started last", {"year": 2024, "round": 20, "session": "race"}, [])
+        self.assertTrue(r["text"].startswith("**Guanyu Zhou** started last on the grid (P19)"))
+        self.assertIn("Esteban Ocon starting behind from the pit lane", r["text"])
+
+
 if __name__ == "__main__":
     unittest.main()
