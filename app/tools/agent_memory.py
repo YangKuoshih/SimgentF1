@@ -35,6 +35,25 @@ _DATA_ANSWERABLE = re.compile(
 )
 
 
+def _race_applies(mem: Dict[str, Any], text: str, context: Optional[Dict[str, Any]]) -> bool:
+    target = (mem.get("a2ui_card") or {}).get("target") or {}
+    year, rnd = target.get("year"), target.get("round")
+    if not (year and rnd):
+        return True  # not about one race
+    ctx = context or {}
+    try:
+        if int(ctx.get("year") or 0) == int(year) and int(ctx.get("round") or 0) == int(rnd):
+            return True
+    except (TypeError, ValueError):
+        pass
+    if str(year) not in text:
+        return False
+    from app.tools import jolpica_sync as J
+    race = next((r for r in (J.schedule(int(year), net=False) or []) if int(r.get("round", 0)) == int(rnd)), None)
+    words = set(re.findall(r"[a-z]+", (race or {}).get("raceName", "").lower())) - {"grand", "prix", "in", "of", "the"}
+    return bool(words & set(re.findall(r"[a-z]+", text)))
+
+
 def is_data_answerable(query: str) -> bool:
     """True for factual result/standings questions the official results data answers."""
     return bool(_DATA_ANSWERABLE.search((query or "").lower()))
@@ -175,6 +194,11 @@ class AgentMemory:
         def _evaluate_match(search_text, search_words):
             nonlocal best_match, best_score
             for mem in memories:
+                # A memory about one race answers only for that race: on screen, or named in the
+                # question (the Bahrain winner memory used to answer "How did VER win this race?"
+                # on the Singapore replay)
+                if not _race_applies(mem, search_text, context):
+                    continue
                 # Context driver check
                 mem_driver = mem.get("driver")
                 if mem_driver and context:
@@ -191,7 +215,9 @@ class AgentMemory:
                 # 1. Exact phrase match
                 for pat in patterns:
                     pat_lower = pat.lower()
-                    if pat_lower == search_text or pat_lower in search_text or search_text in pat_lower:
+                    # the stored phrase in the question, never the question inside a stored phrase
+                    # (that let a short "who won" match "who won the 2026 bahrain grand prix")
+                    if pat_lower == search_text or pat_lower in search_text:
                         score = 1.0 + (len(pat_lower) / 100.0)
                         if score > best_score:
                             best_score = score
