@@ -117,3 +117,30 @@ tests:
   - description: 'before 2011 there is no pit data, and no zero-stops claim'
     vars: {question: "How many pit stops did Hamilton make at the 2008 British Grand Prix?"}
     assert: [{type: icontains, value: "Pit stop data starts in 2011"}]
+
+  # --- the answer gate: clarifying questions and replies to them
+  - description: two races fit - asks which
+    vars: {question: "Who won at Silverstone in 2020?"}
+    assert:
+      - {type: icontains, value: "70th Anniversary Grand Prix"}
+      - {type: icontains, value: "Which one do you mean"}
+  - description: reply to the clarifying question picks the race
+    vars:
+      question: "the anniversary one"
+      history:
+        - {role: user, content: "Who won at Silverstone in 2020?"}
+        - role: assistant
+          content: "There were 2 races that fit in 2020. Which one do you mean?"
+          options:
+            - {label: "British Grand Prix (2 Aug)", query: "Who won the 2020 British Grand Prix?"}
+            - {label: "70th Anniversary Grand Prix (9 Aug)", query: "Who won the 2020 70th Anniversary Grand Prix?"}
+    assert: [{type: icontains, value: "Max Verstappen"}]
+  - description: two drivers of the same name and season - asks which
+    vars: {question: "How did Schumacher do in 2001?"}
+    assert: [{type: icontains, value: "Ralf Schumacher"}]
+  - description: one far better-known driver - no question (Senna is Ayrton)
+    vars: {question: "How many poles did Senna get?"}
+    assert: [{type: icontains, value: "Ayrton Senna"}]
+  - description: career totals come from F1DB, for any driver
+    vars: {question: "How many wins did Graham Hill have?"}
+    assert: [{type: icontains, value: "14 Grand Prix wins"}]

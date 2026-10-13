@@ -145,6 +145,29 @@ Tools keep producing complete, correct answer text. Where several tools share a 
 result lines, top-N lists), the text moves into small template functions so wording is consistent
 and testable. This is not a goal in itself.
 
+### 4b. Answer gate — `app/agent/gate.py`
+
+Every engine answer is checked before it is returned. Deterministic and in-process (no model,
+no network, a few milliseconds):
+
+1. **Ambiguity → a clarifying question.** Two races fit (Silverstone 2020: British GP and 70th
+   Anniversary GP), two drivers of that name raced that season (Michael or Ralf Schumacher), or
+   the router is torn between two intents. The answer carries `clarify.options` (label + the full
+   question); the web app shows them as buttons and sends them back with the history, so a typed
+   reply ("the second one", "Ralf") picks one (`match_clarification`). At most one question per
+   question: asked again, it answers the likeliest reading and says what it assumed. No season and
+   one far better-known driver (Ayrton over Bruno Senna) → no question.
+2. **Race match.** The answer must be about the race the question names; one retry with the full
+   race name, then an honest decline.
+3. **Facts.** Winner, pole, fastest lap, laps, circuit and drivers' champion are checked against
+   F1DB (`data/f1db_facts.json`); a wrong fact is replaced with F1DB's ("*Checked against F1DB.*").
+   Sprint and qualifying answers aren't checked against Grand Prix facts.
+4. **Numbers.** A lap time that isn't in the data for that race is removed.
+
+Each verdict (passed, corrected, retried, clarify, declined) is counted for `/api/agent/gate` and
+logged without the question text. `SIMGENT_GATE=off` turns it off; `tests/eval_golden.py` measures
+the engine with it off (grading with it on would be circular) and with `--with-gate` what visitors get.
+
 ### 5. Optional model — `SIMGENT_LLM`
 
 | Setting | What runs | Cost | Needs |

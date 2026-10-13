@@ -26,7 +26,7 @@ failures say what F1DB expected, and you can thumbs-down any other answer you th
 Wrong answers it finds get fixed in the agent and added to `promptfoo/promptfooconfig.yaml`, which
 CI runs on every pull request.
 
-The golden answer key (`golden/f1db_truth.json`) is rebuilt with `python scripts/build_golden_set.py`
+The answer key (`data/f1db_facts.json`, also used by the answer gate at run time) is rebuilt with `python scripts/build_golden_set.py`
 (F1DB, CC BY 4.0). promptfoo needs Node 22.22+ and the packages in `requirements-eval.txt`.
 
 ---

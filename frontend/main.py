@@ -474,6 +474,19 @@ async def api_chat(msg: ChatMessage, request: Request):
                     view = turn.get("view")
                     if isinstance(view, str) and re.fullmatch(r"\d{4}-\d{1,2}", view):
                         entry["view"] = view  # race on screen when the turn happened
+                    # A clarifying question's options, so a reply ("the second one") can pick one
+                    opts = turn.get("options") if r == "assistant" else None
+                    if isinstance(opts, list):
+                        clean_opts = []
+                        for o in opts[:4]:
+                            if not isinstance(o, dict):
+                                continue
+                            label = sanitize_input(str(o.get("label", "")), max_chars=80)
+                            oq = sanitize_input(str(o.get("query", "")), max_chars=200)
+                            if label and oq and not check_prompt_injection(oq)[0] and not check_dangerous_content(oq)[0]:
+                                clean_opts.append({"label": label, "query": oq})
+                        if clean_opts:
+                            entry["options"] = clean_opts
                     safe_history.append(entry)
 
     # Only turns asked while the current race was on screen count as context.
@@ -520,6 +533,10 @@ async def api_chat(msg: ChatMessage, request: Request):
     # Fallback to the deterministic telemetry engine (no external model call)
     resp = race_agent.answer_race_engineer_query(resolved_query, msg.context, history=safe_history)
     _router_shadow(resolved_query, resp.get("tool"))
+    gate_info = resp.get("gate") or {}
+    logger.info(json.dumps({"answer_gate": {"verdict": gate_info.get("verdict", "passed"),
+                                            "check": gate_info.get("check", ""), "tool": resp.get("tool")}}))
+    gate_info.pop("engine_text", None)  # the engine's wrong text is for logs and evals, not visitors
     latency = round((time.perf_counter() - start_t) * 1000, 2)
     resp["latency_ms"] = latency
     resp["provider"] = "Pit Wall Telemetry Engine"
@@ -555,6 +572,14 @@ async def api_feedback(req: FeedbackRequest, request: Request):
         context=req.context
     )
     return res
+
+
+@app.get("/api/agent/gate")
+async def api_agent_gate():
+    """Live answer-gate score: how many answers passed, were corrected against F1DB, needed a
+    clarifying question or were declined, since this server instance started."""
+    from app.agent import gate
+    return gate.stats()
 
 
 @app.get("/api/memory/stats")

@@ -8,6 +8,8 @@ import difflib
 import functools
 import os
 import re
+from functools import lru_cache
+import json
 from typing import Any, Dict, List, Optional, Tuple
 from app.agent import content as _content
 
@@ -1090,6 +1092,35 @@ def _english_words() -> frozenset:
                           "pitted", "qualified", "overtook", "passed", "leading", "behind", "ahead"})
 
 
+@lru_cache(maxsize=1)
+def _notable_first_names() -> Dict[str, set]:
+    """Last name -> first names of drivers with 20+ starts (F1DB, data/f1db_facts.json)."""
+    import unicodedata as _ud
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data", "f1db_facts.json")
+    out: Dict[str, set] = {}
+    try:
+        with open(path, encoding="utf-8") as f:
+            pairs = json.load(f).get("notable_drivers", [])
+    except (OSError, ValueError):
+        return out
+    fold = lambda t: "".join(c for c in _ud.normalize("NFD", t.lower()) if _ud.category(c) != "Mn")
+    for first, last in pairs:
+        out.setdefault(fold(last), set()).add(fold(first).split()[0])
+    return out
+
+
+def _names_another_driver(q: str, alias: str, did: str) -> bool:
+    """'Graham Hill' must not resolve to Damon Hill through the bare alias 'hill'."""
+    firsts = _notable_first_names().get(alias)
+    if not firsts or len(firsts) < 2:
+        return False
+    own = (HISTORICAL_DRIVERS.get(did, {}).get("name", "").lower().split() or [""])[0]
+    for m in re.finditer(rf"\b([a-z]+)\s+{re.escape(alias)}\b", q):
+        if m.group(1) in firsts and m.group(1) != own:
+            return True
+    return False
+
+
 def resolve_historical_driver(query: str) -> Optional[Dict[str, Any]]:
     """
     Resolves driver queries even with heavy typos (e.g. 'schmacur', 'shumacher', 'sena', 'versappen').
@@ -1120,7 +1151,7 @@ def resolve_historical_driver(query: str) -> Optional[Dict[str, Any]]:
             if alias in q:
                 return HISTORICAL_DRIVERS.get(did)
         else:
-            if alias in words:
+            if alias in words and not _names_another_driver(q, alias, did):
                 return HISTORICAL_DRIVERS.get(did)
 
     # 2. Token-level close match with difflib across all driver aliases, for misspellings only:
@@ -1433,69 +1464,94 @@ def compare_drivers_head_to_head(d1_query: str, d2_query: str) -> Optional[Dict[
 # 6. DRIVER CAREER MILESTONES & SPECIFIC METRIC LOOKUP
 # =============================================================================
 
+@lru_cache(maxsize=1)
+def _f1db_facts() -> Dict[str, Any]:
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "data", "f1db_facts.json")
+    try:
+        with open(path, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+def _fold(text: str) -> str:
+    import unicodedata as _ud
+    return " ".join("".join(c for c in _ud.normalize("NFD", (text or "").lower()) if _ud.category(c) != "Mn").replace("-", " ").split())
+
+
+def _f1db_driver(query: str) -> Optional[Dict[str, Any]]:
+    """The driver a question names, from F1DB career totals: full name first, then the curated
+    aliases (nicknames, typos), then a last name only one driver with 20+ starts has."""
+    drivers = _f1db_facts().get("drivers") or []
+    if not drivers:
+        return None
+    q = " " + " ".join(re.findall(r"[a-z0-9]+", _fold(query))) + " "
+    full = [d for d in drivers if f" {_fold(d['first'] + ' ' + d['last'])} " in q]
+    if full:
+        return max(full, key=lambda d: len(d["first"]) + len(d["last"]))
+    roster = resolve_historical_driver(query)
+    if roster:
+        name = _fold(roster["name"])
+        hit = [d for d in drivers if _fold(f"{d['first']} {d['last']}") == name]
+        if hit:
+            return hit[0]
+    by_last = [d for d in drivers if d["starts"] >= 20 and f" {_fold(d['last'])} " in q]
+    return by_last[0] if len(by_last) == 1 else None
+
+
+METRICS = [  # (question words, F1DB field, label)
+    (("podium", "podiums"), "podiums", "podiums"),
+    (("win", "wins", "victories", "victory", "won"), "wins", "Grand Prix wins"),
+    (("pole", "poles", "pole position", "pole positions"), "poles", "pole positions"),
+    (("championship", "championships", "title", "titles", "wdc"), "titles", "World Championships"),
+    (("fastest lap", "fastest laps"), "fastest_laps", "fastest laps"),
+    (("start", "starts", "races", "entries"), "starts", "Grand Prix starts"),
+]
+
+
 def lookup_driver_metric(query: str) -> Optional[Dict[str, Any]]:
-    """Resolves questions like 'How many podiums does Fernando Alonso have?' or 'How many wins does Max Verstappen have?'"""
-    driver = resolve_historical_driver(query)
-    if not driver:
+    """'How many podiums does Fernando Alonso have?', 'How many wins did Graham Hill have?':
+    career totals from F1DB for every driver, ranked against all of them. (Numbers used to be
+    typed into the driver roster, for a few dozen drivers, and went out of date.)"""
+    d = _f1db_driver(query)
+    if not d:
         return None
-
     q_low = query.lower()
-    val = 0
-    metric_label = ""
-    all_time_rank = ""
-
-    if any(w in q_low for w in ["podium", "podiums"]):
-        metric_label = "Podiums"
-        val = driver.get("podiums", 0)
-        all_time_rank = "#1 All-Time" if driver["id"] == "lewis_hamilton" else "#2 All-Time" if driver["id"] == "michael_schumacher" else "#3 All-Time" if driver["id"] == "max_verstappen" else "#4 All-Time" if driver["id"] == "sebastian_vettel" else "#5 All-Time" if driver["id"] == "fernando_alonso" else "Elite Contender"
-    elif any(w in q_low for w in ["win", "wins", "victories", "victory"]):
-        metric_label = "Grand Prix Wins"
-        val = driver.get("wins", 0)
-        all_time_rank = "#1 All-Time (105)" if driver["id"] == "lewis_hamilton" else "#2 All-Time (91)" if driver["id"] == "michael_schumacher" else "#3 All-Time" if driver["id"] == "max_verstappen" else "#4 All-Time (53)" if driver["id"] == "sebastian_vettel" else "#5 All-Time (51)" if driver["id"] == "alain_prost" else "#6 All-Time (41)" if driver["id"] == "ayrton_senna" else "#7 All-Time (32)" if driver["id"] == "fernando_alonso" else "Grand Prix Winner"
-    elif any(w in q_low for w in ["pole", "poles", "pole position", "qualifying p1"]):
-        metric_label = "Pole Positions"
-        val = driver.get("poles", 0)
-        all_time_rank = "#1 All-Time (104)" if driver["id"] == "lewis_hamilton" else "#2 All-Time (68)" if driver["id"] == "michael_schumacher" else "#3 All-Time (65)" if driver["id"] == "ayrton_senna" else "#4 All-Time (57)" if driver["id"] == "sebastian_vettel" else "#5 All-Time" if driver["id"] == "max_verstappen" else "Front Row Master"
-    elif any(w in q_low for w in ["championship", "championships", "title", "titles", "wdc"]):
-        metric_label = "World Championships"
-        val = driver.get("titles_count", 0)
-        all_time_rank = "= #1 All-Time (7 Titles)" if driver["id"] in ["lewis_hamilton", "michael_schumacher"] else "#2 All-Time (5 Titles)" if driver["id"] == "juan_manuel_fangio" else "= #3 All-Time (4 Titles)" if driver["id"] in ["max_verstappen", "alain_prost", "sebastian_vettel"] else "World Drivers' Champion"
-    elif any(w in q_low for w in ["start", "starts", "races", "entries"]):
-        metric_label = "Race Starts"
-        val = driver.get("starts", 0)
-        all_time_rank = "#1 All-Time (Most Starts in F1 History)" if driver["id"] == "fernando_alonso" else "#2 All-Time" if driver["id"] == "lewis_hamilton" else "#3 All-Time" if driver["id"] == "kimi_raikkonen" else "Veteran Driver"
-    else:
+    metric = next(((field, label) for words, field, label in METRICS
+                   if any(re.search(rf"\b{re.escape(w)}\b", q_low) for w in words)), None)
+    if not metric:
         return None
-
+    field, label = metric
+    facts = _f1db_facts()
+    val = d[field]
+    better = sum(1 for x in facts["drivers"] if x[field] > val)
+    tied = sum(1 for x in facts["drivers"] if x[field] == val) > 1
+    rank = f"{'=' if tied else ''}#{better + 1} all-time" if val else "none"
+    name = f"{d['first']} {d['last']}"
+    years = [y for y, c in sorted(facts.get("champions", {}).items()) if _fold(c["first"]) == _fold(d["first"]) and _fold(c["last"]) == _fold(d["last"])]
+    seasons = f"{d['seasons'][0]}–{d['seasons'][1]}" if d.get("seasons") else ""
+    through = (facts.get("facts_through") or {}).get("race", "")
+    through_txt = f"to the {through.split('_')[0]} season, round {through.split('_')[1]}" if through else ""
     text = (
-        f"**{driver['name']}** has amassed **{val} {metric_label}** across their Formula 1 career ({all_time_rank}).\n\n"
-        f"• **Active Years**: {driver.get('active_years', '')}\n"
-        f"• **World Championships**: **{driver.get('titles_count', 0)} Titles** ({', '.join(str(y) for y in driver.get('championships', [])) if driver.get('championships') else 'None'})\n"
-        f"• **Career Statistics**: {driver.get('wins', 0)} Wins, {driver.get('poles', 0)} Poles, {driver.get('podiums', 0)} Podiums across {driver.get('starts', 0)} starts."
+        f"**{name}** has **{val} {label}** in Formula 1 ({rank}).\n\n"
+        f"• **Seasons**: {seasons}\n"
+        f"• **World Championships**: {d['titles']}" + (f" ({', '.join(years)})" if years else "") + "\n"
+        f"• **Career**: {d['wins']} wins, {d['poles']} poles, {d['podiums']} podiums from {d['starts']} starts\n\n"
+        f"*Source: F1DB{', ' + through_txt if through_txt else ''}.*"
     )
-
     card = {
         "type": "driver_performance_card",
-        "title": f"Career Milestone — {driver['name']} ({metric_label})",
+        "title": f"Career — {name}",
         "metrics": [
-            {"label": metric_label, "value": f"{val}", "color": "#00F5D4"},
-            {"label": "All-Time Standing", "value": all_time_rank[:20], "color": "#FFB703"},
-            {"label": "Total Starts", "value": f"{driver.get('starts', 0)} GPs", "color": "#FFFFFF"},
-            {"label": "Championships", "value": f"{driver.get('titles_count', 0)} WDC", "color": "#E10600"}
+            {"label": label[:30], "value": f"{val}", "color": "#00F5D4"},
+            {"label": "All-time rank", "value": rank, "color": "#FFB703"},
+            {"label": "Starts", "value": f"{d['starts']}", "color": "#FFFFFF"},
+            {"label": "World titles", "value": f"{d['titles']}", "color": "#E10600"},
         ],
-        "action": f"VIEW {driver['code']} CAREER",
-        "target": {
-            "action_type": "open_driver_profile",
-            "driver_id": driver["id"]
-        }
     }
-    return {
-        "driver": driver,
-        "metric": metric_label,
-        "value": val,
-        "text": text,
-        "card": card
-    }
+    roster = resolve_historical_driver(name)
+    return {"driver": {"id": roster["id"] if roster else _fold(name).replace(" ", "_"), "name": name},
+            "metric": label, "value": val, "text": text, "card": card}
 
 
 # =============================================================================

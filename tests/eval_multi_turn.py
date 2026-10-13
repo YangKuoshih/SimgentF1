@@ -15,7 +15,7 @@ logging.disable(logging.WARNING)
 
 from app.tools import jolpica_sync as J
 J._http = lambda url, retries=4: None  # offline: cache only
-from app.tools.race_agent import answer_race_engineer_query as ask
+from app.tools.race_agent import answer_race_engineer_query as ask, resolve_follow_up
 from app.tools.agent_memory import memory_manager
 
 CACHE = os.path.join(ROOT, "data", "cache", "jolpica")
@@ -92,6 +92,16 @@ def retirement_lap(year, rnd, code):
             return f"lap {int(x['laps']) + 1}"
 
 
+def career_wins(given, family):
+    wins = 0
+    for name in os.listdir(CACHE):
+        if name.endswith("_winners.json"):
+            for r in _load(name[:-5])["MRData"]["RaceTable"]["Races"]:
+                d = r["Results"][0]["Driver"]
+                wins += d["givenName"] == given and d["familyName"] == family
+    return wins
+
+
 def conversations():
     """(name, ui_context, [(question, expected_substrings, distractor_substrings)])"""
     ad21 = (2021, 22)
@@ -149,6 +159,19 @@ def conversations():
             ("What was the sprint grid?", [sprint_row(2026, 4, grid=1), sprint_row(2026, 4, grid=2)], []),
             ("Who won the Grand Prix?", [at_pos(2026, 4, 1)], [sprint_row(2026, 4, pos=1)]),
         ]),
+        # The answer gate asks which race or driver is meant, and the reply picks one
+        ("clarify: two races at Silverstone in 2020", None, [
+            ("Who won at Silverstone in 2020?", ["British Grand Prix", "70th Anniversary Grand Prix"], []),
+            ("the anniversary one", [winner(2020, "70th Anniversary Grand Prix")], [winner(2020, "British Grand Prix")]),
+        ]),
+        ("clarify: answered by number", None, [
+            ("Who won in Austria in 2020?", ["Austrian Grand Prix", "Styrian Grand Prix"], []),
+            ("2", [winner(2020, "Styrian Grand Prix")], []),
+        ]),
+        ("clarify: which Hill", None, [
+            ("How many wins did Hill have?", ["Damon Hill", "Graham Hill", "Phil Hill"], []),
+            ("Graham", ["Graham Hill", str(career_wins("Graham", "Hill"))], []),
+        ]),
         ("memory must not hijack follow-ups", {"year": 2026, "round": 16}, [
             ("Who won the 2026 Bahrain Grand Prix?", [at_pos(2026, 16, 1)], []),
             ("Who finished third?", [at_pos(2026, 16, 3)], []),
@@ -175,10 +198,15 @@ def run_conversation(ctx, turns):
     """Mirror the /api/chat pipeline: memory (deferring to data) first, then the engine."""
     history, results = [], []
     for q, expect, distract in turns:
-        r = memory_manager.retrieve(q, ctx, history=history, defer_to_data=True) or ask(q, ctx, history=history)
+        # the endpoint resolves follow-ups and replies to clarifying questions before anything else
+        resolved = resolve_follow_up(q, history)
+        r = memory_manager.retrieve(resolved, ctx, history=history, defer_to_data=True) or ask(resolved, ctx, history=history)
         text = r.get("text") or ""
         results.append((q, expect, grade(text, expect, distract), r.get("intent"), text))
-        history = history + [{"role": "user", "content": q}, {"role": "assistant", "content": text}]
+        turn = {"role": "assistant", "content": text}
+        if (r.get("clarify") or {}).get("options"):
+            turn["options"] = r["clarify"]["options"]  # as the web app sends them back
+        history = history + [{"role": "user", "content": q}, turn]
     return results
 
 

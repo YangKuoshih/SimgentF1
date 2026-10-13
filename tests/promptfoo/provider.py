@@ -24,9 +24,12 @@ _requests = itertools.count()
 
 def call_api(prompt, options, context):
     n = next(_requests)
-    screen = ((context or {}).get("vars") or {}).get("screen") or {}
+    vars_ = (context or {}).get("vars") or {}
+    screen = vars_.get("screen") or {}
+    history = vars_.get("history") or []  # earlier turns, for multi-turn cases (clarifications)
     # one client address per question: the chat endpoint rate-limits per address
-    resp = _client.post("/api/chat", json={"query": prompt, "context": screen, "history": []},
+    resp = _client.post("/api/chat", json={"query": prompt, "context": screen, "history": history},
                         headers={"X-Forwarded-For": f"10.77.{n // 250}.{n % 250 + 1}"})
     data = resp.json()
-    return {"output": data.get("text", ""), "metadata": {"tool": data.get("tool"), "status": resp.status_code}}
+    return {"output": data.get("text", ""), "metadata": {"tool": data.get("tool"), "status": resp.status_code,
+                                                         "gate": data.get("gate"), "clarify": data.get("clarify")}}
