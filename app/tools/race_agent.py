@@ -1282,7 +1282,7 @@ def _answer_core(
     ])
 
     # Starting grid inquiries (specific driver, grid slot, or full grid)
-    is_grid_query = bool(re.search(r'\b(grid|starting grid|started in|start in|started p\d+|start p\d+|started from|start from|where did .* start|what position did .* start|front row|started at the back|pit lane start)\b', q)) or (
+    is_grid_query = bool(re.search(r'\b(grid|starting grid|started in|start in|started p\d+|start p\d+|started from|start from|where did .* start|what position did .* start|front row|started at the back|pit lane start|start(?:ed)? (?:last|from the pit ?lane)|last on the grid)\b', q)) or (
         any(w in q for w in ["start", "started"]) and any(w in q for w in ["grid", "p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8", "p9", "p10", "p20", "position", "where", "which"]) and not any(w in q for w in ["restart", "strategy", "undercut"])
     )
 
@@ -1373,9 +1373,21 @@ def _answer_core(
             top = ", ".join(f"P{d['grid']} {d['code']}" for d in on_grid[:10])
             back = on_grid[-1]
             pit_txt = f" Pit lane start: {', '.join(d['name'] for d in pit_lane)}." if pit_lane else ""
+            # Lead with what was asked: "who started from the pit lane?" used to get the front row
+            # and no word on the pit lane when nobody started there
+            lead = ""
+            if re.search(r"\bpit ?lane\b", q):
+                names = " and ".join(f"**{d['name']}**" for d in pit_lane)
+                lead = (f"{names} started from the pit lane" if pit_lane else
+                        "Nobody started from the pit lane") + f" at the **{race_label} ({year})**.\n\n"
+                pit_txt = ""
+            elif re.search(r"\b(?:started|start|starting) (?:last|at the back)\b|\blast on the grid\b|\bback of the grid\b", q):
+                lead = (f"**{back['name']}** started last on the grid (P{back['grid']}) at the **{race_label} ({year})**"
+                        + (f", with {', '.join(d['name'] for d in pit_lane)} starting behind from the pit lane" if pit_lane else "")
+                        + ".\n\n")
             return {
                 "role": "assistant",
-                "text": (f"Front row for the **{race_label} ({year})**: {front}. Top ten on the grid: {top}. "
+                "text": (f"{lead}Front row for the **{race_label} ({year})**: {front}. Top ten on the grid: {top}. "
                          f"Last on the grid: {back['name']} (P{back['grid']}).{pit_txt}"),
                 "tool": "starting_grid_lookup",
                 "intent": f"{year} FIA Starting Grid",
