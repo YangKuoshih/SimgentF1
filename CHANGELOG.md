@@ -2,6 +2,62 @@
 
 ## Unreleased
 
+## v1.6.0 — 2026-10-13
+
+### Added
+- **Answer gate** (`app/agent/gate.py`): every answer is checked before it goes out. The checks are deterministic and in-process, with no model and no network.
+  - It confirms the answer is about the race named and the race on screen.
+  - It checks facts (winner, pole, fastest lap, laps, circuit, champion) against F1DB and replaces wrong ones.
+  - It removes lap times that aren't in the data.
+  - It asks a clarifying question, with buttons, when a question fits two races, two drivers or two intents. Typed replies such as "the second one" also work.
+  - Live score at `/api/agent/gate`; `SIMGENT_GATE=off` turns it off.
+- **Comebacks**: "In what race did Antonelli win from the back of the grid?", "biggest comeback win ever", "who gained the most places?".
+  - Starting grid against finish for every race since 1950, from F1DB, for a driver, a season, one race or all time.
+  - 1950s shared drives are left out; F1DB gives them no grid slot of their own.
+- **Every race drawn on the layout actually raced, 1950–2026** (`data/circuit-layouts.json`, `scripts/build_circuit_layouts.py`).
+  - F1DB layouts (CC BY 4.0) and f1-circuits-svg outlines (MIT), with the right drawing for each season.
+  - OpenStreetMap outlines (ODbL) for Jerez, Fuji, Korea and Reims-Gueux 1950–51.
+  - Official turn counts, plus the fastest lap for every year.
+  - No more generic ovals or empty Circuit Intel cards.
+- **Agent evals.**
+  - Golden set (`tests/eval_golden.py`): about 5,900 questions over every Grand Prix since 1950, graded against F1DB, a different source from the agent's Jolpica data. Result: 0 wrong, 0 invented lap times.
+  - promptfoo behaviour suite run in CI.
+  - promptfoo playground (`npm run playground`): your own questions plus random ones from every season, each checked against F1DB.
+- Career totals (wins, poles, podiums, titles) from F1DB for every driver.
+- Data credits and licenses in the About box, `NOTICE.md` and the README.
+
+### Changed
+- **Nothing shown beyond what the data supports.**
+  - The corner "telemetry" modal is now a modelled speed profile labelled "not car telemetry".
+  - "LIVE TIMING FEED" is now "LAP TIMING DATA" or "RECONSTRUCTED FROM RESULTS".
+  - Invented circuit defaults removed (lap record, throttle %, tyre stress, pit loss).
+  - Practice questions say practice isn't in the data, instead of using a template.
+  - Tyre compounds are no longer guessed from the stop count.
+- With no race on screen, the agent uses the latest completed race (it used a fixed round 15).
+- Hourly light data sync on race weekends.
+
+### Fixed
+- **Wrong race.**
+  - A stored 2026 Bahrain answer appeared on the Singapore replay for "How did VER win this race?". Stored answers now answer only for their own race, and go through the answer gate.
+  - "In what race did…" questions fell back to the race on screen.
+- **Wrong person.**
+  - Graham Hill career questions answered with Damon Hill.
+  - Winners were presented as pole sitter when qualifying data was missing.
+  - The winner's best lap was presented as the race's fastest lap.
+  - "1976 United States GP" got the US GP West.
+- **Wrong or one-sided content.**
+  - Every safety-car answer mentioned Baku.
+  - When results were incomplete, the winner alone was presented as the whole race.
+- **Grid questions.** "Who started from the pit lane?" now says who did, or that nobody did. "Who started last?" is answered.
+- **Circuits.**
+  - Marina Bay and Paul Ricard animated backwards.
+  - The Indy 500 oval ran in the wrong direction.
+  - Silverstone's start line was misplaced before 2011.
+  - Estoril, Indianapolis and Jacarepaguá showed other layouts of those circuits.
+  - Montreal 1991–93 showed the 1988–90 drawing.
+- Card text was double-escaped ("&amp;").
+- 1949 and 2027 questions got the 2026 race on screen.
+
 ## v1.5.0 — 2026-10-11
 
 ### Added
