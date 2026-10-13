@@ -345,6 +345,28 @@ def check(question: str, context: Optional[Dict[str, Any]], history: Optional[Li
         if clar and not _clarified_last_turn(history):
             return clar
 
+    # 2a. "This race" means the race on screen: an answer about another race is replaced by the
+    # engine's answer for the race on screen (a stored Bahrain answer once answered "How did VER
+    # win this race?" on the Singapore replay)
+    ctx_race = None
+    if (context or {}).get("year") and (context or {}).get("round"):
+        try:
+            ctx_race = (int(context["year"]), int(context["round"]))
+        except (TypeError, ValueError):
+            ctx_race = None
+    if ctx_race and not year and re.search(r"\bthis (?:race|grand prix|gp|weekend|session)\b", q.lower()):
+        about = _race_in_answer(resp.get("text", ""))
+        if about and about != ctx_race:
+            again = ask(q, context)
+            if _race_in_answer(again.get("text", "")) in (None, ctx_race):
+                again["gate"] = {"verdict": "retried", "check": "this_race"}
+                _count("retried", "this_race")
+                return again
+            _count("declined", "this_race")
+            return {"role": "assistant", "tool": "gate_declined", "a2ui_card": None, "intent": "Couldn't confirm",
+                    "gate": {"verdict": "declined", "check": "this_race"},
+                    "text": "I couldn't answer that reliably for the race on screen. Could you rephrase it?"}
+
     # 2. The answer must be about the race the question names
     target = named[0] if len(named) == 1 else None
     if target and year and not _mentions_race(resp.get("text", ""), year, target[1]):

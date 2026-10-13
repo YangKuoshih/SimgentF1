@@ -503,6 +503,15 @@ async def api_chat(msg: ChatMessage, request: Request):
     # Result/standings questions skip stored memory so the official data always wins.
     mem_resp = memory_manager.retrieve(resolved_query, msg.context, history=safe_history, defer_to_data=True)
     if mem_resp:
+        # Stored answers go through the answer gate too (race on screen, facts); a mismatch is
+        # answered by the engine instead
+        from app.agent import gate
+        try:
+            mem_resp = gate.check(resolved_query, msg.context, safe_history, mem_resp,
+                                  lambda q, ctx: race_agent.answer_race_engineer_query(q, ctx, history=safe_history))
+        except Exception as e:
+            logger.warning(f"answer gate failed on a memory answer: {type(e).__name__}")
+        (mem_resp.get("gate") or {}).pop("engine_text", None)
         latency = round((time.perf_counter() - start_t) * 1000, 2)
         mem_resp["latency_ms"] = latency
         mem_resp["query"] = clean_query

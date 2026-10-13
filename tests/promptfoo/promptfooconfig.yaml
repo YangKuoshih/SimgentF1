@@ -144,3 +144,12 @@ tests:
   - description: career totals come from F1DB, for any driver
     vars: {question: "How many wins did Graham Hill have?"}
     assert: [{type: icontains, value: "14 Grand Prix wins"}]
+
+  # --- a stored answer about one race never answers for another
+  - description: the "How did VER win this race?" chip on the Singapore replay answers for Singapore
+    vars:
+      question: "How did VER win this race?"
+      screen: {year: 2026, round: 17, session: race, race: "Singapore Grand Prix"}
+    assert:
+      - {type: icontains, value: "Singapore"}
+      - {type: not-icontains, value: "Bahrain"}

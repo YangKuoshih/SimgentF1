@@ -65,75 +65,13 @@
     }
   },
   {
-    "id": "mem_2026_championship_leaders",
-    "topic": "2026_championship_leaders",
-    "patterns": [
-      "who is currently the leader of the 2026 season",
-      "who is currently leading in the 2026 season",
-      "who is leading the 2026 season",
-      "who is leading 2026",
-      "who leads 2026",
-      "2026 championship leader",
-      "leader of 2026",
-      "who is in first place 2026",
-      "who is p1 in 2026",
-      "wdc leader 2026",
-      "wcc leader 2026",
-      "current leader of 2026",
-      "who is leading the championship in 2026"
-    ],
-    "keywords": [
-      "leader",
-      "leading",
-      "2026",
-      "season",
-      "championship"
-    ],
-    "answer": "**Andrea Kimi Antonelli** currently leads the 2026 Drivers' World Championship with **320 points** for Mercedes across 8 Grand Prix victories. Teammate George Russell holds P2 with 236 points (+84 pts), while Mercedes commands the Constructors' title with **556 points**.",
-    "source": "verified_f1_ground_truth",
-    "confidence": 1.0,
-    "a2ui_card": {
-      "type": "championship_card",
-      "title": "2026 FIA World Championship Leaders",
-      "metrics": [
-        {
-          "label": "WDC Leader",
-          "value": "Andrea Kimi Antonelli",
-          "color": "#00F5D4"
-        },
-        {
-          "label": "WDC Points",
-          "value": "320.0 pts (8 Wins)",
-          "color": "#FFFFFF"
-        },
-        {
-          "label": "WCC Leader",
-          "value": "Mercedes",
-          "color": "#27F4D2"
-        },
-        {
-          "label": "WCC Points",
-          "value": "556.0 pts (11 Wins)",
-          "color": "#FFB703"
-        }
-      ],
-      "action": "OPEN 2026 STANDINGS",
-      "target": {
-        "action_type": "open_standings",
-        "year": 2026
-      }
-    }
-  },
-  {
     "id": "mem_2026_bahrain_gp_winner",
     "topic": "2026_bahrain_gp_winner",
     "patterns": [
       "who won the 2026 bahrain grand prix",
       "who won bahrain 2026",
       "bahrain 2026 winner",
-      "verstappen bahrain 2026",
-      "how did ver win this race",
-      "explain ver victory"
+      "verstappen bahrain 2026"
     ],
     "keywords": [
       "bahrain",

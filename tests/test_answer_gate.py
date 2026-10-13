@@ -113,5 +113,25 @@ class CareerTotals(unittest.TestCase):
         self.assertNotIn("Damon", ask("How many wins did Graham Hill have?", {}, [])["text"])
 
 
+class StoredAnswersStayWithTheirRace(unittest.TestCase):
+    """The memory bank's Bahrain answers used to answer generic questions on any replay."""
+
+    def test_memory_answers_only_for_its_race(self):
+        from app.tools.agent_memory import memory_manager
+        sg = {"year": 2026, "round": 17, "session": "race"}
+        bh = {"year": 2026, "round": 16, "session": "race"}
+        self.assertIsNone(memory_manager.retrieve("what compound did verstappen use", sg, history=[], defer_to_data=True))
+        self.assertIsNotNone(memory_manager.retrieve("what compound did verstappen use", bh, history=[], defer_to_data=True))
+        self.assertIsNotNone(memory_manager.retrieve("what tyres did verstappen use in bahrain 2026", sg, history=[], defer_to_data=True))
+
+    def test_this_race_answer_about_another_race_is_replaced(self):
+        stored = {"tool": "telemetry_memory_retrieval",
+                  "text": "**Max Verstappen** took victory at the 2026 Bahrain Grand Prix in Malaysia."}
+        out = gate.check("How did VER win this race?", {"year": 2026, "round": 17, "session": "race"}, [], stored,
+                         lambda q, ctx: ask(q, ctx, []))
+        self.assertEqual(out["gate"]["check"], "this_race")
+        self.assertIn("Singapore", out["text"])
+
+
 if __name__ == "__main__":
     unittest.main()
