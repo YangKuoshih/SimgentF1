@@ -74,6 +74,15 @@ def main():
             # every lap time F1DB has for the race (qualifying/grid times, fastest lap): an answer
             # quoting any other lap time has invented it
             "lap_times": sorted({t for t in [row["time"] for row in g] + [fl["time"] if fl else ""] if t}),
+            # comeback answers: the podium and every finisher who gained 5+ places, with grid slot
+            # (None = started from the pit lane). Shared drives (1950s car swaps) have no grid slot
+            # of their own and are left out.
+            "comebacks": [dict(person(r["driverId"]), grid=int(r["gridPositionNumber"]) if r["gridPositionNumber"] else None,
+                               finish=int(r["positionNumber"]))
+                          for r in rows if r["positionNumber"] and r["sharedCar"] != "true"
+                          and (int(r["positionNumber"]) <= 3
+                               or not r["gridPositionNumber"]
+                               or int(r["gridPositionNumber"]) - int(r["positionNumber"]) >= 5)],
         }
 
     # Drivers entered each season, and all-time drivers with 20+ starts: the answer gate asks which

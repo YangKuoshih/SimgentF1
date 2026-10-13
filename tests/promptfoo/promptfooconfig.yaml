@@ -153,3 +153,17 @@ tests:
     assert:
       - {type: icontains, value: "Singapore"}
       - {type: not-icontains, value: "Bahrain"}
+
+  # --- comebacks: search the driver's career, not the race on screen
+  - description: Antonelli's win from the back, asked on the Spanish GP replay
+    vars:
+      question: "in what race did Antonelli come back for an incredible win after starting in the back of the grid?"
+      screen: {year: 2026, round: 14, session: race, race: "Spanish Grand Prix"}
+    assert:
+      - {type: icontains, value: "Italian Grand Prix"}
+      - {type: icontains, value: "P19"}
+  - description: the all-time win from furthest back
+    vars: {question: "biggest comeback win ever"}
+    assert:
+      - {type: icontains, value: "John Watson"}
+      - {type: icontains, value: "P22"}

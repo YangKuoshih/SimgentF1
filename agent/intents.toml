@@ -290,6 +290,20 @@ examples = [
   "youngest race winner",
 ]
 
+[comebacks]
+description = "Wins, podiums or big climbs from far back on the grid: for a driver, a season, a race or all time"
+tools = ["comeback_lookup"]
+examples = [
+  "in what race did Antonelli win from the back of the grid",
+  "biggest comeback win ever",
+  "who gained the most places in this race",
+  "what was Hamilton's best comeback",
+  "who won from the furthest back on the grid",
+  "biggest comeback in 2021",
+  "has anyone won from the pit lane",
+  "who made up the most places",
+]
+
 [era_regulations]
 description = "Historic eras and how the rules or cars changed"
 tools = ["f1_era_regulations_lookup"]

@@ -19,3 +19,6 @@
 - vars: {question: "Explain the 2026 active aero rules"}
 - vars: {question: "Who has the most wins in F1 history?"}
 - vars: {question: "Where did Norris finish at Silverstone 2024?"}
+- vars: {question: "in what race did Antonelli win from the back of the grid?"}
+  assert: [{type: icontains, value: "Italian Grand Prix"}]
+- vars: {question: "who has won from furthest back on the grid?"}
