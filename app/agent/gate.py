@@ -30,7 +30,8 @@ FACTS = os.path.join(ROOT, "data", "f1db_facts.json")
 SKIP_TOOLS = {"security_guardrail", "out_of_scope_redirect", "unsupported_data_notice", "season_out_of_range",
               "race_not_run", "no_sprint_weekend", "qualifying_not_in_data", "sprint_not_in_data",
               "sprint_qualifying_not_in_data", "clarify", "free_practice_telemetry_lookup",
-              "pit_strategy_explanation"}
+              "pit_strategy_explanation",
+              "comeback_lookup"}  # grid and finish straight from F1DB, the answer key itself
 FALLBACK_TOOLS = {"session_telemetry_briefing", ""}
 
 

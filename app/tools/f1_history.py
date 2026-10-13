@@ -1554,6 +1554,115 @@ def lookup_driver_metric(query: str) -> Optional[Dict[str, Any]]:
             "metric": label, "value": val, "text": text, "card": card}
 
 
+def _race_title(key: str) -> str:
+    year, rnd = key.split("_")
+    from app.tools import jolpica_sync as J
+    race = next((r for r in (J.schedule(int(year), net=False) or []) if str(r.get("round")) == rnd), None)
+    if race:
+        return f"{year} {race['raceName']}"
+    names = (_f1db_facts().get("races", {}).get(key) or {}).get("circuit_names") or ["round " + rnd]
+    return f"{year} race at {names[0]}"
+
+
+def _grid_text(grid: Optional[int]) -> str:
+    return "the pit lane" if grid is None else f"P{grid}"
+
+
+def lookup_comebacks(query: str, race_key: Optional[str] = None) -> Optional[Dict[str, Any]]:
+    """'In what race did Antonelli win from the back of the grid?', 'biggest comeback win ever',
+    'who gained the most places in this race?': starting grid against finish, from F1DB, for a
+    driver, a season, one race (race_key "2026_13") or all time.
+    Wins and podiums rank by how far back the driver started (the pit lane is furthest);
+    other questions rank by places gained, among finishers who gained 5 or more."""
+    facts = _f1db_facts()
+    races = facts.get("races") or {}
+    q = query.lower()
+    driver = None if race_key else _f1db_driver(query)
+    year = None if race_key else re.search(r"\b(19[5-9]\d|20[0-2]\d)\b", q)
+    want = ("win" if re.search(r"\b(win|wins|won|winning|victory|victories)\b", q)
+            else "podium" if re.search(r"\bpodiums?\b", q) else "gain")
+    rows = []
+    for key, race in races.items():
+        if race_key and key != race_key:
+            continue
+        if year and not key.startswith(year.group(1) + "_"):
+            continue
+        for r in race.get("comebacks") or []:
+            if driver and (_fold(r["first"]), _fold(r["last"])) != (_fold(driver["first"]), _fold(driver["last"])):
+                continue
+            if want == "win" and r["finish"] != 1 or want == "podium" and r["finish"] > 3:
+                continue
+            if want == "gain" and (r["grid"] is None or r["grid"] - r["finish"] < 5):
+                continue
+            rows.append((key, r))
+    order = lambda k: tuple(map(int, k.split("_")))
+    if want == "gain":
+        rows.sort(key=lambda kr: (-(kr[1]["grid"] - kr[1]["finish"]), order(kr[0])))
+    else:  # furthest back first; the pit lane is behind every grid slot
+        rows.sort(key=lambda kr: (-(kr[1]["grid"] if kr[1]["grid"] is not None else 99), order(kr[0])))
+
+    through = (facts.get("facts_through") or {}).get("race", "")
+    source = "*Source: F1DB starting grids and results" + (
+        f", to the {through.split('_')[0]} season, round {through.split('_')[1]}" if through else "") + ".*"
+    name = f"{driver['first']} {driver['last']}" if driver else ""
+    scope = (f" at the **{_race_title(race_key)}**" if race_key else f" in {year.group(1)}" if year else "")
+    what = {"win": "win", "podium": "podium", "gain": "climb through the field"}[want]
+    if not rows:
+        if driver and want == "win" and not driver["wins"]:
+            text = f"**{name}** has no Grand Prix wins in F1DB."
+        elif race_key:
+            text = f"Nobody gained five or more places{scope}."
+        else:
+            text = f"F1DB has no {what}{' for **' + name + '**' if driver else ''}{scope} that fits."
+        return {"text": f"{text}\n\n{source}", "card": None, "driver": name}
+
+    def line(key, r):
+        gained = f" (+{r['grid'] - r['finish']})" if r["grid"] is not None else ""
+        who = "" if driver else f"**{r['first']} {r['last']}** · "
+        where = "" if race_key else f"{_race_title(key)} · "
+        return f"• {who}{where}{_grid_text(r['grid'])} → P{r['finish']}{gained}"
+
+    key, top = rows[0]
+    who = name or f"{top['first']} {top['last']}"
+    race_txt = _race_title(key)
+    if race_key and want != "gain":
+        head = f"At the **{race_txt}**: " + "; ".join(
+            f"**{r['first']} {r['last']}** {'won' if r['finish'] == 1 else 'finished P' + str(r['finish'])} "
+            f"from **{_grid_text(r['grid'])}**" for _, r in sorted(rows, key=lambda kr: kr[1]["finish"])) + "."
+        rows = rows[:1]
+    elif want == "win":
+        head = (f"**{who}**'s win from furthest back{scope} was the **{race_txt}**: "
+                f"started from **{_grid_text(top['grid'])}** and won.")
+        if not driver:
+            head = (f"The win from furthest back{scope}: **{who}** at the **{race_txt}**, "
+                    f"from **{_grid_text(top['grid'])}**.")
+    elif want == "podium":
+        head = (f"{'**' + who + '**' + chr(39) + 's' if driver else 'The'} podium from furthest back{scope}: "
+                f"{'' if driver else '**' + who + '** at '}the **{race_txt}**, from **{_grid_text(top['grid'])}** to **P{top['finish']}**.")
+    else:
+        head = (f"{'**' + who + '**' + chr(39) + 's biggest' if driver else 'The biggest'} climb through the field{scope}: "
+                f"{'' if driver else '**' + who + '**, '}{'' if race_key else 'the **' + race_txt + '**, '}"
+                f"from **{_grid_text(top['grid'])}** to **P{top['finish']}** (+{top['grid'] - top['finish']} places).")
+    if want != "gain" and top["grid"] is not None and re.search(r"\bpit ?lane\b", q):
+        head = f"Nobody has {'won' if want == 'win' else 'reached the podium'} from the pit lane{scope} in F1DB. " + head
+    others = [(k, r) for k, r in rows[1:] if r["grid"] is None or r["grid"] > r["finish"]][:5]
+    listing = ("\n\n**Next furthest back:**\n" if want != "gain" else "\n\n**Next biggest climbs:**\n") + \
+        "\n".join(line(k, r) for k, r in others) if others else ""
+    text = f"{head}{listing}\n\n{source}"
+    card = {
+        "type": "driver_performance_card",
+        "title": f"Comeback — {who}"[:60],
+        "metrics": [
+            {"label": "Race", "value": race_txt, "color": "#FFFFFF"},
+            {"label": "Started", "value": _grid_text(top["grid"]), "color": "#FFB703"},
+            {"label": "Finished", "value": f"P{top['finish']}", "color": "#00F5D4"},
+            {"label": "Places gained", "value": f"+{top['grid'] - top['finish']}" if top["grid"] else "pit lane",
+             "color": "#E10600"},
+        ],
+    }
+    return {"text": text, "card": card, "driver": who, "race": key}
+
+
 # =============================================================================
 # 7. HISTORIC RACE MOMENTS & FAMOUS CONTROVERSIES (1950–2026)
 # =============================================================================

@@ -667,6 +667,27 @@ _WIN_WORDING = re.compile(
     r"|\bwho was victorious\b|\bwho triumphed\b", re.I)
 
 
+_COMEBACK_STRONG = re.compile(
+    r"\bcome ?backs?\b|\bcame back\b|\bcoming back\b|\b(?:places|positions|spots) gained\b"
+    r"|\b(?:gain|gained|gaining|made up|make up) (?:the )?most (?:places|positions|spots)\b|\bthrough the (?:field|pack)\b")
+# "from the back", "pit lane": a comeback only with an outcome ("who started from the pit lane" is the grid)
+_COMEBACK_START = re.compile(
+    r"\bfrom (?:the )?(?:back|rear|last|pit ?lane)\b|\bback of the (?:grid|field|pack)\b|\bfurthest back\b"
+    r"|\blowest (?:grid|starting)\b|\bstart(?:ed|ing)? (?:last|at the back)\b")
+_COMEBACK_OUTCOME = re.compile(r"\b(?:win|wins|won|winning|victory|victories|podiums?|finish\w*|recover\w*|charge\w*)\b")
+
+
+class _Comeback:
+    @staticmethod
+    def search(q: str) -> bool:
+        return bool(_COMEBACK_STRONG.search(q) or (_COMEBACK_START.search(q) and _COMEBACK_OUTCOME.search(q)))
+
+
+_COMEBACK = _Comeback()
+# "ever", "career", "which race": search beyond the race on screen
+_SEARCH_WIDE = re.compile(r"\b(?:ever|all[- ]time|history|career|in f1|which race|what race|of any race)\b")
+
+
 def _out_of_range_season(q: str) -> Optional[Dict[str, Any]]:
     """A season before the championship or not yet run. Checked before anything else: otherwise
     the year is ignored and the race on screen answers (a 1949 question got a 2026 result)."""
@@ -804,6 +825,27 @@ def _answer_core(
     drivers = model["drivers"] if model else []
     events = model["events"] if model else []
     winner = drivers[0] if drivers else None
+
+    # Comebacks: grid against finish across F1DB ("in what race did Antonelli win from the back
+    # of the grid?"). Searches a driver's career, a season or all time; scoped to one race only
+    # when the question names it or says "this race", or asks about climbing places in general
+    # with no driver, year, win/podium or "ever" ("who gained the most places?"). It used to fall
+    # through to the race on screen.
+    if _COMEBACK.search(q):
+        race_scoped = (bool(re.search(r"\b(?:this|today'?s?) (?:race|grand prix|gp)\b", q))
+                       or (year_match and _match_race_round(q, race_replay.season_races(year)) is not None)
+                       or (not year_match and not _SEARCH_WIDE.search(q)
+                           and not re.search(r"\b(?:win|wins|won|winning|victory|victories|podiums?)\b", q)
+                           and f1_history._f1db_driver(q) is None))
+        cb = f1_history.lookup_comebacks(q, f"{year}_{round_no}" if race_scoped else None)
+        if cb:
+            return {
+                "role": "assistant",
+                "text": cb["text"],
+                "tool": "comeback_lookup",
+                "intent": f"Comebacks{' — ' + cb['driver'] if cb.get('driver') else ''}",
+                "a2ui_card": cb["card"],
+            }
 
     # Only the winner is known (results not cached and Jolpica unreachable, e.g. rate-limited):
     # answer what that supports and never present a one-car field as the race (it used to say
