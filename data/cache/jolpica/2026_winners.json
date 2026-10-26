@@ -5,7 +5,7 @@
     "url": "https://api.jolpi.ca/ergast/f1/2026/results/1.json",
     "limit": "100",
     "offset": "0",
-    "total": "17",
+    "total": "18",
     "RaceTable": {
       "position": "1",
       "season": "2026",
@@ -974,6 +974,63 @@
                 "lap": "44",
                 "Time": {
                   "time": "1:36.201"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "season": "2026",
+          "round": "18",
+          "url": "https://en.wikipedia.org/wiki/2026_United_States_Grand_Prix",
+          "raceName": "United States Grand Prix",
+          "Circuit": {
+            "circuitId": "americas",
+            "url": "https://en.wikipedia.org/wiki/Circuit_of_the_Americas",
+            "circuitName": "Circuit of the Americas",
+            "Location": {
+              "lat": "30.1328",
+              "long": "-97.6411",
+              "locality": "Austin",
+              "country": "USA"
+            }
+          },
+          "date": "2026-10-25",
+          "time": "20:00:00Z",
+          "Results": [
+            {
+              "number": "12",
+              "position": "1",
+              "positionText": "1",
+              "points": "25",
+              "Driver": {
+                "driverId": "antonelli",
+                "permanentNumber": "12",
+                "code": "ANT",
+                "url": "https://en.wikipedia.org/wiki/Andrea_Kimi_Antonelli",
+                "givenName": "Andrea Kimi",
+                "familyName": "Antonelli",
+                "dateOfBirth": "2006-08-25",
+                "nationality": "Italian"
+              },
+              "Constructor": {
+                "constructorId": "mercedes",
+                "url": "https://en.wikipedia.org/wiki/Mercedes-Benz_in_Formula_One",
+                "name": "Mercedes",
+                "nationality": "German"
+              },
+              "grid": "1",
+              "laps": "56",
+              "status": "Finished",
+              "Time": {
+                "millis": "5716650",
+                "time": "1:35:16.650"
+              },
+              "FastestLap": {
+                "rank": "4",
+                "lap": "55",
+                "Time": {
+                  "time": "1:39.086"
                 }
               }
             }

@@ -2467,6 +2467,21 @@
    "sha256": "50a8cdcc36abbe89252bb90d4e11015c4434e1688e905f71af36316e0c870e1b",
    "fetched_at": "2026-10-11T20:08:12Z"
   },
+  "jolpica/2026_18_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/18/laps.json (all pages merged)",
+   "sha256": "e1c916bd98797e38cdcf1eaf96fa65aae83bfa14e80415c3d8b963a6bb9b4a5a",
+   "fetched_at": "2026-10-26T01:44:53Z"
+  },
+  "jolpica/2026_18_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/18/pitstops.json?limit=100",
+   "sha256": "0be46dbc7988451a6ecac6d86e1ff6b14ec167ada645b2dbeca1aff348b9d7e7",
+   "fetched_at": "2026-10-26T01:44:48Z"
+  },
+  "jolpica/2026_18_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/18/results.json?limit=40",
+   "sha256": "13474e1290070321820adebdf3869d126a68f5eb1a6649f67cb4fa759261f158",
+   "fetched_at": "2026-10-26T01:44:48Z"
+  },
   "jolpica/2026_1_laps_all.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/1/laps.json (all pages merged)",
    "sha256": "e867f6a4e72e7de43c6884448232f01d1bb9a8fa2195119489e8cc17cc3f82d4",
@@ -2709,14 +2724,14 @@
   },
   "jolpica/2026_constructorStandings.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/constructorStandings.json?limit=40",
-   "sha256": "c026567231cc310ec3549567f4440ba9d1a0c4c2e7a713bda561ecebb18dd656",
-   "fetched_at": "2026-10-25T19:59:06Z",
+   "sha256": "aba8d8e505c32f18c6298615d711bd9ec766d6aab16003ccfe69aa4ec87372c8",
+   "fetched_at": "2026-10-26T01:45:40Z",
    "note": "corrected by revalidate"
   },
   "jolpica/2026_driverStandings.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/driverStandings.json?limit=40",
-   "sha256": "a259ff8104b0d31d4998b5681cc4bfe11013bbc22916a79331c31f58002e9df5",
-   "fetched_at": "2026-10-25T19:59:06Z",
+   "sha256": "b031f6849eb61b6966ba1353469918b5d4a13a2aaf27f95082c18c6598c0cb35",
+   "fetched_at": "2026-10-26T01:45:41Z",
    "note": "corrected by revalidate"
   },
   "jolpica/2026_schedule.json": {
@@ -2727,8 +2742,8 @@
   },
   "jolpica/2026_winners.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/results/1.json?limit=100",
-   "sha256": "7b5dedf8df979912ac51d79f9e04f7c661f680bc81f7e75d33f6938487d48e5e",
-   "fetched_at": "2026-10-11T20:08:59Z",
+   "sha256": "121940971337398af1a5000873acc7a8c411365bfe893a9bda5cdd3085f54ed6",
+   "fetched_at": "2026-10-26T01:45:42Z",
    "note": "corrected by revalidate"
   },
   "openf1/2023_12_sprint_qualifying.json": {

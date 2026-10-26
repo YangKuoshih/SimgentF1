@@ -17,8 +17,8 @@
             {
               "position": "1",
               "positionText": "1",
-              "points": "340",
-              "wins": "8",
+              "points": "365",
+              "wins": "9",
               "Driver": {
                 "driverId": "antonelli",
                 "permanentNumber": "12",
@@ -41,7 +41,7 @@
             {
               "position": "2",
               "positionText": "2",
-              "points": "238",
+              "points": "242",
               "wins": "3",
               "Driver": {
                 "driverId": "russell",
@@ -65,7 +65,7 @@
             {
               "position": "3",
               "positionText": "3",
-              "points": "229",
+              "points": "241",
               "wins": "1",
               "Driver": {
                 "driverId": "hamilton",
@@ -89,7 +89,7 @@
             {
               "position": "4",
               "positionText": "4",
-              "points": "221",
+              "points": "236",
               "wins": "2",
               "Driver": {
                 "driverId": "max_verstappen",
@@ -113,7 +113,7 @@
             {
               "position": "5",
               "positionText": "5",
-              "points": "215",
+              "points": "233",
               "wins": "1",
               "Driver": {
                 "driverId": "leclerc",
@@ -137,7 +137,7 @@
             {
               "position": "6",
               "positionText": "6",
-              "points": "201",
+              "points": "211",
               "wins": "2",
               "Driver": {
                 "driverId": "norris",
@@ -161,7 +161,7 @@
             {
               "position": "7",
               "positionText": "7",
-              "points": "138",
+              "points": "144",
               "wins": "0",
               "Driver": {
                 "driverId": "piastri",
@@ -185,7 +185,7 @@
             {
               "position": "8",
               "positionText": "8",
-              "points": "97",
+              "points": "105",
               "wins": "0",
               "Driver": {
                 "driverId": "hadjar",
@@ -209,7 +209,7 @@
             {
               "position": "9",
               "positionText": "9",
-              "points": "75",
+              "points": "77",
               "wins": "0",
               "Driver": {
                 "driverId": "lawson",
@@ -239,7 +239,7 @@
             {
               "position": "10",
               "positionText": "10",
-              "points": "41",
+              "points": "42",
               "wins": "0",
               "Driver": {
                 "driverId": "gasly",

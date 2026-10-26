@@ -17,8 +17,8 @@
             {
               "position": "1",
               "positionText": "1",
-              "points": "578",
-              "wins": "11",
+              "points": "607",
+              "wins": "12",
               "Constructor": {
                 "constructorId": "mercedes",
                 "url": "https://en.wikipedia.org/wiki/Mercedes-Benz_in_Formula_One",
@@ -29,7 +29,7 @@
             {
               "position": "2",
               "positionText": "2",
-              "points": "444",
+              "points": "474",
               "wins": "2",
               "Constructor": {
                 "constructorId": "ferrari",
@@ -41,19 +41,7 @@
             {
               "position": "3",
               "positionText": "3",
-              "points": "339",
-              "wins": "2",
-              "Constructor": {
-                "constructorId": "mclaren",
-                "url": "https://en.wikipedia.org/wiki/McLaren",
-                "name": "McLaren",
-                "nationality": "British"
-              }
-            },
-            {
-              "position": "4",
-              "positionText": "4",
-              "points": "332",
+              "points": "355",
               "wins": "2",
               "Constructor": {
                 "constructorId": "red_bull",
@@ -63,9 +51,21 @@
               }
             },
             {
+              "position": "4",
+              "positionText": "4",
+              "points": "355",
+              "wins": "2",
+              "Constructor": {
+                "constructorId": "mclaren",
+                "url": "https://en.wikipedia.org/wiki/McLaren",
+                "name": "McLaren",
+                "nationality": "British"
+              }
+            },
+            {
               "position": "5",
               "positionText": "5",
-              "points": "100",
+              "points": "102",
               "wins": "0",
               "Constructor": {
                 "constructorId": "rb",
@@ -77,7 +77,7 @@
             {
               "position": "6",
               "positionText": "6",
-              "points": "68",
+              "points": "69",
               "wins": "0",
               "Constructor": {
                 "constructorId": "alpine",
