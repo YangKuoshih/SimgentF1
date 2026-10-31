@@ -2724,14 +2724,14 @@
   },
   "jolpica/2026_constructorStandings.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/constructorStandings.json?limit=40",
-   "sha256": "aba8d8e505c32f18c6298615d711bd9ec766d6aab16003ccfe69aa4ec87372c8",
-   "fetched_at": "2026-10-26T01:45:40Z",
+   "sha256": "d01e9234f4d2305ee8a3a5f77f21ed76cb98dc343051e3dfe5fd65e019c9ed49",
+   "fetched_at": "2026-10-31T22:51:00Z",
    "note": "corrected by revalidate"
   },
   "jolpica/2026_driverStandings.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/driverStandings.json?limit=40",
-   "sha256": "b031f6849eb61b6966ba1353469918b5d4a13a2aaf27f95082c18c6598c0cb35",
-   "fetched_at": "2026-10-26T01:45:41Z",
+   "sha256": "23061a23ca471619af1353b3edfe20b333fc979a4b0d06cf601f43820dfb2be3",
+   "fetched_at": "2026-10-31T22:51:01Z",
    "note": "corrected by revalidate"
   },
   "jolpica/2026_schedule.json": {
@@ -2980,6 +2980,11 @@
    "source": "https://api.openf1.org/v1/session_result?session_key=11392",
    "sha256": "717a979c6d492e346920b0d0e839d5dc45ba2196d1f877ed2e51765d9d87ad02",
    "fetched_at": "2026-10-24T22:44:21Z"
+  },
+  "openf1/2026_19_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=11400",
+   "sha256": "e52b63138452de64d7759a0cbe3e9e5b21a7372ea05acc5c82e469fc8c25fa91",
+   "fetched_at": "2026-10-31T22:50:21Z"
   },
   "openf1/2026_2_sprint_qualifying.json": {
    "source": "https://api.openf1.org/v1/session_result?session_key=11236",

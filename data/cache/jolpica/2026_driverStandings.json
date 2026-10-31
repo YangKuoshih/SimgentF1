@@ -5,14 +5,14 @@
     "url": "https://api.jolpi.ca/ergast/f1/2026/driverstandings.json",
     "limit": "40",
     "offset": "0",
-    "total": "23",
+    "total": "24",
     "StandingsTable": {
       "season": "2026",
-      "round": "18",
+      "round": "19",
       "StandingsLists": [
         {
           "season": "2026",
-          "round": "18",
+          "round": "19",
           "DriverStandings": [
             {
               "position": "1",
@@ -568,6 +568,25 @@
                   "constructorId": "cadillac",
                   "url": "https://en.wikipedia.org/wiki/Cadillac_in_Formula_One",
                   "name": "Cadillac F1 Team",
+                  "nationality": "American"
+                }
+              ]
+            },
+            {
+              "position": "24",
+              "positionText": "24",
+              "points": "0",
+              "wins": "0",
+              "Driver": {
+                "driverId": "ryo_hirakawa",
+                "givenName": "Ryo",
+                "familyName": "Hirakawa"
+              },
+              "Constructors": [
+                {
+                  "constructorId": "haas",
+                  "url": "https://en.wikipedia.org/wiki/Haas_F1_Team",
+                  "name": "Haas F1 Team",
                   "nationality": "American"
                 }
               ]
