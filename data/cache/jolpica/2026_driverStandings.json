@@ -161,7 +161,7 @@
             {
               "position": "7",
               "positionText": "7",
-              "points": "150",
+              "points": "144",
               "wins": "0",
               "Driver": {
                 "driverId": "piastri",
@@ -185,7 +185,7 @@
             {
               "position": "8",
               "positionText": "8",
-              "points": "105",
+              "points": "107",
               "wins": "0",
               "Driver": {
                 "driverId": "hadjar",
@@ -209,7 +209,7 @@
             {
               "position": "9",
               "positionText": "9",
-              "points": "79",
+              "points": "83",
               "wins": "0",
               "Driver": {
                 "driverId": "lawson",
@@ -239,7 +239,7 @@
             {
               "position": "10",
               "positionText": "10",
-              "points": "43",
+              "points": "42",
               "wins": "0",
               "Driver": {
                 "driverId": "gasly",
@@ -287,7 +287,7 @@
             {
               "position": "12",
               "positionText": "12",
-              "points": "31",
+              "points": "27",
               "wins": "0",
               "Driver": {
                 "driverId": "colapinto",
@@ -335,17 +335,17 @@
             {
               "position": "14",
               "positionText": "14",
-              "points": "13",
+              "points": "14",
               "wins": "0",
               "Driver": {
-                "driverId": "hulkenberg",
-                "permanentNumber": "27",
-                "code": "HUL",
-                "url": "http://en.wikipedia.org/wiki/Nico_H%C3%BClkenberg",
-                "givenName": "Nico",
-                "familyName": "H\u00fclkenberg",
-                "dateOfBirth": "1987-08-19",
-                "nationality": "German"
+                "driverId": "bortoleto",
+                "permanentNumber": "5",
+                "code": "BOR",
+                "url": "https://en.wikipedia.org/wiki/Gabriel_Bortoleto",
+                "givenName": "Gabriel",
+                "familyName": "Bortoleto",
+                "dateOfBirth": "2004-10-14",
+                "nationality": "Brazilian"
               },
               "Constructors": [
                 {
@@ -359,17 +359,17 @@
             {
               "position": "15",
               "positionText": "15",
-              "points": "10",
+              "points": "13",
               "wins": "0",
               "Driver": {
-                "driverId": "bortoleto",
-                "permanentNumber": "5",
-                "code": "BOR",
-                "url": "https://en.wikipedia.org/wiki/Gabriel_Bortoleto",
-                "givenName": "Gabriel",
-                "familyName": "Bortoleto",
-                "dateOfBirth": "2004-10-14",
-                "nationality": "Brazilian"
+                "driverId": "hulkenberg",
+                "permanentNumber": "27",
+                "code": "HUL",
+                "url": "http://en.wikipedia.org/wiki/Nico_H%C3%BClkenberg",
+                "givenName": "Nico",
+                "familyName": "H\u00fclkenberg",
+                "dateOfBirth": "1987-08-19",
+                "nationality": "German"
               },
               "Constructors": [
                 {
@@ -503,6 +503,30 @@
             {
               "position": "21",
               "positionText": "21",
+              "points": "1",
+              "wins": "0",
+              "Driver": {
+                "driverId": "ryo_hirakawa",
+                "permanentNumber": "50",
+                "code": "HIR",
+                "url": "https://en.wikipedia.org/wiki/Ryo_Hirakawa",
+                "givenName": "Ryo",
+                "familyName": "Hirakawa",
+                "dateOfBirth": "1994-03-07",
+                "nationality": "Japanese"
+              },
+              "Constructors": [
+                {
+                  "constructorId": "haas",
+                  "url": "https://en.wikipedia.org/wiki/Haas_F1_Team",
+                  "name": "Haas F1 Team",
+                  "nationality": "American"
+                }
+              ]
+            },
+            {
+              "position": "22",
+              "positionText": "22",
               "points": "0",
               "wins": "0",
               "Driver": {
@@ -525,8 +549,8 @@
               ]
             },
             {
-              "position": "22",
-              "positionText": "22",
+              "position": "23",
+              "positionText": "23",
               "points": "0",
               "wins": "0",
               "Driver": {
@@ -544,30 +568,6 @@
                   "constructorId": "cadillac",
                   "url": "https://en.wikipedia.org/wiki/Cadillac_in_Formula_One",
                   "name": "Cadillac F1 Team",
-                  "nationality": "American"
-                }
-              ]
-            },
-            {
-              "position": "23",
-              "positionText": "23",
-              "points": "0",
-              "wins": "0",
-              "Driver": {
-                "driverId": "ryo_hirakawa",
-                "permanentNumber": "50",
-                "code": "HIR",
-                "url": "https://en.wikipedia.org/wiki/Ryo_Hirakawa",
-                "givenName": "Ryo",
-                "familyName": "Hirakawa",
-                "dateOfBirth": "1994-03-07",
-                "nationality": "Japanese"
-              },
-              "Constructors": [
-                {
-                  "constructorId": "haas",
-                  "url": "https://en.wikipedia.org/wiki/Haas_F1_Team",
-                  "name": "Haas F1 Team",
                   "nationality": "American"
                 }
               ]

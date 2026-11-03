@@ -2494,8 +2494,9 @@
   },
   "jolpica/2026_19_results.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/19/results.json?limit=40",
-   "sha256": "57733342a0b7a513c131d3427d561a790094040075be8f3b3de25b36872ac79b",
-   "fetched_at": "2026-11-02T05:58:52Z"
+   "sha256": "da130c264c0c42e82b3785567c3871e6c0cb0f7450982233595903f3593701ac",
+   "fetched_at": "2026-11-03T00:57:05Z",
+   "note": "corrected by revalidate"
   },
   "jolpica/2026_1_laps_all.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/1/laps.json (all pages merged)",
@@ -2739,14 +2740,14 @@
   },
   "jolpica/2026_constructorStandings.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/constructorStandings.json?limit=40",
-   "sha256": "01e9dce400e7606b2226268d6cf575df27d6c1bef02e5df0d2eadaa44b042571",
-   "fetched_at": "2026-11-02T06:00:21Z",
+   "sha256": "8fadabbcff89a8a124ddee9b369149264a08f1411c02c61813bd1d05b7636c43",
+   "fetched_at": "2026-11-03T00:57:23Z",
    "note": "corrected by revalidate"
   },
   "jolpica/2026_driverStandings.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/driverStandings.json?limit=40",
-   "sha256": "aba4b51aa1896981b5dc13a4e22ef87038d64e70621931f3a26b1f370cb0a64c",
-   "fetched_at": "2026-11-02T06:00:21Z",
+   "sha256": "c7d001e49d6248f70d9cc9cae4dd74268a65156b14edcbcd2469bfa2c953311a",
+   "fetched_at": "2026-11-03T00:57:23Z",
    "note": "corrected by revalidate"
   },
   "jolpica/2026_schedule.json": {
