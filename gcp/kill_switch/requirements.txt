@@ -12,7 +12,7 @@ certifi==2026.7.22 \
     --hash=sha256:62f22742b58a1a33014a2b6b706588a8d7e2a88ae7bd1a6ebe8c992928483775 \
     --hash=sha256:741e2c3b351ddf169a738da9f2c048608ff7f2c5cc02f1ebc6b118bb090d5d55
     # via requests
-cffi==2.1.1 ; platform_python_implementation != 'PyPy' \
+cffi==2.1.1 \
     --hash=sha256:046bfc24911b37851ee1b51aab8bffe713d89c68c6a057b09484ce9fd5f69b4e \
     --hash=sha256:06c72bb76605a4b0cd0aad6930b69d4baf7dd5d806cfc409b824191099700e66 \
     --hash=sha256:0beceaabe56af686895136a2de78db54ecd8e4046b236b8fd6d6cb61389e9bf2 \
@@ -364,10 +364,6 @@ deprecation==2.1.0 \
     --hash=sha256:72b3bde64e5d778694b0cf68178aed03d15e15477116add3fb773e581f9518ff \
     --hash=sha256:a10811591210e1fb0e768a8c25517cabeabcba6f0bf96564f8ff45189f90b14a
     # via cloudevents
-exceptiongroup==1.3.1 ; python_full_version < '3.11' \
-    --hash=sha256:8b412432c6055b0b7d14c310000ae93352ed6754f70fa8f7c34141f91c4e3219 \
-    --hash=sha256:a7a39a3bd276781e98394987d3a5701d0c4edffb633bb7a5144577f82c773598
-    # via anyio
 flask==3.1.3 \
     --hash=sha256:0ef0e52b8a9cd932855379197dd8f94047b359ca0a78695144304cb45f87c9eb \
     --hash=sha256:f4bcbefc124291925f1a26446da31a5178f9483862233b23c0c96a20701f670c
@@ -375,8 +371,8 @@ flask==3.1.3 \
 functions-framework==3.10.2 \
     --hash=sha256:a92f72fc35ead71753090787181ab96a869e609baab0ac3f1ef3a0fddfd20d48 \
     --hash=sha256:f091017aff17acb21033f3934d74aff2531a32d3aa1d15d1eb41e57570f60c9a
-    # via -r gcp/kill_switch/requirements.in
-google-api-core==2.42.0 \
+    # via -r requirements.in
+google-api-core[grpc]==2.42.0 \
     --hash=sha256:82cf5daa2ef1b456d4e29ff1de1a5c2995c7be3ccf4fc608184326e03390c1ee \
     --hash=sha256:b1bdf4f72dc4f910736ce4ba49038352effbbc309579215107649b22973a1317
     # via google-cloud-run
@@ -389,8 +385,8 @@ google-auth==2.61.0 \
 google-cloud-run==0.16.2 \
     --hash=sha256:480ecde89b18dc99aac4584048f6477e856002af4d7a8e7a6eb894801d01190b \
     --hash=sha256:cf21a6ee67fb237f694b444862fb0a717f0e0dfeabfdb64b927c7d1303f18957
-    # via -r gcp/kill_switch/requirements.in
-googleapis-common-protos==1.75.5 \
+    # via -r requirements.in
+googleapis-common-protos[grpc]==1.75.5 \
     --hash=sha256:c7a866fc34ed29a3b10af627a4b9b1dc2433313ca6e959f0ae4feb132047ed72 \
     --hash=sha256:d7285525c23039db98f2463e6d5a4f9b958b94d497f03a844ece3259c4e72d5d
     # via
@@ -683,15 +679,15 @@ protobuf==7.36.2 \
     #   grpc-google-iam-v1
     #   grpcio-status
     #   proto-plus
-pyasn1==0.6.4 \
-    --hash=sha256:9c447d8431c947fe4c8febc4ed9e760bc29011a5b01e5c74b67025bd9fb8ce81 \
-    --hash=sha256:deda9277cfd454080ec40b207fb6df82206a3a2688735233cdcd8d3d565f088b
+pyasn1==0.6.5 \
+    --hash=sha256:4017b0fce125096b8573b39c989fdb1a4b19cf761e683398184550fea0e66587 \
+    --hash=sha256:6b11616a6bcf3a40e635f082bb232fa57b5e0dd7f517bd7ddd69ec3794508a47
     # via pyasn1-modules
 pyasn1-modules==0.4.2 \
     --hash=sha256:29253a9207ce32b64c3ac6600edc75368f98473906e8fd1043bd6b5b1de2c14a \
     --hash=sha256:677091de870a80aae844b1ca6134f54652fa2c8c5a52aa396440ac3106e941e6
     # via google-auth
-pycparser==3.1 ; implementation_name != 'PyPy' and platform_python_implementation != 'PyPy' \
+pycparser==3.1 \
     --hash=sha256:b3fc6dec06a8b2fefa0ed4ff92285306a5e3be9987bc5603c9edbdc4e492418f \
     --hash=sha256:f09d358c840bd147b79e55f2bc494f18ea869dc897f5852a8f5766b74f787882
     # via cffi
@@ -707,13 +703,8 @@ typing-extensions==4.16.0 \
     --hash=sha256:481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8 \
     --hash=sha256:dc983d19a509c94dba722ee6abd33940f7c05a89e243c47e907eb4db6f1a43e5
     # via
-    #   anyio
-    #   cryptography
-    #   exceptiongroup
     #   grpcio
     #   opentelemetry-api
-    #   starlette
-    #   uvicorn
 urllib3==2.8.0 \
     --hash=sha256:0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3 \
     --hash=sha256:63bf2ead4c879426ebf22ef2a781eeb4aa3b4ae798a0435506f8687fd5bb9b63
