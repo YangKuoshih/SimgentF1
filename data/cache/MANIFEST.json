@@ -3002,6 +3002,11 @@
    "sha256": "e52b63138452de64d7759a0cbe3e9e5b21a7372ea05acc5c82e469fc8c25fa91",
    "fetched_at": "2026-10-31T22:50:21Z"
   },
+  "openf1/2026_20_qualifying.json": {
+   "source": "https://api.openf1.org/v1/session_result?session_key=11408",
+   "sha256": "40081026e88bc04de8664604d88d3428556a416d6aa163400013bf73efdc0531",
+   "fetched_at": "2026-11-07T21:48:10Z"
+  },
   "openf1/2026_2_sprint_qualifying.json": {
    "source": "https://api.openf1.org/v1/session_result?session_key=11236",
    "sha256": "94ffa785c4025b70cbc6258065ead44dcf480d4641456228ced32513c3feb6e9",
