@@ -310,6 +310,65 @@ def _ordinal_position(q: str) -> Optional[int]:
     return None
 
 
+def _season_schedule_progress(year: int) -> Dict[str, Any]:
+    """Completed vs. remaining calendar rounds and maximum remaining points for a season."""
+    races = race_replay.season_races(year, net=False)
+    completed = [r for r in races if r.get("completed")]
+    remaining = [r for r in races if not r.get("completed")]
+    rem_sprints = sum(1 for r in remaining if r.get("has_sprint"))
+    gp_win_pts = 25 if year >= 2025 else 26
+    gp_team_pts = 43 if year >= 2025 else 44
+    max_driver_pts = len(remaining) * gp_win_pts + rem_sprints * 8
+    max_constructor_pts = len(remaining) * gp_team_pts + rem_sprints * 15
+    return {
+        "total_rounds": len(races),
+        "completed_rounds": len(completed),
+        "remaining_rounds": len(remaining),
+        "remaining_races": [r.get("race_name", f"Round {r.get('round')}") for r in remaining],
+        "remaining_sprints": rem_sprints,
+        "max_driver_pts": max_driver_pts,
+        "max_constructor_pts": max_constructor_pts,
+    }
+
+
+def get_season_grounding_summary(year: int = 2026) -> Dict[str, Any]:
+    """Compact ground-truth snapshot of season standings, clinch math, and remaining calendar for LLM grounding."""
+    prog = _season_schedule_progress(year)
+    st = race_replay.standings(year, net=False)
+    d_top = st.get("drivers", [])[:5]
+    c_top = st.get("constructors", [])[:3]
+    wdc_clinched = False
+    wcc_clinched = False
+    wdc_margin = 0.0
+    wcc_margin = 0.0
+    if len(d_top) >= 2:
+        wdc_margin = float(d_top[0]["points"]) - float(d_top[1]["points"])
+        wdc_clinched = (prog["remaining_rounds"] == 0) or (wdc_margin > prog["max_driver_pts"]) or (
+            wdc_margin == prog["max_driver_pts"]
+            and int(d_top[0].get("wins", 0)) > int(d_top[1].get("wins", 0)) + prog["remaining_rounds"]
+        )
+    if len(c_top) >= 2:
+        wcc_margin = float(c_top[0]["points"]) - float(c_top[1]["points"])
+        wcc_clinched = (prog["remaining_rounds"] == 0) or (wcc_margin > prog["max_constructor_pts"])
+    return {
+        "year": year,
+        "completed_rounds": prog["completed_rounds"],
+        "total_rounds": prog["total_rounds"],
+        "remaining_rounds": prog["remaining_rounds"],
+        "remaining_races": prog["remaining_races"],
+        "max_driver_points_remaining": prog["max_driver_pts"],
+        "max_constructor_points_remaining": prog["max_constructor_pts"],
+        "drivers_championship_clinched": wdc_clinched,
+        "drivers_champion_or_leader": d_top[0]["driver"] if d_top else None,
+        "drivers_lead_margin_pts": wdc_margin,
+        "constructors_championship_clinched": wcc_clinched,
+        "constructors_champion_or_leader": c_top[0]["team"] if c_top else None,
+        "constructors_lead_margin_pts": wcc_margin,
+        "top_drivers": d_top,
+        "top_constructors": c_top,
+    }
+
+
 def _season_title_from_data(year: int, constructor: bool = False) -> Optional[Dict[str, Any]]:
     """Season champion from the official final standings data (cache, or the API when
     the cache is stale). Returns None when no standings data exists for that season,
@@ -340,18 +399,49 @@ def _season_title_from_data(year: int, constructor: bool = False) -> Optional[Di
         label = "World Drivers' Champion"
     pts, wins, ru_pts = float(champ["points"]), champ.get("wins", "?"), float(ru["points"])
     team_str = f" driving for **{team}**" if not constructor else ""
-    text = (
-        f"**{year} FIA Formula 1 World Championship Summary**:\n\n"
-        f"• **{label}**: **{name}**{team_str}\n"
-        f"• **Championship Record**: **{wins} Grand Prix victories**, scoring **{pts:g} points**\n"
-        f"• **Runner-Up**: {ru_name} ({ru_pts:g} points, {pts - ru_pts:+g})\n\n"
-        f"> *Source: {year} final standings data (Jolpica-F1).*"
-    )
+    prog = _season_schedule_progress(year)
+    rem_n = prog["remaining_rounds"]
+    if rem_n > 0 and year >= _CURRENT_SEASON:
+        max_avail = prog["max_constructor_pts"] if constructor else prog["max_driver_pts"]
+        margin = pts - ru_pts
+        clinched = (margin > max_avail) or (
+            not constructor and margin == max_avail
+            and int(champ.get("wins", 0)) > int(ru.get("wins", 0)) + rem_n
+        )
+        rem_short = ", ".join(r.replace(" Grand Prix", " GP") for r in prog["remaining_races"])
+        done_n, total_n = prog["completed_rounds"], prog["total_rounds"]
+        if clinched:
+            text = (
+                f"**{year} FIA Formula 1 World Championship Summary**:\n\n"
+                f"• **{label}**: **{name}**{team_str} — mathematically clinched with **{rem_n} race{'s' if rem_n != 1 else ''} remaining** ({rem_short})\n"
+                f"• **Championship Record**: **{wins} Grand Prix victories**, scoring **{pts:g} points** after Round {done_n} of {total_n}\n"
+                f"• **Runner-Up**: {ru_name} ({ru_pts:g} points, {margin:+g} pts vs {max_avail} max points available)\n\n"
+                f"> *Source: {year} standings data after Round {done_n}/{total_n} (Jolpica-F1).*"
+            )
+            card_label = "Constructors' Champion" if constructor else "World Champion (Clinched)"
+        else:
+            text = (
+                f"**{year} FIA Formula 1 World Championship Summary**:\n\n"
+                f"• **{label}**: **{name}**{team_str} currently leads (title not yet mathematically clinched — **{rem_n} race{'s' if rem_n != 1 else ''} remaining**: {rem_short})\n"
+                f"• **Championship Record**: **{wins} Grand Prix victories**, scoring **{pts:g} points** after Round {done_n} of {total_n}\n"
+                f"• **Runner-Up**: {ru_name} ({ru_pts:g} points, {margin:+g} pts with {max_avail} max points still available)\n\n"
+                f"> *Source: {year} standings data after Round {done_n}/{total_n} (Jolpica-F1).*"
+            )
+            card_label = "WCC Leader" if constructor else "WDC Leader"
+    else:
+        text = (
+            f"**{year} FIA Formula 1 World Championship Summary**:\n\n"
+            f"• **{label}**: **{name}**{team_str}\n"
+            f"• **Championship Record**: **{wins} Grand Prix victories**, scoring **{pts:g} points**\n"
+            f"• **Runner-Up**: {ru_name} ({ru_pts:g} points, {pts - ru_pts:+g})\n\n"
+            f"> *Source: {year} final standings data (Jolpica-F1).*"
+        )
+        card_label = "Constructors' Champion" if constructor else "World Champion"
     card = {
         "type": "championship_card",
         "title": f"{year} World Championship Classification",
         "metrics": [
-            {"label": "Constructors' Champion" if constructor else "World Champion", "value": name[:20], "color": "#FFB703"},
+            {"label": card_label, "value": name[:20], "color": "#FFB703"},
             {"label": "Points", "value": f"{pts:g} pts", "color": "#00F5D4"},
             {"label": "Season Wins", "value": f"{wins} Victories", "color": "#FFFFFF"},
             {"label": "Runner-Up", "value": ru_name[:20], "color": "#64748B"},
@@ -780,9 +870,9 @@ def _answer_core(
                 try:
                     round_no = int(ctx["round"])
                 except (ValueError, TypeError):
-                    round_no = (races[-1]["round"] if races else 1)
+                    round_no = _latest_round(year)
             else:
-                round_no = (races[-1]["round"] if races else 1)
+                round_no = _latest_round(year)
     else:
         # Check if user mentioned another circuit/race in current season
         races = race_replay.season_races(year)
@@ -914,18 +1004,30 @@ def _answer_core(
         }
 
     # B. Head-to-Head Driver Comparisons (e.g. Senna vs Prost, Hamilton vs Schumacher)
-    is_h2h_query = bool(re.search(r'\b(compare|vs|versus|head-to-head|head to head)\b', q)) or (
+    explicit_h2h = bool(re.search(r'\b(compare|vs|versus|head-to-head|head to head)\b', q))
+    is_h2h_query = explicit_h2h or (
         " and " in q and any(w in q for w in ["wins", "titles", "championships", "better", "stats", "greater", "record"])
     )
     if is_h2h_query:
         found_d = []
+        matched_spans = []
         q_low = q.lower()
         for alias, did in sorted(f1_history.DRIVER_NAME_LOOKUP.items(), key=lambda x: -len(x[0])):
-            if len(alias) >= 3 and alias in q_low:
-                if did not in found_d:
-                    found_d.append(did)
-                    if len(found_d) == 2:
-                        break
+            if len(alias) < 3 or (len(alias) == 3 and not explicit_h2h):
+                continue
+            m = re.search(rf"(?<![#\w]){re.escape(alias)}(?!\w)", q_low)
+            if not m:
+                continue
+            span = m.span()
+            if any(not (span[1] <= s[0] or span[0] >= s[1]) for s in matched_spans):
+                continue
+            if " " not in alias and len(alias) > 3 and f1_history._names_another_driver(q_low, alias, did):
+                continue
+            if did not in found_d:
+                found_d.append(did)
+                matched_spans.append(span)
+                if len(found_d) == 2:
+                    break
         if len(found_d) == 2:
             h2h_res = f1_history.compare_drivers_head_to_head(found_d[0], found_d[1])
             if h2h_res:
@@ -971,11 +1073,36 @@ def _answer_core(
                 "a2ui_card": rec_data["card"]
             }
 
-    # E. Historical World Championship Outcome (1950–2025)
-    if year_match and not race_named and not any(w in q for w in ["grand prix", "gp", "race", "circuit", "round", "sprint"]):
-        hist_yr = int(year_match.group(1))
-        if 1950 <= hist_yr <= 2025 and any(w in q for w in ["champion", "championship", "title", "who won", "winner of the season", "won the"]):
-            # Prefer the official final standings data; the hand-written roster in
+    # E. World Championship Outcome & Title Clinch Status (1950–2026)
+    is_single_race_ask = (
+        race_named
+        or bool(round_match)
+        or bool(re.search(r"\b(grand prix|gp|sprint|circuit)\b|\b(?:this|that|the|today'?s) race\b", q))
+    )
+    is_season_champ_q = not is_single_race_ask and (
+        (
+            year_match
+            and 1950 <= int(year_match.group(1)) <= _CURRENT_SEASON
+            and any(w in q for w in [
+                "champion", "championship", "championships", "title", "who won",
+                "winner of the season", "won the", "crowned", "clinched", "clinch"
+            ])
+        )
+        or (
+            not year_match
+            and bool(re.search(r"\b(champion\w*|title\w*|wdc|wcc|crowned|clinch\w*)\b", q))
+            and bool(re.search(
+                r"\b(who (?:has )?won|won (?:the|this)|has won|already (?:won|crowned|clinched)|"
+                r"crowned|clinch\w*|world champion|f1 champion|this season\w*|current champion|"
+                r"winner of (?:the|this) (?:season|championship|title))\b",
+                q,
+            ))
+        )
+    )
+    if is_season_champ_q:
+        hist_yr = int(year_match.group(1)) if year_match else _CURRENT_SEASON
+        if 1950 <= hist_yr <= _CURRENT_SEASON:
+            # Prefer the official standings data; the hand-written roster in
             # f1_history is only a fallback for seasons without standings data.
             wants_constructor = bool(re.search(r"\b(constructor|constructors|constructors'|team|teams|wcc)\b", q))
             champ_data = _season_title_from_data(hist_yr, wants_constructor)
@@ -994,11 +1121,11 @@ def _answer_core(
                 # why, so add the story of the race that decided it when content has one
                 decider = next((st for st in _content.race_stories()
                                 if st["year"] == hist_yr and st.get("decided_title")), None)
-                if decider and re.search(r"\b(why|how)\b", q):
+                if decider and re.search(r"\b(why|how)\b", q) and hist_yr < _CURRENT_SEASON:
                     resp["text"] = (f"{champ_data['text'].rstrip()}\n\n**How it was decided — {decider['title']}**\n\n"
                                     f"{decider['summary']}")
                     resp["sources"] = [_content.source_of("races", id=decider["id"])]
-                elif re.search(r"\b(why|how)\b", q):
+                elif re.search(r"\b(why|how)\b", q) and hist_yr < _CURRENT_SEASON:
                     resp["text"] = (f"{champ_data['text'].rstrip()}\n\nI have the final standings for {hist_yr} "
                                     "but no write-up of how the title was decided.")
                 return resp
@@ -1702,8 +1829,12 @@ def _answer_core(
 
     # 3.3 RACE WINNER / PODIUM / STORY
     # "how did ..." is a race summary only when no driver is named ("how did Lindblad do?"
-    # belongs to the driver handler below).
-    if any(w in q for w in ["who won", "winner", "podium", "p1", "summary"]) or ("how did" in q and not target_driver):
+    # belongs to the driver handler below). Championship/standings queries without a named race
+    # belong to the championship handler below, not a single race result.
+    is_championship_scope_only = not race_named and bool(re.search(
+        r"\b(champion\w*|standings|wdc|wcc|title\w*|crowned|clinch\w*|season leader|points leader|races left|remaining races|more races)\b", q
+    ))
+    if not is_championship_scope_only and (any(w in q for w in ["who won", "winner", "podium", "p1", "summary"]) or ("how did" in q and not target_driver)):
         # Classify by official finishing position, not list order: in the 1950s two
         # drivers who shared a car are both classified P1 (e.g. Fangio/Musso, 1956 Argentina).
         def _at(pos):
@@ -2018,10 +2149,11 @@ def _answer_core(
 
     # 7. CHAMPIONSHIP STANDINGS & LEADERSHIP (WDC / WCC / Title Fight)
     is_standings_query = any(w in q for w in [
-        "championship", "standings", "wdc", "wcc", "points leader", "title fight",
+        "championship", "championships", "standings", "wdc", "wcc", "points leader", "title fight",
         "title race", "who is ahead", "who is leading", "who leads", "current leader",
         "season leader", "leader of the season", "leader of 2026", "leader of the 2026",
-        "leader in the 2026", "leader in 2026", "championship leader", "first place"
+        "leader in the 2026", "leader in 2026", "championship leader", "first place",
+        "crowned", "clinched", "clinch", "races left", "remaining races", "more races"
     ]) or (any(w in q for w in ["leader", "leading", "leads", "p1"]) and any(w in q for w in ["season", "championship", "standings", "title", "2026", "2025", "2024", "points"]))
 
     if is_standings_query:
@@ -2034,9 +2166,23 @@ def _answer_core(
         if wdc_leader:
             p2 = d_top[1] if len(d_top) > 1 else None
             wins_str = f" across {wdc_leader['wins']} Grand Prix victories" if wdc_leader.get('wins') else ""
-            p2_str = f" over teammate {p2['driver']} (+{wdc_leader['points'] - p2['points']:.0f} pts)" if (p2 and p2['team'] == wdc_leader['team']) else f" over {p2['driver']} (+{wdc_leader['points'] - p2['points']:.0f} pts)" if p2 else ""
+            margin = (wdc_leader['points'] - p2['points']) if p2 else 0.0
+            p2_str = f" over teammate {p2['driver']} (+{margin:.0f} pts)" if (p2 and p2['team'] == wdc_leader['team']) else f" over {p2['driver']} (+{margin:.0f} pts)" if p2 else ""
+            prog = _season_schedule_progress(year)
+            rem_n = prog["remaining_rounds"]
+            clinch_str = ""
+            if rem_n > 0 and p2:
+                max_avail = prog["max_driver_pts"]
+                rem_short = ", ".join(r.replace(" Grand Prix", " GP") for r in prog["remaining_races"])
+                if margin > max_avail or (margin == max_avail and int(wdc_leader.get("wins", 0)) > int(p2.get("wins", 0)) + rem_n):
+                    clinch_str = (
+                        f" With **{rem_n} race{'s' if rem_n != 1 else ''} remaining** ({rem_short}; {max_avail} max points available), "
+                        f"{wdc_leader['driver']} has **mathematically clinched the {year} Drivers' World Championship**."
+                    )
+                else:
+                    clinch_str = f" **{rem_n} race{'s' if rem_n != 1 else ''} remain** ({rem_short}; {max_avail} max points available)."
             wcc_str = f" {wcc_leader['team']} commands the Constructors' title with **{wcc_leader['points']:.0f} points**." if wcc_leader else ""
-            text = f"**{wdc_leader['driver']}** currently leads the {year} Drivers' World Championship with **{wdc_leader['points']:.0f} points** for {wdc_leader['team']}{wins_str}{p2_str}.{wcc_str}"
+            text = f"**{wdc_leader['driver']}** currently leads the {year} Drivers' World Championship with **{wdc_leader['points']:.0f} points** for {wdc_leader['team']}{wins_str}{p2_str}.{clinch_str}{wcc_str}"
         else:
             text = f"Championship standings for the {year} season are not yet classified."
 

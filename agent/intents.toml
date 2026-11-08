@@ -231,7 +231,7 @@ examples = [
 [championship_standings]
 description = "Current championship standings, points and the title fight"
 canonical = "who leads the championship {race}"
-tools = ["championship_standings_lookup"]
+tools = ["championship_standings_lookup", "historical_championship_lookup"]
 examples = [
   "who leads the championship",
   "what are the standings",
@@ -242,9 +242,10 @@ examples = [
 ]
 
 [season_champion]
-description = "Who won a past world championship"
+description = "Who won a past world championship (a specific year)"
 canonical = "who won the {year} championship"
-tools = ["historical_championship_lookup"]
+requires = ["year"]
+tools = ["historical_championship_lookup", "championship_standings_lookup"]
 examples = [
   "who won the 2008 championship",
   "who was world champion in 1994",

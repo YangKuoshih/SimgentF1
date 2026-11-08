@@ -524,32 +524,64 @@ async def api_chat(msg: ChatMessage, request: Request):
             mem_resp["a2ui_card"] = sanitize_a2ui_card(mem_resp["a2ui_card"])
         return mem_resp
 
-    # Optional model provider query (provider-specific pricing and quotas)
-    llm_resp = llm_router.query(resolved_query, msg.context, history=safe_history)
-    if llm_resp:
-        latency = round((time.perf_counter() - start_t) * 1000, 2)
-        llm_resp["latency_ms"] = latency
-        llm_resp["query"] = clean_query
-        llm_resp["context_received"] = msg.context or {}
-        llm_resp["cost"] = "Telemetry Feed Active"
-        llm_resp["tokens_billed"] = 0
-        if "tier" not in llm_resp:
-            llm_resp["tier"] = "External LLM Copilot"
-        if llm_resp.get("a2ui_card"):
-            llm_resp["a2ui_card"] = sanitize_a2ui_card(llm_resp["a2ui_card"])
-        return llm_resp
-
-    # Fallback to the deterministic telemetry engine (no external model call)
+    # Compute deterministic ground truth, A2UI card, and Answer Gate verification first
     resp = race_agent.answer_race_engineer_query(resolved_query, msg.context, history=safe_history)
     _router_shadow(resolved_query, resp.get("tool"))
+
+    # Optional model provider synthesis grounded in verified deterministic data & content corpus
+    if llm_router.is_configured() and not resp.get("clarify") and resp.get("tool") not in {
+        "security_guardrail", "out_of_scope_redirect", "unsupported_data_notice", "season_out_of_range", "clarify"
+    }:
+        from app.agent import content as _content
+        from app.agent import gate
+        ctx_year = 2026
+        try:
+            if (msg.context or {}).get("year"):
+                ctx_year = int(msg.context["year"])
+        except (ValueError, TypeError):
+            ctx_year = 2026
+        content_hits = []
+        for kind in ("races", "eras", "regulations", "retirements"):
+            for doc, score in _content.search(resolved_query, kind, k=1):
+                if score >= 0.35:
+                    content_hits.append({
+                        "source_file": doc.get("source_file"),
+                        "title": doc.get("title"),
+                        "excerpt": str(doc.get(_content.BODY_FIELD[kind], ""))[:600],
+                    })
+        grounding = {
+            "verified_engine_answer": resp.get("text", ""),
+            "tool": resp.get("tool", ""),
+            "season_status": race_agent.get_season_grounding_summary(ctx_year),
+            "content_matches": content_hits[:2],
+        }
+        llm_resp = llm_router.query(resolved_query, msg.context, history=safe_history, grounding=grounding)
+        if llm_resp and llm_resp.get("text"):
+            candidate = dict(resp)
+            candidate["text"] = llm_resp["text"]
+            candidate["provider"] = llm_resp.get("provider", "External LLM Copilot")
+            candidate["tier"] = "External LLM Copilot (Grounded)"
+            try:
+                checked = gate.check(
+                    resolved_query,
+                    msg.context,
+                    safe_history,
+                    candidate,
+                    lambda q, ctx: race_agent.answer_race_engineer_query(q, ctx, history=safe_history),
+                )
+                if checked.get("gate", {}).get("verdict") not in ("declined", "corrected"):
+                    resp = checked
+            except Exception as e:
+                logger.warning(f"answer gate failed on LLM answer: {type(e).__name__}")
+
     gate_info = resp.get("gate") or {}
     logger.info(json.dumps({"answer_gate": {"verdict": gate_info.get("verdict", "passed"),
                                             "check": gate_info.get("check", ""), "tool": resp.get("tool")}}))
     gate_info.pop("engine_text", None)  # the engine's wrong text is for logs and evals, not visitors
     latency = round((time.perf_counter() - start_t) * 1000, 2)
     resp["latency_ms"] = latency
-    resp["provider"] = "Pit Wall Telemetry Engine"
-    resp["tier"] = "Local In-Memory Transponder"
+    resp.setdefault("provider", "Pit Wall Telemetry Engine")
+    resp.setdefault("tier", "Local In-Memory Transponder")
     resp["cost"] = "Telemetry Feed Active"
     resp["tokens_billed"] = 0
     resp["query"] = clean_query

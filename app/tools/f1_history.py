@@ -1110,14 +1110,22 @@ def _notable_first_names() -> Dict[str, set]:
 
 
 def _names_another_driver(q: str, alias: str, did: str) -> bool:
-    """'Graham Hill' must not resolve to Damon Hill through the bare alias 'hill'."""
-    firsts = _notable_first_names().get(alias)
-    if not firsts or len(firsts) < 2:
-        return False
-    own = (HISTORICAL_DRIVERS.get(did, {}).get("name", "").lower().split() or [""])[0]
-    for m in re.finditer(rf"\b([a-z]+)\s+{re.escape(alias)}\b", q):
-        if m.group(1) in firsts and m.group(1) != own:
-            return True
+    """'Graham Hill' must not resolve to Damon Hill through the bare alias 'hill',
+    and 'Kimi Antonelli' must not resolve to Kimi Räikkönen through the bare alias 'kimi'."""
+    name_parts = _fold(HISTORICAL_DRIVERS.get(did, {}).get("name", "")).split()
+    own_first = name_parts[0] if name_parts else ""
+    own_last = name_parts[-1] if name_parts else ""
+    notable = _notable_first_names()
+    firsts = notable.get(alias)
+    if firsts and len(firsts) >= 2:
+        for m in re.finditer(rf"\b([a-z]+)\s+{re.escape(alias)}\b", q):
+            if m.group(1) in firsts and m.group(1) != own_first:
+                return True
+    if alias == own_first:
+        known_lasts = set(notable.keys()) | {"antonelli", "bearman", "colapinto", "hadjar", "bortoleto", "doohan", "lawson"}
+        for m in re.finditer(rf"\b{re.escape(alias)}\s+([a-z]+)\b", q):
+            if m.group(1) in known_lasts and m.group(1) != own_last:
+                return True
     return False
 
 
