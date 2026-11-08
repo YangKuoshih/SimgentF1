@@ -132,7 +132,9 @@ def build_cases(truth):
         if int(year) < CURRENT_SEASON:
             cases.append({"category": "champion", "year": int(year), "q": f"Who won the {year} drivers' championship?",
                           "truth": champ})
-    run = {k for k in truth["races"]}
+    run = {k for k in truth["races"]} | {
+        f"{year}_{rnd}" for (year, rnd) in sched if J.results(year, rnd, net=False)
+    }
     for (year, rnd), race in sorted(sched.items()):
         if year == CURRENT_SEASON and f"{year}_{rnd}" not in run:
             cases.append({"category": "decline", "year": year, "round": rnd, "expect": "race_not_run",
