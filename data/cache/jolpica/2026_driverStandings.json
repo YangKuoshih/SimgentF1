@@ -5,14 +5,14 @@
     "url": "https://api.jolpi.ca/ergast/f1/2026/driverstandings.json",
     "limit": "40",
     "offset": "0",
-    "total": "24",
+    "total": "25",
     "StandingsTable": {
       "season": "2026",
-      "round": "19",
+      "round": "20",
       "StandingsLists": [
         {
           "season": "2026",
-          "round": "19",
+          "round": "20",
           "DriverStandings": [
             {
               "position": "1",
@@ -592,6 +592,25 @@
                   "constructorId": "cadillac",
                   "url": "https://en.wikipedia.org/wiki/Cadillac_in_Formula_One",
                   "name": "Cadillac F1 Team",
+                  "nationality": "American"
+                }
+              ]
+            },
+            {
+              "position": "25",
+              "positionText": "25",
+              "points": "0",
+              "wins": "0",
+              "Driver": {
+                "driverId": "rafael_camara",
+                "givenName": "Rafael",
+                "familyName": "Camara"
+              },
+              "Constructors": [
+                {
+                  "constructorId": "haas",
+                  "url": "https://en.wikipedia.org/wiki/Haas_F1_Team",
+                  "name": "Haas F1 Team",
                   "nationality": "American"
                 }
               ]
