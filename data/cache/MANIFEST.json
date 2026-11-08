@@ -2522,6 +2522,16 @@
    "fetched_at": "2026-10-08T18:37:48Z",
    "note": "verified against Jolpica 2026-10-08"
   },
+  "jolpica/2026_20_pitstops.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/20/pitstops.json?limit=100",
+   "sha256": "9e27bd935c1059b136b51da3127855aac2f33c6dc4e926ddab4aa47bea4f0101",
+   "fetched_at": "2026-11-08T20:47:01Z"
+  },
+  "jolpica/2026_20_results.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/20/results.json?limit=40",
+   "sha256": "571e761098c64309a26ac32a2dce255860f7be54108e694a1110d88be623b93d",
+   "fetched_at": "2026-11-08T20:47:01Z"
+  },
   "jolpica/2026_2_laps_all.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/2/laps.json (all pages merged)",
    "sha256": "e7feced57027f44e4f21a10daf4292e1b94e5d4688649d3a94c46f6dee2616fe",
@@ -2740,14 +2750,14 @@
   },
   "jolpica/2026_constructorStandings.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/constructorStandings.json?limit=40",
-   "sha256": "efc6c161c91aebb1b0f4bc1eb23a6f67164d899493d95e83b0823eb4b1f1cd19",
-   "fetched_at": "2026-11-08T02:44:21Z",
+   "sha256": "d77d7668fc700dcc3d6e3ac1a74c159a3ffcd0a1cea5879cd3f34cf24256447b",
+   "fetched_at": "2026-11-08T20:47:46Z",
    "note": "corrected by revalidate"
   },
   "jolpica/2026_driverStandings.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/driverStandings.json?limit=40",
-   "sha256": "7f67eb193e7260c9bcba1f38f979b3baa3c533287f526380a0f7a3044ad99120",
-   "fetched_at": "2026-11-08T02:44:22Z",
+   "sha256": "142ebfddf370866320ff7875405c0b95a0bd1b1d0395597f8da225238d66e6f4",
+   "fetched_at": "2026-11-08T20:47:47Z",
    "note": "corrected by revalidate"
   },
   "jolpica/2026_schedule.json": {
@@ -2758,8 +2768,8 @@
   },
   "jolpica/2026_winners.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/results/1.json?limit=100",
-   "sha256": "c3b12829863537b6349c0a8550301a904374df6b44e875917219c62e3bbd3d26",
-   "fetched_at": "2026-11-02T06:00:22Z",
+   "sha256": "596bcac28c95d71836a39e11d840cd21d794ac260ce0e0692b83a1c76a27c4ca",
+   "fetched_at": "2026-11-08T20:47:47Z",
    "note": "corrected by revalidate"
   },
   "openf1/2023_12_sprint_qualifying.json": {

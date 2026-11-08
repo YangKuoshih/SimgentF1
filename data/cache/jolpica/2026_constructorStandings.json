@@ -17,7 +17,7 @@
             {
               "position": "1",
               "positionText": "1",
-              "points": "630",
+              "points": "652",
               "wins": "12",
               "Constructor": {
                 "constructorId": "mercedes",
@@ -29,7 +29,7 @@
             {
               "position": "2",
               "positionText": "2",
-              "points": "504",
+              "points": "512",
               "wins": "2",
               "Constructor": {
                 "constructorId": "ferrari",
@@ -41,7 +41,7 @@
             {
               "position": "3",
               "positionText": "3",
-              "points": "382",
+              "points": "415",
               "wins": "3",
               "Constructor": {
                 "constructorId": "red_bull",
@@ -53,8 +53,8 @@
             {
               "position": "4",
               "positionText": "4",
-              "points": "365",
-              "wins": "2",
+              "points": "398",
+              "wins": "3",
               "Constructor": {
                 "constructorId": "mclaren",
                 "url": "https://en.wikipedia.org/wiki/McLaren",
@@ -65,7 +65,7 @@
             {
               "position": "5",
               "positionText": "5",
-              "points": "108",
+              "points": "112",
               "wins": "0",
               "Constructor": {
                 "constructorId": "rb",
@@ -101,7 +101,7 @@
             {
               "position": "8",
               "positionText": "8",
-              "points": "27",
+              "points": "28",
               "wins": "0",
               "Constructor": {
                 "constructorId": "audi",
