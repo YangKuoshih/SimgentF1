@@ -231,7 +231,7 @@ examples = [
 [championship_standings]
 description = "Current championship standings, points and the title fight"
 canonical = "who leads the championship {race}"
-tools = ["championship_standings_lookup"]
+tools = ["championship_standings_lookup", "historical_championship_lookup"]
 examples = [
   "who leads the championship",
   "what are the standings",
@@ -239,18 +239,23 @@ examples = [
   "who is leading the constructors championship",
   "how close is the title fight",
   "show me the drivers standings",
+  "how many races are left in the championship",
+  "who is winning the championship this season",
 ]
 
 [season_champion]
-description = "Who won a past world championship"
+description = "Who won or clinched a world championship"
 canonical = "who won the {year} championship"
-tools = ["historical_championship_lookup"]
+tools = ["historical_championship_lookup", "championship_standings_lookup"]
 examples = [
   "who won the 2008 championship",
   "who was world champion in 1994",
   "who won the title in 2016",
   "which team won the constructors title in 2010",
   "who was runner up in the 2021 championship",
+  "who has won the f1 championship this season",
+  "did Kimi Antonelli clinch the championship",
+  "was Antonelli already crowned world champion",
 ]
 
 [driver_career]

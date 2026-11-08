@@ -273,6 +273,92 @@ class TestF1HistoryAgent(unittest.TestCase):
         self.assertIn("Yes! Fernando Alonso", res.get("text", ""))
         self.assertIn("P3", res.get("text", ""))
 
+    # =========================================================================
+    # SUITE 12: 2026 CHAMPIONSHIP CLINCH & NATURAL LANGUAGE ROUTING
+    # =========================================================================
+    def test_2026_championship_clinch_and_natural_language_routing(self):
+        ctx = {"year": 2026, "round": 19, "session": "race"}
+        user_query = (
+            "who has won the f1 championships there are 4 more races "
+            "(including the one this weekend) and Kimi Antonelli was already crowned this seasons f1 seaon"
+        )
+        res = answer_race_engineer_query(user_query, context=ctx)
+        self.assertEqual(res.get("tool"), "historical_championship_lookup")
+        self.assertIn("Andrea Kimi Antonelli", res.get("text", ""))
+        self.assertIn("4 races remaining", res.get("text", ""))
+        self.assertIn("380 points", res.get("text", ""))
+        self.assertEqual(res.get("a2ui_card", {}).get("type"), "championship_card")
+
+        res_clinch = answer_race_engineer_query("did Kimi Antonelli clinch the championship?", context=ctx)
+        self.assertEqual(res_clinch.get("tool"), "historical_championship_lookup")
+        self.assertIn("Andrea Kimi Antonelli", res_clinch.get("text", ""))
+        self.assertIn("mathematically clinched", res_clinch.get("text", ""))
+
+        res_standings = answer_race_engineer_query("who is leading the championship?", context=ctx)
+        self.assertEqual(res_standings.get("tool"), "championship_standings_lookup")
+        self.assertIn("Andrea Kimi Antonelli", res_standings.get("text", ""))
+        self.assertIn("mathematically clinched", res_standings.get("text", ""))
+
+    # =========================================================================
+    # SUITE 13: GROUNDED FREE-TIER GOOGLE LLM CASCADE & GATE PRESERVATION
+    # =========================================================================
+    def test_google_free_tier_llm_cascade_and_grounded_api_chat(self):
+        import json
+        import urllib.error
+        from app.tools.llm_router import LLMRouter
+
+        router = LLMRouter()
+        router.gemini_api_key = "test-free-tier-key"
+        router.groq_api_key = ""
+        router.gemini_models = ["gemini-2.5-flash-lite", "gemma-3-27b-it", "gemini-2.5-flash"]
+
+        attempted_urls = []
+
+        class _FakeHTTPResponse:
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                pass
+            def read(self):
+                return json.dumps({
+                    "candidates": [{
+                        "content": {
+                            "parts": [{
+                                "text": (
+                                    "**Andrea Kimi Antonelli** (Mercedes) has mathematically clinched the "
+                                    "2026 F1 World Championship with **380 points** and **4 races remaining** "
+                                    "(Brazilian GP, Las Vegas GP, Qatar GP, Abu Dhabi GP)."
+                                )
+                            }]
+                        }
+                    }]
+                }).encode("utf-8")
+
+        def fake_urlopen(req, timeout=4):
+            attempted_urls.append(req.full_url)
+            if "gemini-2.5-flash-lite" in req.full_url:
+                raise urllib.error.HTTPError(
+                    url=req.full_url,
+                    code=429,
+                    msg="Too Many Requests",
+                    hdrs=None,
+                    fp=None,
+                )
+            return _FakeHTTPResponse()
+
+        with patch("urllib.request.urlopen", side_effect=fake_urlopen):
+            out = router.query(
+                "who has won the f1 championships there are 4 more races and Kimi Antonelli was already crowned",
+                context={"year": 2026, "round": 19, "session": "race"},
+                grounding={"verified_engine_answer": "Andrea Kimi Antonelli mathematically clinched with 380 points"},
+            )
+        self.assertEqual(len(attempted_urls), 2)
+        self.assertIn("gemini-2.5-flash-lite", attempted_urls[0])
+        self.assertIn("gemma-3-27b-it", attempted_urls[1])
+        self.assertEqual(out.get("model"), "gemma-3-27b-it")
+        self.assertIn("Google AI Studio (gemma-3-27b-it)", out.get("provider", ""))
+        self.assertIn("Andrea Kimi Antonelli", out.get("text", ""))
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

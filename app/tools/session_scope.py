@@ -257,7 +257,10 @@ def answer_weekend(query: str, scope: Dict[str, Any]) -> Optional[Dict[str, Any]
     the weekend that has a result. None unless the question asks about a driver's weekend."""
     from app.tools.race_agent import _find_driver
     q = query.lower()
-    if not _WEEKEND.search(q) or re.search(r"\b(career|season|championship|standings)\b", q):
+    if not _WEEKEND.search(q) or re.search(
+        r"\b(career|season\w*|seaon\w*|champion\w*|standings|wdc|wcc|title\w*|crowned|clinch\w*|more races|remaining races|races left)\b",
+        q,
+    ):
         return None
     sched = next((r for r in race_replay.season_races(scope["year"]) if r.get("round") == scope["round"]), {})
     held = set(sched.get("sessions") or ("race", "qualifying"))  # only sessions this weekend actually had
@@ -297,8 +300,11 @@ def answer_in_session(query: str, scope: Dict[str, Any], context: Optional[Dict[
     # A named driver leaving this session is answered from its classification, even though
     # retirements and "why" questions otherwise belong to the main engine.
     exit_q = bool(_EXIT_Q.search(q)) and not _CAREER_EXIT.search(q)
-    generic = r"\b(career|all-time|championship|standings|title|season|regulation|rule|era|history|strategy|pit|tyre|tire|stint" \
-              r"|safety car|weather|lap record|grid penalty)\b"
+    generic = (
+        r"\b(career|all-time|champion\w*|standings|wdc|wcc|title\w*|crowned|clinch\w*|season\w*|seaon\w*|"
+        r"more races|remaining races|races left|regulation\w*|rule\w*|era\w*|history|strategy|pit|tyre|tire|stint"
+        r"|safety car|weather|lap record|grid penalty)\b"
+    )
     if re.search(generic, q) or (not exit_q and re.search(r"\b(incident|crash|retire|dnf|why)\b", q)):
         return None
     model = race_replay.build_replay(scope["year"], scope["round"], session_type=session)

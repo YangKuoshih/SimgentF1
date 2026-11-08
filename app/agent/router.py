@@ -19,7 +19,10 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Dict, List, Optional, Tuple
 
-import numpy as np
+try:
+    import numpy as np
+except ImportError:  # pragma: no cover - fallback when numpy is not installed locally
+    np = None  # type: ignore[assignment]
 
 from app.agent.embedding import StaticEmbedder
 
@@ -228,9 +231,9 @@ class _BM25:
         n = len(self.docs)
         self.idf = {w: math.log(1 + (n - c + 0.5) / (c + 0.5)) for w, c in df.items()}
 
-    def scores(self, query: str) -> np.ndarray:
+    def scores(self, query: str):
         words = _WORD.findall(query.lower())
-        out = np.zeros(len(self.docs), dtype=np.float32)
+        out = [0.0] * len(self.docs)
         for i, (d, ln) in enumerate(zip(self.docs, self.lens)):
             s = 0.0
             for w in words:
@@ -238,8 +241,11 @@ class _BM25:
                     tf = d[w]
                     s += self.idf[w] * tf * 2.2 / (tf + 1.2 * (1 - 0.75 + 0.75 * ln / self.avg))
             out[i] = s
-        # squash to 0..1 so the same thresholds roughly apply
-        return out / (out.max() + 1e-9) * min(1.0, out.max() / 8.0) if out.max() > 0 else out
+        mx = max(out) if out else 0.0
+        if mx > 0:
+            scale = min(1.0, mx / 8.0) / (mx + 1e-9)
+            out = [x * scale for x in out]
+        return np.asarray(out, dtype=np.float32) if np is not None else out
 
 
 class Router:
@@ -271,12 +277,12 @@ class Router:
                 out.setdefault(t, []).append(i.name)
         return out
 
-    def _similarities(self, question: str) -> Tuple[np.ndarray, np.ndarray]:
+    def _similarities(self, question: str):
         """Per-example scores: embedding cosine blended with BM25, or BM25 alone without a model."""
         question = mask(question)
         lex = self._bm25.scores(question)
-        lex_not = self._bm25_not.scores(question) if self._bm25_not else np.zeros(0)
-        if not self.embedder:
+        lex_not = self._bm25_not.scores(question) if self._bm25_not else ([] if np is None else np.zeros(0))
+        if not self.embedder or np is None:
             return lex, lex_not
         q = self.embedder.embed([question])[0]
         cos_not = self._not @ q if len(self._not) else np.zeros(0, np.float32)
@@ -289,7 +295,11 @@ class Router:
         per: Dict[str, List[float]] = {}
         for owner, s in zip(self._ex_owner, ex):
             per.setdefault(owner, []).append(float(s))
-        best = {o: float(np.mean(sorted(v, reverse=True)[:TOP_K])) for o, v in per.items()}
+        best = {
+            o: float(sum(top_vals) / len(top_vals))
+            for o, v in per.items()
+            for top_vals in [sorted(v, reverse=True)[:TOP_K]]
+        }
         for owner, s in zip(self._not_owner, nots):
             if float(s) >= best.get(owner, 0.0):
                 best[owner] = 0.0

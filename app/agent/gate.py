@@ -130,8 +130,10 @@ def category_of(question: str) -> Optional[str]:
         return "laps"
     if re.search(r"which circuit|what track|which track|where was|\bheld\b|hosted|venue", q):
         return "circuit"
-    # the answer key has drivers' champions only: constructors' questions are left alone
-    if re.search(r"champion|championship|title", q) and not re.search(r"grand prix|\bgp\b|\brace\b|constructor|\bteams?\b|wcc", q):
+    # the answer key has drivers' champions only: constructors' and standings questions are left alone
+    if re.search(r"champion|championship|title|crowned|clinch|standings|wdc|wcc", q) and not re.search(r"grand prix|\bgp\b", q):
+        if re.search(r"constructor|\bteams?\b|wcc|standings", q):
+            return None
         return "champion"
     if re.search(r"\bwho won\b|\bwinner\b|\bwho finished first\b", q):
         return "winner"

@@ -17,7 +17,10 @@ import struct
 import unicodedata
 from typing import Dict, List, Optional
 
-import numpy as np
+try:
+    import numpy as np
+except ImportError:  # pragma: no cover - fallback when numpy is not installed locally
+    np = None  # type: ignore[assignment]
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 MODEL_DIR = os.environ.get("SIMGENT_EMBEDDING_MODEL", os.path.join(ROOT, "models", "potion-base-8M"))
@@ -129,6 +132,8 @@ class StaticEmbedder:
 
     @classmethod
     def load(cls, model_dir: str = MODEL_DIR) -> Optional["StaticEmbedder"]:
+        if np is None:
+            return None
         tok, weights = os.path.join(model_dir, "tokenizer.json"), os.path.join(model_dir, "model.safetensors")
         if not (os.path.exists(tok) and os.path.exists(weights)):
             return None
