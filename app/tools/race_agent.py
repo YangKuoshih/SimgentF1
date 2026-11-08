@@ -334,7 +334,7 @@ def _season_schedule_progress(year: int) -> Dict[str, Any]:
 def get_season_grounding_summary(year: int = 2026) -> Dict[str, Any]:
     """Compact ground-truth snapshot of season standings, clinch math, and remaining calendar for LLM grounding."""
     prog = _season_schedule_progress(year)
-    st = race_replay.standings(year)
+    st = race_replay.standings(year, net=False)
     d_top = st.get("drivers", [])[:5]
     c_top = st.get("constructors", [])[:3]
     wdc_clinched = False

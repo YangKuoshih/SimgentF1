@@ -239,13 +239,12 @@ examples = [
   "who is leading the constructors championship",
   "how close is the title fight",
   "show me the drivers standings",
-  "how many races are left in the championship",
-  "who is winning the championship this season",
 ]
 
 [season_champion]
-description = "Who won or clinched a world championship"
+description = "Who won a past world championship (a specific year)"
 canonical = "who won the {year} championship"
+requires = ["year"]
 tools = ["historical_championship_lookup", "championship_standings_lookup"]
 examples = [
   "who won the 2008 championship",
@@ -253,9 +252,6 @@ examples = [
   "who won the title in 2016",
   "which team won the constructors title in 2010",
   "who was runner up in the 2021 championship",
-  "who has won the f1 championship this season",
-  "did Kimi Antonelli clinch the championship",
-  "was Antonelli already crowned world champion",
 ]
 
 [driver_career]
