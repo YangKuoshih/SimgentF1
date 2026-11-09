@@ -29,7 +29,7 @@
             {
               "position": "2",
               "positionText": "2",
-              "points": "512",
+              "points": "510",
               "wins": "2",
               "Constructor": {
                 "constructorId": "ferrari",
@@ -65,7 +65,7 @@
             {
               "position": "5",
               "positionText": "5",
-              "points": "112",
+              "points": "114",
               "wins": "0",
               "Constructor": {
                 "constructorId": "rb",

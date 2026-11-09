@@ -2522,15 +2522,22 @@
    "fetched_at": "2026-10-08T18:37:48Z",
    "note": "verified against Jolpica 2026-10-08"
   },
+  "jolpica/2026_20_laps_all.json": {
+   "source": "https://api.jolpi.ca/ergast/f1/2026/20/laps.json (all pages merged)",
+   "sha256": "815f6b574530cd21298ee85e739c72a5f7a3bcb4249bc20107b5418b3ba3f607",
+   "fetched_at": "2026-11-09T00:06:54Z"
+  },
   "jolpica/2026_20_pitstops.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/20/pitstops.json?limit=100",
-   "sha256": "9e27bd935c1059b136b51da3127855aac2f33c6dc4e926ddab4aa47bea4f0101",
-   "fetched_at": "2026-11-08T20:47:01Z"
+   "sha256": "e6bcbef73c801c39018a44379109318266753b20558787ef19b9678f58a402ef",
+   "fetched_at": "2026-11-09T00:07:19Z",
+   "note": "corrected by revalidate"
   },
   "jolpica/2026_20_results.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/20/results.json?limit=40",
-   "sha256": "571e761098c64309a26ac32a2dce255860f7be54108e694a1110d88be623b93d",
-   "fetched_at": "2026-11-08T20:47:01Z"
+   "sha256": "a859ac3f71178b57a4558b4ed30b8be327392f3be64ecb48f7306730ddbdfe3a",
+   "fetched_at": "2026-11-09T00:07:20Z",
+   "note": "corrected by revalidate"
   },
   "jolpica/2026_2_laps_all.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/2/laps.json (all pages merged)",
@@ -2750,14 +2757,14 @@
   },
   "jolpica/2026_constructorStandings.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/constructorStandings.json?limit=40",
-   "sha256": "d77d7668fc700dcc3d6e3ac1a74c159a3ffcd0a1cea5879cd3f34cf24256447b",
-   "fetched_at": "2026-11-08T20:47:46Z",
+   "sha256": "c054be3b9dba3a5f4edc686eb3bfedb7082821ee99ec27be8ab43ea7bfaf8163",
+   "fetched_at": "2026-11-09T00:07:49Z",
    "note": "corrected by revalidate"
   },
   "jolpica/2026_driverStandings.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/driverStandings.json?limit=40",
-   "sha256": "142ebfddf370866320ff7875405c0b95a0bd1b1d0395597f8da225238d66e6f4",
-   "fetched_at": "2026-11-08T20:47:47Z",
+   "sha256": "c3a2b8a312a2d0f08b213a7351a34657915178ff1deea6ca375b4b844eedafc0",
+   "fetched_at": "2026-11-09T00:07:55Z",
    "note": "corrected by revalidate"
   },
   "jolpica/2026_schedule.json": {
