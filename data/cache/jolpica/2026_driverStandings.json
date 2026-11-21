@@ -8,11 +8,11 @@
     "total": "25",
     "StandingsTable": {
       "season": "2026",
-      "round": "20",
+      "round": "21",
       "StandingsLists": [
         {
           "season": "2026",
-          "round": "20",
+          "round": "21",
           "DriverStandings": [
             {
               "position": "1",
@@ -603,8 +603,13 @@
               "wins": "0",
               "Driver": {
                 "driverId": "rafael_camara",
+                "permanentNumber": "51",
+                "code": "CAM",
+                "url": "https://en.wikipedia.org/wiki/Rafael_C%C3%A2mara",
                 "givenName": "Rafael",
-                "familyName": "Camara"
+                "familyName": "Camara",
+                "dateOfBirth": "2005-05-05",
+                "nationality": "Brazilian"
               },
               "Constructors": [
                 {

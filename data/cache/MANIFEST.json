@@ -2757,14 +2757,14 @@
   },
   "jolpica/2026_constructorStandings.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/constructorStandings.json?limit=40",
-   "sha256": "c054be3b9dba3a5f4edc686eb3bfedb7082821ee99ec27be8ab43ea7bfaf8163",
-   "fetched_at": "2026-11-09T00:07:49Z",
+   "sha256": "18411a9ab1cf8e3554ac6209c3c97992b14dd720228b96be81bfd464c6a50b34",
+   "fetched_at": "2026-11-21T16:25:47Z",
    "note": "corrected by revalidate"
   },
   "jolpica/2026_driverStandings.json": {
    "source": "https://api.jolpi.ca/ergast/f1/2026/driverStandings.json?limit=40",
-   "sha256": "c3a2b8a312a2d0f08b213a7351a34657915178ff1deea6ca375b4b844eedafc0",
-   "fetched_at": "2026-11-09T00:07:55Z",
+   "sha256": "c8d261d2ef46851444585b3db684f323144394af5a5d62253c6c3cd1b6f0916a",
+   "fetched_at": "2026-11-21T16:25:48Z",
    "note": "corrected by revalidate"
   },
   "jolpica/2026_schedule.json": {
