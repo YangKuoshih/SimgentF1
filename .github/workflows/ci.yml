@@ -35,6 +35,11 @@ jobs:
       - name: Fetch router embedding model (pinned, SHA-256 checked)
         run: python scripts/fetch_models.py
 
+      - name: Data Integrity Gate (standings vs results, grids, lap timing, provenance manifest)
+        run: |
+          python tests/check_data_integrity.py
+          python -m app.tools.data_manifest --check
+
       - name: Run Python Automated Test Suite
         run: |
           python -m unittest discover tests
@@ -46,11 +51,6 @@ jobs:
       - name: Run 7-Pillar Offline Data & Frontend Evaluation Suite
         run: |
           python -m app.tools.offline_eval --year 2026 --round 16 --circuit bahrain --remediate
-
-      - name: Data Integrity Gate (standings vs results, grids, lap timing, provenance manifest)
-        run: |
-          python tests/check_data_integrity.py
-          python -m app.tools.data_manifest --check
 
       - name: Agent Accuracy Evals (all eras, multi-turn, on-screen session scope)
         run: |
