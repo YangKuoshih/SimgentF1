@@ -29,9 +29,9 @@ on:
   workflow_dispatch:
     inputs:
       year:
-        description: 'Season year to sync'
-        required: true
-        default: '2026'
+        description: 'Season year to sync (defaults to current UTC year)'
+        required: false
+        default: ''
       full_revalidate:
         description: 'Also re-check every cached season against Jolpica'
         type: boolean
@@ -53,7 +53,7 @@ jobs:
     outputs:
       changed: ${{ steps.package.outputs.changed }}
     env:
-      YEAR: ${{ github.event.inputs.year || '2026' }}
+      INPUT_YEAR: ${{ github.event.inputs.year }}
       FULL: ${{ github.event.schedule == '43 3 * * 3' || github.event.inputs.full_revalidate == 'true' }}
 
     steps:
@@ -61,6 +61,14 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: Resolve season year
+        run: |
+          if [ -n "$INPUT_YEAR" ]; then
+            echo "YEAR=$INPUT_YEAR" >> "$GITHUB_ENV"
+          else
+            echo "YEAR=$(date -u +%Y)" >> "$GITHUB_ENV"
+          fi
 
       - name: Set up Python 3.14.8
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
@@ -156,9 +164,10 @@ jobs:
       - name: Apply, check and push
         id: push
         env:
-          YEAR: ${{ github.event.inputs.year || '2026' }}
+          INPUT_YEAR: ${{ github.event.inputs.year }}
           PATCH: ${{ runner.temp }}/verified/verified-data.patch
         run: |
+          YEAR="${INPUT_YEAR:-$(date -u +%Y)}"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           # Only verified cache files may ever be published automatically.
