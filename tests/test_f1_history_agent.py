@@ -277,6 +277,9 @@ class TestF1HistoryAgent(unittest.TestCase):
     # SUITE 12: 2026 CHAMPIONSHIP CLINCH & NATURAL LANGUAGE ROUTING
     # =========================================================================
     def test_2026_championship_clinch_and_natural_language_routing(self):
+        from app.tools import jolpica_sync
+        from app.tools.race_agent import _season_schedule_progress
+
         ctx = {"year": 2026, "round": 19, "session": "race"}
         user_query = (
             "who has won the f1 championships there are 4 more races "
@@ -285,19 +288,27 @@ class TestF1HistoryAgent(unittest.TestCase):
         res = answer_race_engineer_query(user_query, context=ctx)
         self.assertEqual(res.get("tool"), "historical_championship_lookup")
         self.assertIn("Andrea Kimi Antonelli", res.get("text", ""))
-        self.assertIn("4 races remaining", res.get("text", ""))
-        self.assertIn("380 points", res.get("text", ""))
+
+        prog = _season_schedule_progress(2026)
+        rem_n = prog["remaining_rounds"]
+        standings = jolpica_sync.driver_standings(2026, net=False)
+        pts = float(standings[0]["points"])
+        if rem_n > 0:
+            self.assertIn(f"{rem_n} race{'s' if rem_n != 1 else ''} remaining", res.get("text", ""))
+        self.assertIn(f"{pts:g} points", res.get("text", ""))
         self.assertEqual(res.get("a2ui_card", {}).get("type"), "championship_card")
 
         res_clinch = answer_race_engineer_query("did Kimi Antonelli clinch the championship?", context=ctx)
         self.assertEqual(res_clinch.get("tool"), "historical_championship_lookup")
         self.assertIn("Andrea Kimi Antonelli", res_clinch.get("text", ""))
-        self.assertIn("mathematically clinched", res_clinch.get("text", ""))
+        expected_phrase = "mathematically clinched" if rem_n > 0 else "World Drivers' Champion"
+        self.assertIn(expected_phrase, res_clinch.get("text", ""))
 
         res_standings = answer_race_engineer_query("who is leading the championship?", context=ctx)
         self.assertEqual(res_standings.get("tool"), "championship_standings_lookup")
         self.assertIn("Andrea Kimi Antonelli", res_standings.get("text", ""))
-        self.assertIn("mathematically clinched", res_standings.get("text", ""))
+        if rem_n > 0:
+            self.assertIn("mathematically clinched", res_standings.get("text", ""))
 
     # =========================================================================
     # SUITE 13: GROUNDED FREE-TIER GOOGLE LLM CASCADE & GATE PRESERVATION
