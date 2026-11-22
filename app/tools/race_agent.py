@@ -743,7 +743,11 @@ def _answer_once(
     return resp
 
 
-_CURRENT_SEASON = 2026
+def _current_season() -> int:
+    return max(2026, datetime.date.today().year)
+
+
+_CURRENT_SEASON = _current_season()
 PIT_DATA_FROM = 2011  # Jolpica-F1 has pit stops from 2011
 
 
@@ -849,18 +853,21 @@ def _answer_core(
         return mem_hit
 
     # Check if user mentioned "today", "latest", "last race", "recent race", "current race"
+    cur_season = _current_season()
     if any(w in q for w in ["today", "latest race", "recent race", "last race", "current race"]):
-        races_2026 = race_replay.season_races(2026)
-        completed_2026 = [r for r in races_2026 if r.get("completed")]
-        if completed_2026:
-            year = 2026
-            round_no = completed_2026[-1]["round"]
+        for y in (cur_season, cur_season - 1):
+            races_cur = race_replay.season_races(y)
+            completed_cur = [r for r in races_cur if r.get("completed")]
+            if completed_cur:
+                year = y
+                round_no = completed_cur[-1]["round"]
+                break
 
-    # Check if a specific year was requested in the text (1950 to 2026)
+    # Check if a specific year was requested in the text (1950 to current season)
     year_match = re.search(r'\b(19\d\d|20\d\d)\b', q)
     if year_match:
         requested_year = int(year_match.group(1))
-        if 1950 <= requested_year <= 2026:
+        if 1950 <= requested_year <= cur_season:
             year = requested_year
             races = race_replay.season_races(year)
             matched_rnd = _match_race_round(q, races)

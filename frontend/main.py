@@ -534,12 +534,12 @@ async def api_chat(msg: ChatMessage, request: Request):
     }:
         from app.agent import content as _content
         from app.agent import gate
-        ctx_year = 2026
+        ctx_year = datetime.date.today().year
         try:
             if (msg.context or {}).get("year"):
                 ctx_year = int(msg.context["year"])
         except (ValueError, TypeError):
-            ctx_year = 2026
+            ctx_year = datetime.date.today().year
         content_hits = []
         for kind in ("races", "eras", "regulations", "retirements"):
             for doc, score in _content.search(resolved_query, kind, k=1):
