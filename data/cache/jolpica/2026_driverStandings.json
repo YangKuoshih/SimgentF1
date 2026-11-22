@@ -17,7 +17,7 @@
             {
               "position": "1",
               "positionText": "1",
-              "points": "390",
+              "points": "402",
               "wins": "9",
               "Driver": {
                 "driverId": "antonelli",
@@ -41,8 +41,8 @@
             {
               "position": "2",
               "positionText": "2",
-              "points": "279",
-              "wins": "3",
+              "points": "304",
+              "wins": "4",
               "Driver": {
                 "driverId": "max_verstappen",
                 "permanentNumber": "3",
@@ -65,31 +65,7 @@
             {
               "position": "3",
               "positionText": "3",
-              "points": "262",
-              "wins": "3",
-              "Driver": {
-                "driverId": "russell",
-                "permanentNumber": "63",
-                "code": "RUS",
-                "url": "http://en.wikipedia.org/wiki/George_Russell_(racing_driver)",
-                "givenName": "George",
-                "familyName": "Russell",
-                "dateOfBirth": "1998-02-15",
-                "nationality": "British"
-              },
-              "Constructors": [
-                {
-                  "constructorId": "mercedes",
-                  "url": "https://en.wikipedia.org/wiki/Mercedes-Benz_in_Formula_One",
-                  "name": "Mercedes",
-                  "nationality": "German"
-                }
-              ]
-            },
-            {
-              "position": "4",
-              "positionText": "4",
-              "points": "261",
+              "points": "267",
               "wins": "1",
               "Driver": {
                 "driverId": "hamilton",
@@ -111,33 +87,33 @@
               ]
             },
             {
-              "position": "5",
-              "positionText": "5",
-              "points": "249",
-              "wins": "1",
+              "position": "4",
+              "positionText": "4",
+              "points": "264",
+              "wins": "3",
               "Driver": {
-                "driverId": "leclerc",
-                "permanentNumber": "16",
-                "code": "LEC",
-                "url": "http://en.wikipedia.org/wiki/Charles_Leclerc",
-                "givenName": "Charles",
-                "familyName": "Leclerc",
-                "dateOfBirth": "1997-10-16",
-                "nationality": "Monegasque"
+                "driverId": "russell",
+                "permanentNumber": "63",
+                "code": "RUS",
+                "url": "http://en.wikipedia.org/wiki/George_Russell_(racing_driver)",
+                "givenName": "George",
+                "familyName": "Russell",
+                "dateOfBirth": "1998-02-15",
+                "nationality": "British"
               },
               "Constructors": [
                 {
-                  "constructorId": "ferrari",
-                  "url": "https://en.wikipedia.org/wiki/Scuderia_Ferrari",
-                  "name": "Ferrari",
-                  "nationality": "Italian"
+                  "constructorId": "mercedes",
+                  "url": "https://en.wikipedia.org/wiki/Mercedes-Benz_in_Formula_One",
+                  "name": "Mercedes",
+                  "nationality": "German"
                 }
               ]
             },
             {
-              "position": "6",
-              "positionText": "6",
-              "points": "246",
+              "position": "5",
+              "positionText": "5",
+              "points": "264",
               "wins": "3",
               "Driver": {
                 "driverId": "norris",
@@ -159,9 +135,33 @@
               ]
             },
             {
+              "position": "6",
+              "positionText": "6",
+              "points": "250",
+              "wins": "1",
+              "Driver": {
+                "driverId": "leclerc",
+                "permanentNumber": "16",
+                "code": "LEC",
+                "url": "http://en.wikipedia.org/wiki/Charles_Leclerc",
+                "givenName": "Charles",
+                "familyName": "Leclerc",
+                "dateOfBirth": "1997-10-16",
+                "nationality": "Monegasque"
+              },
+              "Constructors": [
+                {
+                  "constructorId": "ferrari",
+                  "url": "https://en.wikipedia.org/wiki/Scuderia_Ferrari",
+                  "name": "Ferrari",
+                  "nationality": "Italian"
+                }
+              ]
+            },
+            {
               "position": "7",
               "positionText": "7",
-              "points": "152",
+              "points": "167",
               "wins": "0",
               "Driver": {
                 "driverId": "piastri",
@@ -239,7 +239,7 @@
             {
               "position": "10",
               "positionText": "10",
-              "points": "42",
+              "points": "52",
               "wins": "0",
               "Driver": {
                 "driverId": "gasly",
@@ -287,7 +287,7 @@
             {
               "position": "12",
               "positionText": "12",
-              "points": "27",
+              "points": "35",
               "wins": "0",
               "Driver": {
                 "driverId": "colapinto",
@@ -383,6 +383,30 @@
             {
               "position": "16",
               "positionText": "16",
+              "points": "11",
+              "wins": "0",
+              "Driver": {
+                "driverId": "sainz",
+                "permanentNumber": "55",
+                "code": "SAI",
+                "url": "http://en.wikipedia.org/wiki/Carlos_Sainz_Jr.",
+                "givenName": "Carlos",
+                "familyName": "Sainz",
+                "dateOfBirth": "1994-09-01",
+                "nationality": "Spanish"
+              },
+              "Constructors": [
+                {
+                  "constructorId": "williams",
+                  "url": "https://en.wikipedia.org/wiki/Williams_Racing",
+                  "name": "Williams",
+                  "nationality": "British"
+                }
+              ]
+            },
+            {
+              "position": "17",
+              "positionText": "17",
               "points": "7",
               "wins": "0",
               "Driver": {
@@ -405,8 +429,8 @@
               ]
             },
             {
-              "position": "17",
-              "positionText": "17",
+              "position": "18",
+              "positionText": "18",
               "points": "7",
               "wins": "0",
               "Driver": {
@@ -424,30 +448,6 @@
                   "constructorId": "aston_martin",
                   "url": "https://en.wikipedia.org/wiki/Aston_Martin_in_Formula_One",
                   "name": "Aston Martin",
-                  "nationality": "British"
-                }
-              ]
-            },
-            {
-              "position": "18",
-              "positionText": "18",
-              "points": "7",
-              "wins": "0",
-              "Driver": {
-                "driverId": "sainz",
-                "permanentNumber": "55",
-                "code": "SAI",
-                "url": "http://en.wikipedia.org/wiki/Carlos_Sainz_Jr.",
-                "givenName": "Carlos",
-                "familyName": "Sainz",
-                "dateOfBirth": "1994-09-01",
-                "nationality": "Spanish"
-              },
-              "Constructors": [
-                {
-                  "constructorId": "williams",
-                  "url": "https://en.wikipedia.org/wiki/Williams_Racing",
-                  "name": "Williams",
                   "nationality": "British"
                 }
               ]
